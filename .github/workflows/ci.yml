@@ -1,0 +1,131 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run format:check
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Path separators and line endings are where a rules engine breaks quietly.
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run test
+
+  drift:
+    # Stops the published plugin and the docs describing a constitution that no
+    # longer exists.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - name: Constitution loads and is internally consistent
+        run: pnpm run rules:validate
+      - name: Generated plugin, docs and skills match rules/
+        run: pnpm run sync:check
+
+  smoke:
+    # Proves the CLI works in a project that is not this one: only an end-to-end
+    # run catches a broken bin shebang, a missing `files` entry, or a generated
+    # import that does not resolve once the package is built.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+
+      - name: init into a fresh project, then doctor
+        shell: bash
+        run: |
+          set -euo pipefail
+          project="$(mktemp -d)"
+          echo '{"name":"smoke","private":true}' > "$project/package.json"
+
+          node packages/cli/dist/cli.js init --cwd "$project" --yes
+          test -f "$project/AGENTS.md"
+          test -f "$project/eslint.config.mjs"
+          test -f "$project/.understudy/install.json"
+          grep -q "BEGIN UNDERSTUDY" "$project/AGENTS.md"
+
+          # Running init twice must change nothing.
+          node packages/cli/dist/cli.js init --cwd "$project" --yes | tee /tmp/second.txt
+          grep -q "already up to date" /tmp/second.txt
+
+          # A hand-edited file must survive.
+          echo "// mine" >> "$project/eslint.config.mjs"
+          node packages/cli/dist/cli.js init --cwd "$project" --yes
+          grep -q "// mine" "$project/eslint.config.mjs"
+
+          # doctor --ci reports the one real gap (the plugin is not installed).
+          node packages/cli/dist/cli.js doctor --cwd "$project" --offline || true
+
+          node packages/cli/dist/cli.js uninstall --cwd "$project" --yes --force
+          # Our region was the only thing in these files, so a clean uninstall
+          # removes them. Had the user written their own prose, the file would
+          # have survived with only our block stripped out.
+          test ! -f "$project/AGENTS.md"
+          test ! -f "$project/eslint.config.mjs"
+
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: VERSION matches package.json
+        run: |
+          file="$(cat VERSION)"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$file" != "$pkg" ]; then
+            echo "VERSION ($file) does not match package.json ($pkg)" >&2
+            exit 1
+          fi
+          echo "version $file"

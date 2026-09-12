@@ -1,0 +1,23 @@
+dist/
+coverage/
+node_modules/
+.tsbuild/
+CHANGELOG.md
+LICENSE
+pnpm-lock.yaml
+
+# Deliberately malformed: these are the rules' test inputs.
+packages/*/test/fixtures/
+
+# Generated from rules/. The generator formats its own output with Prettier, so
+# these stay byte-identical to what `sync:check` expects.
+packages/*/src/generated/
+docs/reference/
+plugins/understudy/
+.claude-plugin/
+.cursor-plugin/
+.grok-plugin/
+.agents/plugins/
+gemini-extension.json
+docs/.next/
+docs/.source/

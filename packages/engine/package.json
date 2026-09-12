@@ -1,0 +1,49 @@
+{
+  "name": "@understudy/engine",
+  "version": "0.8.0",
+  "description": "Understudy core: constitution loader, detectors, analyzer, reporters.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "understudy-engine": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "node ../../scripts/tsc7.mjs --build tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "rules:validate": "node dist/cli.js validate ../../rules",
+    "typecheck": "node ../../scripts/tsc7.mjs -p tsconfig.json"
+  },
+  "dependencies": {
+    "@typescript-eslint/typescript-estree": "^8.70.0",
+    "@typescript-eslint/visitor-keys": "^8.70.0",
+    "esquery": "^1.7.0",
+    "picomatch": "^4.0.3",
+    "yaml": "^2.9.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/esquery": "^1.5.4",
+    "@types/node": "^26.5.0",
+    "@types/picomatch": "^4.0.2",
+    "prettier": "^3.9.6",
+    "typescript": "6.0.3",
+    "typescript7": "npm:typescript@^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  }
+}

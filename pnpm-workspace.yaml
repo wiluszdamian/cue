@@ -1,0 +1,18 @@
+packages:
+  - packages/*
+
+# esbuild links a platform binary in a postinstall step. It arrives under vitest,
+# so approving it explicitly is what keeps the test run from depending on a hook
+# some package managers decline to run.
+allowBuilds:
+  esbuild: true
+
+# TypeScript 7 dropped the JavaScript compiler API, and typescript-eslint needs
+# it — for parsing and for type-aware linting — so every release caps its peer at
+# `typescript <6.1.0`. Two compilers on purpose:
+#   * TypeScript 7 builds and type-checks our own source (`tsc --build`)
+#   * TypeScript 6.0.3, the last with a JS API, is pinned into the
+#     typescript-eslint subtree so ESLint and the engine's parser keep working
+#
+# Remove every line below the moment typescript-eslint supports TypeScript 7;
+# .github/workflows/upstream.yml fails when that lands.

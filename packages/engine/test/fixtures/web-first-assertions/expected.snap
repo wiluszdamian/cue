@@ -1,0 +1,4 @@
+[
+  "4:10-4:35  await total.textContent()",
+  "5:10-5:33  await total.isVisible()",
+]

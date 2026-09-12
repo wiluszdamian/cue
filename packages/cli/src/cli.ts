@@ -1,0 +1,487 @@
+#!/usr/bin/env node
+import { existsSync, readFileSync } from 'node:fs';
+import { createInterface } from 'node:readline/promises';
+import { join } from 'node:path';
+import { isTargetId } from './agents.js';
+import { COMMANDS } from './commands.js';
+import { formatReport, runChecks, summarise } from './doctor.js';
+import { describePlan, planInit, resolveRules, runInit } from './init.js';
+import { removeFiles } from './install.js';
+import {
+  filesForTarget,
+  forgetFile,
+  ManifestError,
+  readManifest,
+  writeManifest,
+} from './manifest.js';
+import { detectPackageManager } from './package-manager.js';
+import {
+  FileDriver,
+  formatSurveyResult,
+  PlaywrightCliDriver,
+  survey,
+  SurveyError,
+} from './survey.js';
+import { formatVerifyReport, verifyExitCode, verifyMap } from './verify-map.js';
+import {
+  extract,
+  formatExtractResult,
+  formatLocatorAnswer,
+  resolveLocator,
+} from '@understudy/engine';
+import { checkExitCode, formatSyncReport, NotInstalledError, planSync, runSync } from './sync.js';
+import { getTarget, optionalTargets, TARGETS } from './targets/index.js';
+
+const VERSION = '0.8.0';
+
+const USAGE = `understudy <command> [options]
+
+  init                 install Understudy in this project
+  doctor               check that everything is wired up
+  sync                 rewrite managed files from the current rules
+  add <target>         add an agent target
+  remove <target>      remove an agent target and its files
+  list                 show available and installed targets
+  explain <rule-id>    why a rule exists, and what to do instead
+  survey <url>         map a live route into .agent-kb
+  extract              read the product source into .agent-kb
+  verify-map           check the map still matches the application
+  locator <element>    look up a selector, with freshness and confidence
+  uninstall            remove everything init installed
+
+Options
+  --target <a,b>       explicit target list for init
+  --all                every agent detected in this project
+  --baseline-only      AGENTS.md and shared setup only
+  --bare               skip the Playwright suite skeleton
+  --yes                do not prompt
+  --force              overwrite files that were edited by hand
+  --ci                 non-zero exit when doctor finds errors
+  --check              report drift without writing (sync)
+  --offline            skip checks that need the network
+  --from <file>        survey from a captured snapshot instead of a browser
+  --source <path>      where the product source lives (extract)
+  --adapter <a,b>      restrict extract to named adapters
+  --base-url <url>     environment to verify the map against
+  --route <path>       restrict a locator lookup to one route
+  --refresh            mark unchanged routes as verified now
+  --package-manager <npm|pnpm|yarn|bun>
+  --cwd <path>         project root (default: current directory)
+
+Targets
+${[...TARGETS.values()].map((t) => `  ${t.id.padEnd(14)} ${t.summary}`).join('\n')}
+
+All commands: ${COMMANDS.join(', ')}
+`;
+
+interface Args {
+  readonly command: string | undefined;
+  readonly positional: readonly string[];
+  readonly flags: Readonly<Record<string, string | true>>;
+}
+
+function parseArgs(argv: readonly string[]): Args {
+  const positional: string[] = [];
+  const flags: Record<string, string | true> = {};
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === undefined) continue;
+    if (!arg.startsWith('--')) {
+      positional.push(arg);
+      continue;
+    }
+    const [name, inline] = arg.slice(2).split('=', 2);
+    if (name === undefined || name.length === 0) continue;
+    if (inline !== undefined) {
+      flags[name] = inline;
+      continue;
+    }
+    const next = argv[i + 1];
+    if (next !== undefined && !next.startsWith('--')) {
+      flags[name] = next;
+      i += 1;
+    } else {
+      flags[name] = true;
+    }
+  }
+
+  return { command: positional[0], positional: positional.slice(1), flags };
+}
+
+const asString = (value: string | true | undefined): string | undefined =>
+  typeof value === 'string' ? value : undefined;
+
+function readPackageJson(root: string): unknown {
+  const file = join(root, 'package.json');
+  if (!existsSync(file)) return undefined;
+  try {
+    return JSON.parse(readFileSync(file, 'utf8'));
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Non-interactive by default when there is no TTY. A prompt nobody can answer is
+ * a hang, and this runs in CI.
+ */
+async function confirm(question: string, assumeYes: boolean): Promise<boolean> {
+  if (assumeYes || !process.stdin.isTTY) return true;
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    const answer = (await rl.question(`${question} [Y/n] `)).trim().toLowerCase();
+    return answer === '' || answer === 'y' || answer === 'yes';
+  } finally {
+    rl.close();
+  }
+}
+
+async function main(): Promise<number> {
+  const { command, positional, flags } = parseArgs(process.argv.slice(2));
+  const out = (text: string): void => void process.stdout.write(`${text}\n`);
+  const err = (text: string): void => void process.stderr.write(`${text}\n`);
+
+  if (command === undefined || command === 'help' || flags['help'] !== undefined) {
+    out(USAGE);
+    return command === undefined ? 1 : 0;
+  }
+
+  if (command === 'version' || flags['version'] !== undefined) {
+    out(VERSION);
+    return 0;
+  }
+
+  const projectRoot = asString(flags['cwd']) ?? process.cwd();
+  const detection = detectPackageManager({
+    cwd: projectRoot,
+    userAgent: process.env['npm_config_user_agent'],
+    packageJson: readPackageJson(projectRoot),
+    override: asString(flags['package-manager']),
+  });
+  const assumeYes = flags['yes'] === true;
+
+  switch (command) {
+    case 'init':
+    case 'add': {
+      const targetList =
+        command === 'add'
+          ? positional
+          : asString(flags['target'])
+              ?.split(',')
+              .map((t) => t.trim())
+              .filter((t) => t.length > 0);
+
+      if (command === 'add' && targetList?.length === 0) {
+        err(
+          `add needs a target. Available: ${optionalTargets()
+            .map((t) => t.id)
+            .join(', ')}`,
+        );
+        return 2;
+      }
+
+      const existing = readManifest(projectRoot)?.targets ?? [];
+      const prepared = planInit({
+        projectRoot,
+        detection,
+        understudyVersion: VERSION,
+        ...(command === 'add'
+          ? { targets: [...existing, ...positional] }
+          : targetList
+            ? { targets: targetList }
+            : {}),
+        ...(flags['all'] === true ? { all: true } : {}),
+        ...(flags['baseline-only'] === true ? { baselineOnly: true } : {}),
+        ...(flags['bare'] === true ? { bare: true } : {}),
+        ...(flags['force'] === true ? { force: true } : {}),
+      });
+
+      out(describePlan(prepared));
+      out('');
+
+      if (!(await confirm('Write these files?', assumeYes))) {
+        out('Nothing written.');
+        return 0;
+      }
+
+      const result = runInit(
+        {
+          projectRoot,
+          detection,
+          understudyVersion: VERSION,
+          ...(flags['force'] === true ? { force: true } : {}),
+        },
+        prepared,
+      );
+
+      out('');
+      out(
+        result.written.length > 0
+          ? `Wrote ${result.written.length} file(s).`
+          : 'Everything was already up to date.',
+      );
+      for (const skipped of result.skipped) {
+        out(`  left alone: ${skipped.file.path}`);
+      }
+      out('');
+      out('Next:');
+      for (const step of result.nextSteps) out(`  ${step}`);
+      return 0;
+    }
+
+    case 'sync': {
+      const options = {
+        projectRoot,
+        detection,
+        understudyVersion: VERSION,
+        ...(flags['force'] === true ? { force: true } : {}),
+      };
+      const report = planSync(options);
+
+      out(formatSyncReport(report, report.manifest.targets));
+
+      if (flags['check'] !== undefined) {
+        // Reporting only. `--check` exists so CI can fail on drift without a
+        // build step quietly rewriting files under it.
+        if (report.stale > 0) {
+          out('');
+          out('Run `understudy sync` to bring them up to date.');
+        }
+        return checkExitCode(report);
+      }
+
+      if (report.stale === 0) return 0;
+      out('');
+      if (!(await confirm('Apply these changes?', assumeYes))) {
+        out('Nothing written.');
+        return 0;
+      }
+
+      const result = runSync(options, report);
+      out('');
+      out(`Wrote ${result.written.length} file(s).`);
+      for (const path of result.skipped) out(`  left alone: ${path}`);
+      return 0;
+    }
+
+    case 'survey': {
+      const url = positional[0];
+      if (url === undefined) {
+        err('survey needs a URL, e.g. understudy survey https://staging.example.com/login');
+        return 2;
+      }
+      const from = asString(flags['from']);
+      const result = survey({
+        projectRoot,
+        url,
+        driver: from === undefined ? new PlaywrightCliDriver() : new FileDriver(from),
+      });
+      out(formatSurveyResult(result));
+      return 0;
+    }
+
+    case 'extract': {
+      const source = asString(flags['source']) ?? positional[0];
+      if (source === undefined) {
+        err('extract needs --source <path>, pointing at the product source.');
+        return 2;
+      }
+      const only = asString(flags['adapter'])
+        ?.split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0);
+
+      out(
+        formatExtractResult(
+          extract({ projectRoot, sourceRoot: source, ...(only ? { only } : {}) }),
+        ),
+      );
+      return 0;
+    }
+
+    case 'verify-map': {
+      const baseUrl = asString(flags['base-url']);
+      const from = asString(flags['from']);
+      const report = verifyMap({
+        projectRoot,
+        baseUrl,
+        driver:
+          from !== undefined
+            ? new FileDriver(from)
+            : baseUrl === undefined
+              ? undefined
+              : new PlaywrightCliDriver(),
+        ...(flags['refresh'] === true ? { refresh: true } : {}),
+      });
+      out(formatVerifyReport(report));
+      return flags['ci'] !== undefined ? verifyExitCode(report) : 0;
+    }
+
+    case 'locator': {
+      const query = positional.join(' ');
+      if (query.length === 0) {
+        err('locator needs a description, e.g. understudy locator "log in button" --route /login');
+        return 2;
+      }
+      out(
+        formatLocatorAnswer(
+          resolveLocator({ projectRoot, query, route: asString(flags['route']) }),
+        ),
+      );
+      // An unknown element is a finding, not a crash: the output says which
+      // route to survey.
+      return 0;
+    }
+
+    case 'remove': {
+      const id = positional[0];
+      if (id === undefined || !isTargetId(id)) {
+        err(
+          `remove needs a target. Available: ${optionalTargets()
+            .map((t) => t.id)
+            .join(', ')}`,
+        );
+        return 2;
+      }
+      if (id === 'agents') {
+        err('The baseline cannot be removed on its own — use `understudy uninstall`.');
+        return 2;
+      }
+
+      const manifest = readManifest(projectRoot);
+      if (!manifest) {
+        err('Nothing to remove: Understudy is not installed in this project.');
+        return 1;
+      }
+
+      const owned = filesForTarget(manifest, id);
+      const removal = removeFiles(projectRoot, owned, {
+        ...(flags['force'] === true ? { force: true } : {}),
+      });
+
+      let next = { ...manifest, targets: manifest.targets.filter((t) => t !== id) };
+      for (const path of removal.removed) next = forgetFile(next, path);
+      writeManifest(projectRoot, next);
+
+      out(`Removed ${getTarget(id).name}: ${removal.removed.length} file(s).`);
+      for (const kept of removal.kept) out(`  kept ${kept.path} — ${kept.reason}`);
+      return 0;
+    }
+
+    case 'uninstall': {
+      const manifest = readManifest(projectRoot);
+      if (!manifest) {
+        err('Understudy is not installed in this project.');
+        return 1;
+      }
+      if (!(await confirm(`Remove all ${manifest.files.length} managed file(s)?`, assumeYes))) {
+        out('Nothing removed.');
+        return 0;
+      }
+      const removal = removeFiles(projectRoot, manifest.files, {
+        ...(flags['force'] === true ? { force: true } : {}),
+      });
+      out(`Removed ${removal.removed.length} file(s).`);
+      for (const kept of removal.kept) out(`  kept ${kept.path} — ${kept.reason}`);
+      out(`\nThe manifest at .understudy/ is left for you to delete.`);
+      return 0;
+    }
+
+    case 'list': {
+      const manifest = readManifest(projectRoot);
+      const installed = new Set(manifest?.targets ?? []);
+      out('');
+      for (const target of TARGETS.values()) {
+        const mark = installed.has(target.id)
+          ? 'installed'
+          : target.baseline
+            ? 'baseline '
+            : '         ';
+        out(`  [${mark}] ${target.id.padEnd(14)} ${target.summary}`);
+      }
+      out('');
+      return 0;
+    }
+
+    case 'explain': {
+      const id = positional[0];
+      const rules = resolveRules(projectRoot);
+      if (id === undefined) {
+        for (const rule of rules.constitution.rules) out(`  ${rule.id.padEnd(26)} ${rule.title}`);
+        return 0;
+      }
+      const rule = rules.constitution.rules.find((r) => r.id === id);
+      if (!rule) {
+        err(`No rule called "${id}". Run \`understudy explain\` for the list.`);
+        return 2;
+      }
+      const oneLine = (text: string): string => text.replace(/\s+/g, ' ').trim();
+      out('');
+      out(`${rule.id}  (${rule.tier}, ${rule.severity})`);
+      out('');
+      out(`  What: ${oneLine(rule.title)}`);
+      out(`  Why:  ${oneLine(rule.rationale)}`);
+      out(`  Do:   ${oneLine(rule.message)}`);
+      out('');
+      out('  wrong:');
+      for (const line of rule.examples.bad.trimEnd().split('\n')) out(`    ${line}`);
+      out('  right:');
+      for (const line of rule.examples.good.trimEnd().split('\n')) out(`    ${line}`);
+      out('');
+      if (rule.detector.kind === 'manual') {
+        out('  No linter can check this one. It is binding all the same.');
+        out('');
+      }
+      return 0;
+    }
+
+    case 'doctor': {
+      let rules;
+      try {
+        rules = resolveRules(projectRoot);
+      } catch {
+        rules = undefined;
+      }
+
+      const summary = summarise(
+        runChecks({
+          projectRoot,
+          manifest: readManifest(projectRoot),
+          rules,
+          detection,
+          understudyVersion: VERSION,
+          ...(flags['offline'] === true ? { offline: true } : {}),
+        }),
+      );
+
+      out(formatReport(summary));
+      // Warnings never fail the build. A team that has to suppress warnings to
+      // ship stops reading them, and then the errors go unread too.
+      return flags['ci'] !== undefined && summary.errors > 0 ? 1 : 0;
+    }
+
+    default:
+      err(`Unknown command "${command}".\n\n${USAGE}`);
+      return 2;
+  }
+}
+
+main()
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((error: unknown) => {
+    // These two already read as advice to the user; anything else is a bug and
+    // should not be dressed up as guidance.
+    if (
+      error instanceof ManifestError ||
+      error instanceof NotInstalledError ||
+      error instanceof SurveyError
+    ) {
+      process.stderr.write(`${error.message}\n`);
+    } else {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    }
+    process.exitCode = 2;
+  });

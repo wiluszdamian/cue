@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "understudy",
+  "version": "0.8.0",
+  "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
+  "author": { "name": "Understudy", "url": "https://github.com/wiluszdamian/understudy" },
+  "homepage": "https://github.com/wiluszdamian/understudy",
+  "repository": "https://github.com/wiluszdamian/understudy",
+  "license": "MIT",
+  "keywords": ["playwright", "testing", "e2e", "typescript", "agent-skills"]
+}

@@ -1,0 +1,293 @@
+# The ownership table — who decides what, and who wins on a conflict.
+#
+# Three skill trees compete for the model's attention and none of them knows the
+# other two exist. Without an arbiter the agent gets contradictory signals and
+# picks one at random. This file is the arbiter.
+#
+# It is generated into AGENTS.md — the always-loaded layer — and deliberately not
+# into a skill, because a skill has no way to announce that it outranks another
+# skill.
+#
+# The governing principle: every topic the constitution covers belongs to
+# Understudy unconditionally. Everything else is delegated on purpose. A topic
+# with no owner is a gap to fill in this file, never an invitation to improvise —
+# `whoOwns` says so explicitly rather than staying silent.
+#
+# Schema: packages/engine/src/schema/ownership.ts (Zod, validated in CI)
+schemaVersion: 1
+
+owners:
+  - id: understudy
+    name: Understudy
+    kind: internal
+    maintainer: The Understudy Authors
+    consult: >
+      rules/constitution.yaml and docs/rules/. The ESLint plugin enforces it, so
+      a disagreement here surfaces as a failing build, not as a style debate.
+
+  - id: agent-kb
+    name: The project knowledge base
+    kind: internal
+    maintainer: This repository
+    consult: >
+      .agent-kb/ — app-map for what the running application looks like, product/
+      for what the source says. Every entry carries a freshness marker; an entry
+      marked stale is a lead to verify, not a fact to use.
+
+  - id: playwright-official
+    name: Official Playwright skills and CLI
+    kind: external
+    maintainer: Microsoft
+    install: playwright-cli install --skills
+    consult: >
+      Read the installed skill. Do not restate or fork its content into this
+      repository — their release is our free update, and a stale copy of it is
+      worse than no copy.
+
+  - id: playwright-mcp
+    name: Playwright MCP
+    kind: external
+    maintainer: Microsoft
+    install: '@playwright/mcp'
+    consult: >
+      Point-in-time browser calls with small results. Not exploration: a full
+      accessibility tree through MCP costs more context than the task it serves.
+
+  - id: reference-skill
+    name: Playwright best-practices reference skill
+    kind: external
+    maintainer: Currents Software Inc. (MIT)
+    install: optional, chosen during `understudy init`
+    consult: >
+      The owner of general Playwright practice — the areas Understudy has no
+      opinion about because someone else already maintains one.
+
+  - id: external-process
+    name: Your team's own engineering process
+    kind: external
+    maintainer: Whoever runs your product process
+    consult: >
+      Understudy has no opinion here and will not grow one. It rules on
+      testability and on the shape of a suite, never on a roadmap. Say the topic
+      is outside Understudy and hand it back to however your team already writes
+      specs, splits tickets, and reviews features — duplicating that is how a
+      focused tool turns into a worse version of a general one.
+
+topics:
+  # ---------------------------------------------------------------- understudy
+  - topic: page object model and locator organisation
+    owner: understudy
+    precedence: absolute
+    skills: [stage-map]
+    keywords:
+      [
+        page object,
+        pom,
+        locator organisation,
+        locators live,
+        locators in tests,
+        getter,
+        component composition,
+        screen class,
+      ]
+    note: >
+      Locators live in page objects, exposed as getters, in three sections. A
+      spec names intent; the page object holds the addressing.
+
+  - topic: test structure, tagging and assertions
+    owner: understudy
+    precedence: absolute
+    skills: [canon]
+    keywords: [test structure, tag, tagging, given when then, assertion, skip, only, focused]
+    note: >
+      Canonical tags come from rules/tags.yaml. Web-first assertions only, no
+      hard waits, no committed .only.
+
+  - topic: locator strategy and selector priority
+    owner: understudy
+    precedence: absolute
+    skills: [locator-policy]
+    keywords:
+      [
+        locator strategy,
+        selector priority,
+        locator priority,
+        which locator should i use,
+        getbyrole,
+        getbytestid,
+        css selector,
+        xpath,
+      ]
+    note: >
+      Which *kind* of locator to reach for is ours. Which selector actually
+      exists in the application is agent-kb's — see "application-specific
+      selectors and test ids". The two are routinely confused, and the answers
+      come from different places.
+
+  - topic: fixtures, dependency injection and environment configuration
+    owner: understudy
+    precedence: absolute
+    skills: [harness]
+    keywords: [fixture, mergetests, dependency injection, baseurl, environment, import point]
+    note: >
+      One import point for the merged test object. baseURL belongs to the
+      config, never to a spec.
+
+  - topic: API testing and response schemas
+    owner: understudy
+    precedence: absolute
+    skills: [wire-contract]
+    keywords: [api test, request fixture, zod, schema, contract, response shape, negative test]
+    note: >
+      Strict schemas, complete negative cases. A schema that ignores unknown keys
+      is not an assertion.
+
+  - topic: type safety in the suite
+    owner: understudy
+    precedence: absolute
+    skills: [strict-types]
+    keywords: [type safety, any, unknown, strict mode, generics, typescript config]
+    note: A test suite's types are load-bearing for correctness, not convenience.
+
+  - topic: test data strategy
+    owner: understudy
+    precedence: absolute
+    skills: [seed-policy]
+    keywords: [test data, factory, fixture data, seed, static data, invalid values]
+    note: >
+      Not yet backed by a constitution rule — the three-level rule for factories
+      versus static data is still to be written.
+
+  - topic: how the knowledge base gets populated
+    owner: understudy
+    precedence: absolute
+    skills: [cartography]
+    keywords:
+      [
+        populate the knowledge base,
+        fill the knowledge base,
+        which command writes,
+        extract or survey,
+        keep the map fresh,
+      ]
+    note: >
+      Which command feeds which part of .agent-kb, and what a freshness marker
+      obliges you to do, is ours. How to drive the browser while doing it is
+      playwright-official's — see "browser exploration and inspecting a live
+      page".
+
+  # ----------------------------------------------------------------- agent-kb
+  - topic: application-specific selectors and test ids
+    owner: agent-kb
+    precedence: absolute
+    keywords:
+      [
+        application-specific selectors,
+        what is the selector,
+        which selector exists,
+        selector for,
+        data-testid,
+        testid,
+        test id,
+        element on page,
+        does this element exist,
+      ]
+    note: >
+      No model has ever seen this application. A plausible selector fails at
+      runtime in a way that reads like an application bug. If it is not in
+      .agent-kb, run `understudy survey` — do not guess.
+
+  - topic: application behaviour, routes and domain vocabulary
+    owner: agent-kb
+    precedence: absolute
+    keywords: [what does this page do, route, endpoint, domain term, user role, permission, flow]
+    note: >
+      .agent-kb/product/ is extracted from the product source with file:line
+      references. A claim about the application without a reference is a guess.
+
+  # ------------------------------------------------------- playwright-official
+  - topic: running, filtering and debugging tests
+    owner: playwright-official
+    keywords: [run tests, cli flag, debug, inspector, ui mode, headed, grep, retries, workers]
+
+  - topic: tracing, video, screenshots and reports
+    owner: playwright-official
+    keywords:
+      [trace, record a trace, trace viewer, video, screenshot, html report, blob report, artifact]
+
+  - topic: authentication state, request mocking and network interception
+    owner: playwright-official
+    keywords: [storage state, auth setup, route, mock, intercept, har, offline]
+
+  - topic: browser exploration and inspecting a live page
+    owner: playwright-official
+    channel: cli
+    keywords: [explore, inspect element, accessibility tree, snapshot, codegen, record a test]
+    note: >
+      Through `playwright-cli`, not through MCP. Microsoft's own guidance is that
+      CLI-as-skill avoids loading large tool schemas and verbose accessibility
+      trees into context — see blueprint section 8. Write what you find to
+      .agent-kb.
+
+  - topic: Playwright configuration, projects and parallelism
+    owner: playwright-official
+    keywords: [playwright.config, project, parallel, shard, timeout, reporter option, webserver]
+    note: >
+      How the options work is theirs. Which values this repo uses is
+      Understudy's — see "fixtures, dependency injection and environment
+      configuration".
+
+  # ------------------------------------------------------------ playwright-mcp
+  - topic: single scripted browser actions from an agent
+    owner: playwright-mcp
+    channel: mcp
+    keywords: [click through mcp, navigate from agent, one-off browser call]
+    note: >
+      Only for point-in-time calls with small results. Anything exploratory goes
+      to playwright-official over the CLI.
+
+  # ----------------------------------------------------------- reference-skill
+  - topic: Electron, browser extensions and desktop targets
+    owner: reference-skill
+    keywords: [electron, browser extension, chrome extension, desktop app]
+
+  - topic: canvas, WebGL, service workers and other exotic surfaces
+    owner: reference-skill
+    keywords: [canvas, webgl, service worker, web worker, shadow dom, iframe strategy]
+
+  - topic: internationalisation and accessibility testing
+    owner: reference-skill
+    keywords: [i18n, localisation, locale, accessibility audit, axe, wcag]
+
+  - topic: GraphQL, security testing and performance auditing
+    owner: reference-skill
+    keywords: [graphql, security test, penetration, lighthouse, performance audit, web vitals]
+
+  - topic: visual regression and component testing
+    owner: reference-skill
+    keywords: [visual regression, screenshot comparison, component test, ct, storybook]
+
+  - topic: framework-specific testing concerns
+    owner: reference-skill
+    keywords: [react, angular, vue, next.js, svelte, hydration]
+    note: >
+      Framework quirks are theirs. What this repo's application does is
+      agent-kb's, and that wins.
+
+  # ---------------------------------------------------------- external-process
+  - topic: product specification, ticket breakdown and general code review
+    owner: external-process
+    keywords:
+      [
+        product spec,
+        write a prd,
+        requirements document,
+        break into tickets,
+        split into issues,
+        roadmap,
+        review this feature,
+      ]
+    note: >
+      Deliberately not ours. Understudy rules on testability and on the shape of
+      a suite; a tool that also claims the roadmap is a worse version of the
+      general process tools your team already has. Say so and hand it back.

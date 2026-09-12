@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": ".tsbuild/tools",
+    "tsBuildInfoFile": ".tsbuild/tools/.tsbuildinfo",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": false
+  },
+  "include": ["eslint.config.mts"],
+  "references": [
+    {
+      "path": "./packages/eslint-plugin/tsconfig.build.json"
+    }
+  ]
+}

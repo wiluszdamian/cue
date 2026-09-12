@@ -1,0 +1,44 @@
+{
+  "name": "understudy-monorepo",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "description": "The Playwright framework your AI agent already knows by heart.",
+  "license": "MIT",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/**\" run build",
+    "typecheck": "node scripts/tsc7.mjs --build --force && pnpm -r --filter \"./packages/**\" run typecheck",
+    "test": "pnpm -r --filter \"./packages/**\" run test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "rules:validate": "node packages/engine/dist/cli.js validate rules",
+    "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run sync:check",
+    "docs:generate": "node packages/engine/scripts/generate-docs.mjs",
+    "docs:check": "node packages/engine/scripts/generate-docs.mjs --check",
+    "generate": "pnpm --filter @understudy/engine run build && pnpm --filter @understudy/eslint-plugin run generate && pnpm --filter @understudy/cli run generate && pnpm --filter @understudy/mcp run generate && pnpm run build && pnpm run docs:generate && pnpm run skills:generate",
+    "sync:check": "pnpm --filter @understudy/eslint-plugin run generate:check && pnpm --filter @understudy/cli run generate:check && pnpm --filter @understudy/mcp run generate:check && pnpm run docs:check && pnpm run skills:check",
+    "tsc": "node scripts/tsc7.mjs",
+    "skills:generate": "node packages/engine/scripts/generate-skills.mjs && node packages/engine/scripts/generate-plugins.mjs",
+    "skills:check": "node packages/engine/scripts/generate-skills.mjs --check && node packages/engine/scripts/generate-plugins.mjs --check",
+    "release:dry": "pnpm -r publish --dry-run --no-git-checks",
+    "release": "pnpm run verify && pnpm run generate && pnpm -r publish"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.5.0",
+    "@understudy/eslint-plugin": "workspace:*",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "jiti": "^2.7.0",
+    "prettier": "^3.6.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "typescript7": "npm:typescript@^7.0.2"
+  }
+}

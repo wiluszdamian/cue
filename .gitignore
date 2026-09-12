@@ -1,0 +1,27 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# Playwright (scaffold output, section 11)
+test-results/
+playwright-report/
+blob-report/
+.auth/
+env/.env.*
+!env/.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.local
+
+# NOTE: .agent-kb/ is deliberately NOT ignored — see docs/knowledge-base.md
+.tsbuild/
+
+# Browser session scratch from playwright-cli
+.playwright-cli/
+
+# Planning documents, kept locally rather than shipped
+understudy-blueprints/

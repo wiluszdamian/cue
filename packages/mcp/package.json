@@ -1,0 +1,46 @@
+{
+  "name": "@understudy/mcp",
+  "version": "0.8.0",
+  "description": "Three point-lookup tools over the Understudy rules and knowledge base.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "understudy-mcp": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/tsc7.mjs --build tsconfig.build.json",
+    "typecheck": "node ../../scripts/tsc7.mjs -p tsconfig.json",
+    "test": "vitest run",
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/generate.mjs --check"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@understudy/engine": "workspace:*",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0",
+    "prettier": "^3.9.6",
+    "typescript": "6.0.3",
+    "typescript7": "npm:typescript@^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "understudy",
+  "version": "0.8.0",
+  "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
+  "mcpServers": {
+    "understudy": { "command": "npx", "args": ["-y", "@understudy/mcp@latest"] },
+    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@latest"] }
+  }
+}

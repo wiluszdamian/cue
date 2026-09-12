@@ -1,0 +1,7 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "understudy": { "type": "stdio", "command": "npx", "args": ["-y", "@understudy/mcp@latest"] },
+    "playwright": { "type": "stdio", "command": "npx", "args": ["-y", "@playwright/mcp@latest"] }
+  }
+}

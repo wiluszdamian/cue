@@ -1,0 +1,35 @@
+{
+  "name": "@understudy/benchmark",
+  "version": "0.8.0",
+  "private": true,
+  "description": "Does Understudy actually change what an assistant writes? This measures it.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "understudy-benchmark": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "node ../../scripts/tsc7.mjs --build tsconfig.build.json",
+    "typecheck": "node ../../scripts/tsc7.mjs -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
+    "@understudy/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.0",
+    "typescript": "6.0.3",
+    "typescript7": "npm:typescript@^7.0.2",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  }
+}

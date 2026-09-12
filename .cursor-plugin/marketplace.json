@@ -1,0 +1,18 @@
+{
+  "name": "understudy",
+  "owner": { "name": "Understudy" },
+  "metadata": {
+    "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
+    "version": "0.8.0",
+    "pluginRoot": "plugins"
+  },
+  "plugins": [
+    {
+      "name": "understudy",
+      "source": "understudy",
+      "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
+      "version": "0.8.0",
+      "skills": "./skills"
+    }
+  ]
+}

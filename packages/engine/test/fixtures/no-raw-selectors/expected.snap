@@ -1,0 +1,10 @@
+[
+  "3:11-3:52  page.locator('div.card > button.primary')",
+  "4:13-4:54  page.locator('//div[@id="root"]//button')",
+  "5:14-5:45  page.waitForSelector('#submit')",
+  "11:9-11:30  page.click('#submit')",
+  "12:9-12:47  page.fill('#email', 'ada@example.com')",
+  "13:9-13:29  page.check('.terms')",
+  "14:9-14:43  page.textContent('.flash-message')",
+  "15:9-15:51  page.$$eval('.row', (rows) => rows.length)",
+]

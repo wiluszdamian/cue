@@ -1,0 +1,37 @@
+name: upstream
+
+# The integrator model trades "I cannot write fast enough" for "upstream moves
+# under me". This job makes that movement visible on a schedule instead of at the
+# moment a user's install breaks.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - name: Report current upstream versions
+        run: |
+          for pkg in playwright @playwright/test @playwright/mcp; do
+            printf '%-24s %s\n' "$pkg" "$(npm view "$pkg" version)"
+          done
+      # Fails when typescript-eslint accepts TypeScript 7, which is the signal to
+      # collapse the two-compiler setup back to one. See scripts/tsc7.mjs.
+      - name: Is the two-TypeScript workaround still needed?
+        run: node scripts/check-ts7-support.mjs
+
+      # TODO: open an issue when a version moves past the pinned range in
+      # compatibility.yaml, and re-run the conflict detection described in
+      # blueprint section 2. Both need compatibility.yaml, which does not exist
+      # yet — see the roadmap in README.md.

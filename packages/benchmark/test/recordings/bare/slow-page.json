@@ -1,0 +1,6 @@
+{
+  "promptId": "slow-page",
+  "condition": "bare",
+  "model": "fixture (not a real model)",
+  "code": "import { test, expect } from '@playwright/test';\n\ntest('dashboard loads', async ({ page }) => {\n  await page.goto('/dashboard');\n  await page.waitForTimeout(5000);\n  const heading: any = await page.locator('#welcome').textContent();\n  expect(heading).toBeTruthy();\n});"
+}

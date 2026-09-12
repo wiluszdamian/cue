@@ -1,0 +1,23 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.tools.json"
+    },
+    {
+      "path": "./packages/engine/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/eslint-plugin/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/cli/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/benchmark/tsconfig.build.json"
+    },
+    {
+      "path": "./packages/mcp/tsconfig.build.json"
+    }
+  ]
+}

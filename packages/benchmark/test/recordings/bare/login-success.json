@@ -1,0 +1,6 @@
+{
+  "promptId": "login-success",
+  "condition": "bare",
+  "model": "fixture (not a real model)",
+  "code": "import { test, expect } from '@playwright/test';\n\ntest('login works', async ({ page }) => {\n  await page.goto('https://staging.example.com/login');\n  await page.getByTestId('login-email').fill('user@example.com');\n  await page.getByTestId('login-btn').click();\n  await page.waitForTimeout(3000);\n  expect(await page.locator('.welcome').textContent()).toContain('Welcome');\n});"
+}

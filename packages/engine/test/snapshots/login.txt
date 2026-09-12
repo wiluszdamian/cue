@@ -1,0 +1,17 @@
+### Page
+- Page URL: http://localhost:8931/login
+- Page Title: Sign in
+### Snapshot
+```yaml
+- main [ref=e2]:
+  - heading "Welcome back" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - text: Email
+    - textbox "Email" [ref=e5]
+    - text: Password
+    - textbox "Password" [ref=e6]
+    - button "Log in" [ref=e7]
+  - alert [ref=e8]: Invalid credentials
+  - link "Forgot password?" [ref=e9] [cursor=pointer]:
+    - /url: /forgot
+```

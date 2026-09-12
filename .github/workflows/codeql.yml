@@ -1,0 +1,34 @@
+name: codeql
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+  # The action reads its own run through the workflow-runs API. Without this the
+  # upload fails as "Resource not accessible by integration", which hides the
+  # real reason underneath it.
+  actions: read
+
+jobs:
+  analyze:
+    # Code scanning is a GitHub Advanced Security feature, and GHAS is not
+    # available on a private repository owned by a personal account: every run
+    # here uploaded nothing and failed with "Code scanning is not enabled for
+    # this repository". The scan is kept rather than deleted because the moment
+    # this repo goes public the feature turns on for free and this gate opens by
+    # itself — a workflow that is permanently red teaches everyone to ignore a
+    # red tick, which is the only thing worse than not running it.
+    if: github.event.repository.visibility == 'public'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@v4

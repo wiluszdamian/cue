@@ -1,0 +1,37 @@
+# Canonical tags. The require-test-tags rule validates against this list, so a
+# tag that is not here is a lint error rather than a typo that silently drops a
+# test out of every filtered run.
+#
+# Keep this list short. A taxonomy nobody can hold in their head gets ignored.
+schemaVersion: 1
+
+tags:
+  - name: '@smoke'
+    means: >
+      Fast, stable, and gating. Runs on every push. Adding @smoke is a promise
+      that this test will not flake and will not take minutes.
+    ci: every-push
+
+  - name: '@regression'
+    means: Full-coverage test. Runs on the nightly and pre-release suites.
+    ci: nightly
+
+  - name: '@api'
+    means: Exercises the API directly through the request fixture, no browser.
+    ci: every-push
+
+  - name: '@e2e'
+    means: Crosses more than one system or persists state that outlives the test.
+    ci: nightly
+
+  - name: '@destructive'
+    means: >
+      Mutates or deletes shared data. Excluded from shared environments by
+      grep-invert in playwright.config.ts — never run this against production.
+    ci: isolated-env-only
+
+  - name: '@flaky'
+    means: >
+      Known-unstable and quarantined. Temporary by definition: an @flaky tag with
+      no linked issue is a bug in the process, not a state of the world.
+    ci: quarantine
