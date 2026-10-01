@@ -42,8 +42,25 @@ rather than deletion, and stay documented for one major cycle.
   evidence by id, with a stored status (`inferred`, `observed`, `verified`, `stale`).
   Facts that rest only on an agent's inference cannot be `observed` or `verified`;
   references must resolve; a model version newer than this Understudy is refused
-  with an instruction to upgrade. Nothing reads or writes it yet — `.agent-kb`
-  still uses its existing format until the model is wired in.
+  with an instruction to upgrade.
+- **`loadKnowledge(root)`** reads the existing `.agent-kb` files (route maps,
+  `testids.yaml`, `surface.yaml`, `vocabulary.yaml`) into that model, and
+  `indexKnowledge(kb)` answers questions about it: routes, locators on a route,
+  who has a test id, evidence, coverage, freshness. Files it cannot use come back
+  as issues instead of being skipped. The old `confidence` field becomes a status
+  plus evidence (`confirmed` → verified, `runtime-only` → observed, `code-only` and
+  `unknown` → inferred).
+- **Conflicts are recorded, not resolved.** When two sources disagree about a field
+  — two translation files giving different labels for one key, say — the first
+  value stays and the disagreement is kept with the evidence on each side.
+
+### Changed
+
+- `resolveLocator` (the `locator` command and the `resolve_locator` MCP tool) now
+  answers through the Knowledge Core. Its answers are unchanged, verified against a
+  copy of the old algorithm on 120 query/route combinations. One difference: a
+  hand-written `code-only` entry with no source reference now reads as `unknown`,
+  because nothing supports the claim. Understudy never writes `code-only`.
 
 - **Snapshot formats are versioned.** `survey` and `verify-map` read the browser
   tool's output through a named format (`playwright-cli/markdown-yaml@1`). Text no

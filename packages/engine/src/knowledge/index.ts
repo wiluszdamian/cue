@@ -4,6 +4,7 @@
  */
 
 export {
+  ConflictSchema,
   DependenciesSchema,
   EvidenceSchema,
   EvidenceTypeSchema,
@@ -14,6 +15,8 @@ export {
   KnowledgeBaseSchema,
   KnowledgeFactSchema,
   VerifiedAgainstSchema,
+  type Conflict,
+  type ConflictValue,
   type EvidenceType,
   type FactConfidence,
   type FactKind,
@@ -43,3 +46,16 @@ export {
   toData,
   UnsupportedKnowledgeVersionError,
 } from './serialize.js';
+
+export { KnowledgeBuilder } from './builder.js';
+
+export {
+  indexKnowledge,
+  type ApiFact,
+  type Coverage,
+  type KnowledgeIndex,
+  type LocatorFact,
+  type RouteFact,
+  type TermFact,
+  type TestIdFact,
+} from './query.js';

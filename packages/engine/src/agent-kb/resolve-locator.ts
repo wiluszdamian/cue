@@ -1,6 +1,8 @@
 import type { Confidence, Freshness, KbElement } from '../schema/agent-kb.js';
-import { freshnessAdvice, freshnessOf } from './freshness.js';
-import { readAllRouteMaps, readRouteMap, readTestIds, correlate } from './store.js';
+import { indexKnowledge, type KnowledgeIndex, type LocatorFact } from '../knowledge/index.js';
+import { freshnessAdvice } from './freshness.js';
+import { loadKnowledge } from './load-knowledge.js';
+import { routeToFilename } from './snapshot/index.js';
 
 /**
  * Answering "what is the selector for this element?" — the one place where
@@ -68,25 +70,47 @@ export interface ResolveOptions {
   readonly now?: Date;
 }
 
+/** The older element shape, for the answer's callers; what it says is read off the fact. */
+function toElement(index: KnowledgeIndex, fact: LocatorFact): KbElement {
+  return {
+    role: fact.role,
+    ...(fact.name === undefined ? {} : { name: fact.name }),
+    ...(fact.level === undefined ? {} : { level: fact.level }),
+    locator: fact.expression,
+    ...(fact.testId === undefined ? {} : { testId: fact.testId }),
+    confidence: index.coverage(fact),
+  };
+}
+
+/** `/login/`, `login` and `/login` are one route, as they are one file name. */
+function samePath(a: string, b: string): boolean {
+  return routeToFilename(a) === routeToFilename(b);
+}
+
 export function resolveLocator(options: ResolveOptions): LocatorAnswer {
   const { projectRoot, route, query, now } = options;
-  const testIds = readTestIds(projectRoot);
+  const index = indexKnowledge(loadKnowledge(projectRoot, now).kb);
 
-  const maps =
-    route === undefined
-      ? readAllRouteMaps(projectRoot, now)
-      : [readRouteMap(projectRoot, route, now)].flatMap((m) => (m ? [m] : []));
+  // Routes somebody actually looked at; a route only the source declares is not "surveyed".
+  const knownRoutes = index
+    .routes()
+    .filter((fact) => index.evidenceFor(fact.id).some((evidence) => evidence.type === 'browser'))
+    .map((fact) => fact.path);
 
-  const knownRoutes = readAllRouteMaps(projectRoot, now).map((m) => m.map.route);
+  const routeOf = (fact: LocatorFact): string => fact.route.replace(/^route:/, '');
+  const inScope = index
+    .allLocators()
+    .filter((fact) => route === undefined || samePath(routeOf(fact), route));
 
-  const candidates = maps.flatMap((loaded) =>
-    correlate(loaded.map.elements, testIds).map((element) => ({
+  const candidates = inScope.map((fact) => {
+    const element = toElement(index, fact);
+    return {
       element,
-      route: loaded.map.route,
-      freshness: freshnessOf(loaded.map.verifiedAt, now),
+      route: routeOf(fact),
+      freshness: index.freshness(fact, now) satisfies Freshness,
       score: score(element, query),
-    })),
-  );
+    };
+  });
 
   const matches = candidates.filter((c) => c.score > 0).sort((a, b) => b.score - a.score);
   const best = matches[0];

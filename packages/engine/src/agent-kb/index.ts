@@ -61,6 +61,8 @@ export { extractLocators, type LocatorUse } from './extract-locators.js';
 
 export * from './extract/index.js';
 
+export { loadKnowledge, type LoadedKnowledge, type LoadIssue } from './load-knowledge.js';
+
 export {
   formatLocatorAnswer,
   resolveLocator,
