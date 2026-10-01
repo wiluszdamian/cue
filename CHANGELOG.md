@@ -19,6 +19,13 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Fixed
 
+- **`survey` and `verify-map` no longer run `playwright-cli` through a shell.** The
+  URL used to be joined into a command line, so `&` in a query string cut the
+  command short. The executable and its arguments are now passed separately. The
+  CLI is found in the project's `node_modules`, then on `PATH`, or with the new
+  `--playwright-cli <path>`; a Windows `.cmd` shim is resolved to the script behind
+  it. `doctor` and `extract` no longer use a shell either.
+
 - `@understudy/eslint-plugin` reported `meta.version` `0.1.0`; it now reads the
   version from its own `package.json`.
 

@@ -18,7 +18,7 @@ import { detectPackageManager } from './package-manager.js';
 import {
   FileDriver,
   formatSurveyResult,
-  PlaywrightCliDriver,
+  createPlaywrightCliDriver,
   survey,
   SurveyError,
 } from './survey.js';
@@ -61,6 +61,7 @@ Options
   --check              report drift without writing (sync)
   --offline            skip checks that need the network
   --from <file>        survey from a captured snapshot instead of a browser
+  --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify-map
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
   --base-url <url>     environment to verify the map against
@@ -287,7 +288,10 @@ async function main(): Promise<number> {
       const result = survey({
         projectRoot,
         url,
-        driver: from === undefined ? new PlaywrightCliDriver() : new FileDriver(from),
+        driver:
+          from === undefined
+            ? createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli']))
+            : new FileDriver(from),
       });
       out(formatSurveyResult(result));
       return 0;
@@ -323,7 +327,7 @@ async function main(): Promise<number> {
             ? new FileDriver(from)
             : baseUrl === undefined
               ? undefined
-              : new PlaywrightCliDriver(),
+              : createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli'])),
         ...(flags['refresh'] === true ? { refresh: true } : {}),
       });
       out(formatVerifyReport(report));

@@ -36,10 +36,9 @@ export interface ExtractResult {
 
 /** The product's commit, so a claim can be traced to a version of the code. */
 function commitOf(sourceRoot: string): string | undefined {
-  const result = spawnSync('git rev-parse HEAD', {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], {
     cwd: sourceRoot,
     encoding: 'utf8',
-    shell: true,
   });
   const sha = result.status === 0 ? result.stdout.trim() : '';
   return /^[0-9a-f]{40}$/.test(sha) ? sha : undefined;

@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Rules } from '@understudy/engine';
@@ -6,6 +5,7 @@ import { readAllRouteMaps } from '@understudy/engine';
 import { detectAgents, type TargetId } from './agents.js';
 import { inspect } from './install.js';
 import { MANIFEST_PATH, type Manifest } from './manifest.js';
+import { existsOnPath, resolvePlaywrightCli } from './browser/resolve.js';
 import { addDevCommand, execCommand, type Detection } from './package-manager.js';
 import { getTarget, resolveTargets } from './targets/index.js';
 
@@ -38,11 +38,6 @@ export interface DoctorContext {
   readonly offline?: boolean;
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly home?: string;
-}
-
-function onPath(binary: string): boolean {
-  const probe = process.platform === 'win32' ? `where ${binary}` : `command -v ${binary}`;
-  return spawnSync(probe, { shell: true, stdio: 'ignore' }).status === 0;
 }
 
 function readPackageJson(projectRoot: string): Record<string, unknown> | undefined {
@@ -242,7 +237,7 @@ function checkContentFresh(ctx: DoctorContext): CheckResult {
 }
 
 function checkPlaywrightCli(ctx: DoctorContext): CheckResult {
-  if (onPath('playwright-cli') || onPath('playwright')) {
+  if (resolvePlaywrightCli(ctx.projectRoot) !== undefined || existsOnPath('playwright')) {
     return {
       id: 'playwright-cli',
       title: 'playwright-cli available',

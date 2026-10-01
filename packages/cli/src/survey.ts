@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import {
   correlate,
@@ -12,6 +11,8 @@ import {
   type RouteMap,
   type WriteResult,
 } from '@understudy/engine';
+import { nodeRunner, type ProcessRunner } from './browser/process.js';
+import { NOT_FOUND_ADVICE, resolvePlaywrightCli, type ResolvedCommand } from './browser/resolve.js';
 
 /**
  * `understudy survey <url>` — map the running application into `.agent-kb`.
@@ -27,7 +28,10 @@ export interface SnapshotDriver {
 
 /** From `@playwright/cli`. The bare `playwright-cli` on npm is a deprecated different thing. */
 export class PlaywrightCliDriver implements SnapshotDriver {
-  constructor(private readonly binary = 'playwright-cli') {}
+  constructor(
+    private readonly command: ResolvedCommand,
+    private readonly runner: ProcessRunner = nodeRunner,
+  ) {}
 
   capture(url: string): { ok: true; output: string } | { ok: false; reason: string } {
     // `open <url>`, not `goto`: goto fails with "the browser is not open" on a
@@ -44,15 +48,11 @@ export class PlaywrightCliDriver implements SnapshotDriver {
   private run(
     args: readonly string[],
   ): { ok: true; output: string } | { ok: false; reason: string } {
-    // A .cmd shim on Windows, which Node has refused to spawn directly since v20.
-    const result = spawnSync(`${this.binary} ${args.join(' ')}`, {
-      encoding: 'utf8',
-      shell: true,
-      timeout: 120_000,
-    });
+    // The URL is one element of an array, never part of a command line.
+    const result = this.runner.run(this.command.executable, [...this.command.prefixArgs, ...args]);
 
-    if (result.error) return { ok: false, reason: result.error.message };
-    if (result.status !== 0) {
+    if (result.error !== undefined) return { ok: false, reason: result.error };
+    if (!result.ok) {
       return {
         ok: false,
         reason: (result.stderr || result.stdout || 'playwright-cli exited non-zero').trim(),
@@ -60,6 +60,17 @@ export class PlaywrightCliDriver implements SnapshotDriver {
     }
     return { ok: true, output: result.stdout };
   }
+}
+
+/** Resolves `playwright-cli` for a project, or fails with the way to install it. */
+export function createPlaywrightCliDriver(
+  projectRoot: string,
+  explicit?: string,
+  runner: ProcessRunner = nodeRunner,
+): PlaywrightCliDriver {
+  const command = resolvePlaywrightCli(projectRoot, explicit);
+  if (command === undefined) throw new SurveyError(NOT_FOUND_ADVICE);
+  return new PlaywrightCliDriver(command, runner);
 }
 
 /** A snapshot captured earlier: for an environment behind credentials or a VPN, and for tests. */
