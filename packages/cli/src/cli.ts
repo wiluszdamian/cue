@@ -22,6 +22,7 @@ import {
   survey,
   SurveyError,
 } from './survey.js';
+import { decideConfirmation, REFUSED_MESSAGE } from './confirm.js';
 import { formatVerifyReport, verifyExitCode, verifyMap } from './verify-map.js';
 import {
   extract,
@@ -122,16 +123,17 @@ function readPackageJson(root: string): unknown {
   }
 }
 
-/**
- * Non-interactive by default when there is no TTY. A prompt nobody can answer is
- * a hang, and this runs in CI.
- */
-async function confirm(question: string, assumeYes: boolean): Promise<boolean> {
-  if (assumeYes || !process.stdin.isTTY) return true;
+type Answer = 'yes' | 'no' | 'refused';
+
+async function confirm(question: string, assumeYes: boolean): Promise<Answer> {
+  const decision = decideConfirmation(assumeYes, process.stdin.isTTY);
+  if (decision === 'proceed') return 'yes';
+  if (decision === 'refuse') return 'refused';
+
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
     const answer = (await rl.question(`${question} [Y/n] `)).trim().toLowerCase();
-    return answer === '' || answer === 'y' || answer === 'yes';
+    return answer === '' || answer === 'y' || answer === 'yes' ? 'yes' : 'no';
   } finally {
     rl.close();
   }
@@ -200,7 +202,12 @@ async function main(): Promise<number> {
       out(describePlan(prepared));
       out('');
 
-      if (!(await confirm('Write these files?', assumeYes))) {
+      const answer = await confirm('Write these files?', assumeYes);
+      if (answer === 'refused') {
+        err(REFUSED_MESSAGE);
+        return 1;
+      }
+      if (answer === 'no') {
         out('Nothing written.');
         return 0;
       }
@@ -253,7 +260,12 @@ async function main(): Promise<number> {
 
       if (report.stale === 0) return 0;
       out('');
-      if (!(await confirm('Apply these changes?', assumeYes))) {
+      const answer = await confirm('Apply these changes?', assumeYes);
+      if (answer === 'refused') {
+        err(REFUSED_MESSAGE);
+        return 1;
+      }
+      if (answer === 'no') {
         out('Nothing written.');
         return 0;
       }
@@ -375,7 +387,15 @@ async function main(): Promise<number> {
         err('Understudy is not installed in this project.');
         return 1;
       }
-      if (!(await confirm(`Remove all ${manifest.files.length} managed file(s)?`, assumeYes))) {
+      const answer = await confirm(
+        `Remove all ${manifest.files.length} managed file(s)?`,
+        assumeYes,
+      );
+      if (answer === 'refused') {
+        err(REFUSED_MESSAGE);
+        return 1;
+      }
+      if (answer === 'no') {
         out('Nothing removed.');
         return 0;
       }

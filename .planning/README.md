@@ -36,7 +36,7 @@ Zasady wspólne dla wszystkich ticketów:
 | #  | Ticket | Prio | Zależy od | Status |
 | -- | ------ | ---- | --------- | ------ |
 | 00 | [Baseline: zielone `pnpm verify`](tickets/00-baseline.md) | P0 | — | done (453 testów: engine 247, cli 97, mcp 52, benchmark 33, eslint-plugin 24) |
-| 01 | [Drobne niespójności (confirm bez TTY, wersja pluginu, odnośnik do planu)](tickets/01-hygiene.md) | P0 | 00 | todo |
+| 01 | [Drobne niespójności (confirm bez TTY, wersja pluginu, odnośnik do planu)](tickets/01-hygiene.md) | P0 | 00 | done |
 | 02 | [Bezpieczne uruchamianie playwright-cli (bez shella)](tickets/02-browser-process-hardening.md) | P0.1 | 00 | todo |
 | 03 | [Aplikacja demo do E2E i benchmarku](tickets/03-demo-app.md) | P0.2 | 00 | todo |
 | 04 | [Wersjonowany parser snapshotów + fixtures](tickets/04-snapshot-parser-versioning.md) | P0.1 | 02, 03 | todo |
