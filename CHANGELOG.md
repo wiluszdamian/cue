@@ -30,6 +30,14 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Fixed
 
+- **`extract` reads OpenAPI with a real parser.** The line-based reader missed the
+  usual JSON shape (`"/users": {`) and everything in a minified file, so most JSON
+  specs produced no endpoints. JSON, YAML and minified JSON now give identical
+  results, with a `file:line` per operation. Swagger 2.0 `basePath` is applied,
+  local `$ref` path items are followed, and a document that is invalid, has no
+  `paths`, or has an unsupported version is reported under `gaps` instead of
+  silently contributing nothing.
+
 - **`survey` and `verify-map` no longer run `playwright-cli` through a shell.** The
   URL used to be joined into a command line, so `&` in a query string cut the
   command short. The executable and its arguments are now passed separately. The

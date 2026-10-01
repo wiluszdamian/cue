@@ -1,4 +1,5 @@
 import type { SurfaceEntry, TermEntryLike, TestIdEntry } from './types.js';
+import { readOpenApi } from './openapi.js';
 import { reference, type SourceFileRef } from './scan.js';
 
 /**
@@ -171,7 +172,6 @@ export const nextAdapter: Adapter = {
 // ----------------------------------------------------------------- OpenAPI
 
 const OPENAPI_FILE = /(openapi|swagger)\.(json|ya?ml)$/i;
-const METHODS = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'];
 
 export const openApiAdapter: Adapter = {
   id: 'openapi',
@@ -183,36 +183,18 @@ export const openApiAdapter: Adapter = {
 
   extract({ files }) {
     const surface: SurfaceEntry[] = [];
+    const gaps: string[] = [];
 
     for (const file of files.filter((f) => OPENAPI_FILE.test(f.path))) {
-      // Line-wise rather than parsed: works for JSON and YAML alike, survives a
-      // document that does not quite validate, and keeps a real line number.
-      let currentPath: string | undefined;
-
-      file.lines.forEach((line, index) => {
-        const pathLine = /^\s{0,6}["']?(\/[\w{}/.:-]*)["']?\s*:\s*$/.exec(line);
-        if (pathLine) {
-          currentPath = pathLine[1];
-          return;
-        }
-        const methodLine = /^\s{2,}["']?(get|post|put|patch|delete|head|options)["']?\s*:/i.exec(
-          line,
-        );
-        if (methodLine && currentPath !== undefined) {
-          const method = (methodLine[1] ?? '').toUpperCase();
-          if (METHODS.includes(method.toLowerCase())) {
-            surface.push({
-              kind: 'endpoint',
-              path: currentPath,
-              method,
-              source: reference(file, index),
-            });
-          }
-        }
-      });
+      const result = readOpenApi(file);
+      surface.push(...result.surface);
+      gaps.push(...result.gaps);
     }
 
-    return { surface: surface.sort((a, b) => a.path.localeCompare(b.path)) };
+    return {
+      surface: surface.sort((a, b) => a.path.localeCompare(b.path)),
+      ...(gaps.length > 0 ? { gaps } : {}),
+    };
   },
 };
 
