@@ -319,7 +319,7 @@ rules:
       bug. A selector is a fact about the application, and facts have sources.
       Not mechanically detectable — a linter cannot tell an invented test-id from
       a real one — so this rule documents the obligation and leaves enforcement
-      to verify-map and review.
+      to understudy verify and review.
     detector:
       kind: manual
     scope: ['**/*.ts']

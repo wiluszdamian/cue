@@ -46,11 +46,14 @@ export {
   correlate,
   PRODUCT_DIR,
   readAllRouteMaps,
+  readAllRouteMapsWithErrors,
   readRouteMap,
   readTestIds,
   routeMapPath,
   writeRouteMap,
+  type InvalidRouteMap,
   type LoadedRouteMap,
+  type RouteMapReading,
   type WriteResult,
 } from './store.js';
 
