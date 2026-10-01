@@ -3,7 +3,10 @@ name: ci
 on:
   push:
     branches: [main]
+    # Planning notes cannot break anything, and every ticket pushes some.
+    paths-ignore: ['.planning/**']
   pull_request:
+    paths-ignore: ['.planning/**']
 
 permissions:
   contents: read
@@ -13,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  static:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -27,14 +30,25 @@ jobs:
       - run: pnpm run format:check
       - run: pnpm run lint
       - run: pnpm run typecheck
+      - name: Constitution loads and is internally consistent
+        run: pnpm run rules:validate
+      # Stops the published plugin and the docs describing a constitution that
+      # no longer exists.
+      - name: Generated plugin, docs and skills match rules/
+        run: pnpm run sync:check
 
   test:
     strategy:
       fail-fast: false
       matrix:
-        # Path separators and line endings are where a rules engine breaks quietly.
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [22, 24]
+        # Path separators and line endings are where a rules engine breaks quietly,
+        # so Windows is kept. The two supported Node lines are split across the two
+        # systems rather than multiplied, and macOS (10x the minutes) is left out.
+        include:
+          - os: ubuntu-latest
+            node: 24
+          - os: windows-latest
+            node: 22
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -47,33 +61,13 @@ jobs:
       - run: pnpm run build
       - run: pnpm run test
 
-  drift:
-    # Stops the published plugin and the docs describing a constitution that no
-    # longer exists.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
-      - name: Constitution loads and is internally consistent
-        run: pnpm run rules:validate
-      - name: Generated plugin, docs and skills match rules/
-        run: pnpm run sync:check
-
   smoke:
     # Proves the CLI works in a project that is not this one: only an end-to-end
     # run catches a broken bin shebang, a missing `files` entry, or a generated
     # import that does not resolve once the package is built.
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    # Ubuntu only: the Windows leg of `test` already runs the built binary
+    # (cli/test/confirm.test.ts), and a Windows E2E arrives with the browser job.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4

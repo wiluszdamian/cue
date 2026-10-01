@@ -1,11 +1,12 @@
 name: codeql
 
+# Weekly and on demand only: on a private personal repository every run uploads
+# nothing, so running it per push spent minutes for no signal. Restore the
+# push and pull_request triggers when the repository goes public.
 on:
-  push:
-    branches: [main]
-  pull_request:
   schedule:
     - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
