@@ -23,7 +23,7 @@ import {
   SurveyError,
 } from './survey.js';
 import { decideConfirmation, REFUSED_MESSAGE } from './confirm.js';
-import { formatVerifyReport, verifyExitCode, verifyMap } from './verify-map.js';
+import { formatVerifyReport, verify, verifyExitCode, type CiMode } from './verify.js';
 import {
   extract,
   formatExtractResult,
@@ -46,7 +46,8 @@ const USAGE = `understudy <command> [options]
   explain <rule-id>    why a rule exists, and what to do instead
   survey <url>         map a live route into .agent-kb
   extract              read the product source into .agent-kb
-  verify-map           check the map still matches the application
+  verify               check the map against the application (and say what was not checked)
+  verify-map           old name for verify
   locator <element>    look up a selector, with freshness and confidence
   uninstall            remove everything init installed
 
@@ -57,15 +58,16 @@ Options
   --bare               skip the Playwright suite skeleton
   --yes                do not prompt
   --force              overwrite files that were edited by hand
-  --ci                 non-zero exit when doctor finds errors
+  --ci[=advisory|strict] non-zero exit: doctor errors; verify drift (strict: also unverified)
+  --json               print the verify report as JSON
   --check              report drift without writing (sync)
   --offline            skip checks that need the network
   --from <file>        survey from a captured snapshot instead of a browser
-  --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify-map
+  --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
   --base-url <url>     environment to verify the map against
-  --route <path>       restrict a locator lookup to one route
+  --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked)
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
   --cwd <path>         project root (default: current directory)
@@ -316,10 +318,19 @@ async function main(): Promise<number> {
       return 0;
     }
 
-    case 'verify-map': {
+    case 'verify-map':
+    case 'verify': {
+      if (command === 'verify-map') {
+        err('verify-map is now `understudy verify`; the old name will be removed.');
+      }
+      const ci = flags['ci'];
+      if (ci !== undefined && ci !== true && ci !== 'advisory' && ci !== 'strict') {
+        err('--ci takes advisory or strict, e.g. --ci=strict');
+        return 2;
+      }
       const baseUrl = asString(flags['base-url']);
       const from = asString(flags['from']);
-      const report = verifyMap({
+      const report = verify({
         projectRoot,
         baseUrl,
         driver:
@@ -329,9 +340,13 @@ async function main(): Promise<number> {
               ? undefined
               : createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli'])),
         ...(flags['refresh'] === true ? { refresh: true } : {}),
+        ...(asString(flags['route']) === undefined
+          ? {}
+          : { only: (asString(flags['route']) ?? '').split(',').map((route) => route.trim()) }),
       });
-      out(formatVerifyReport(report));
-      return flags['ci'] !== undefined ? verifyExitCode(report) : 0;
+      out(flags['json'] === true ? JSON.stringify(report, null, 2) : formatVerifyReport(report));
+      if (ci === undefined) return 0;
+      return verifyExitCode(report, (ci === 'strict' ? 'strict' : 'advisory') satisfies CiMode);
     }
 
     case 'locator': {

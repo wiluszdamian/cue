@@ -276,7 +276,7 @@ export const CONSTITUTION = {
       severity: 'error',
       title: 'Selectors come from .agent-kb or from fresh exploration',
       rationale:
-        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. Not mechanically detectable — a linter cannot tell an invented test-id from a real one — so this rule documents the obligation and leaves enforcement to verify-map and review.\n',
+        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. Not mechanically detectable — a linter cannot tell an invented test-id from a real one — so this rule documents the obligation and leaves enforcement to understudy verify and review.\n',
       detector: {
         kind: 'manual',
       },

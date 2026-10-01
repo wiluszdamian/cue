@@ -45,7 +45,7 @@ export const RouteMapSchema = z.strictObject({
   route: z.string().min(1),
   title: z.string(),
   exploredAt: z.string().min(1),
-  /** Equal to `exploredAt` on a fresh survey; moved forward by `verify-map`. */
+  /** Equal to `exploredAt` on a fresh survey; moved forward by `verify --refresh`. */
   verifiedAt: z.string().min(1),
   /** Hash of the accessibility snapshot, so drift is detectable without a diff. */
   snapshotHash: z.string().min(1),

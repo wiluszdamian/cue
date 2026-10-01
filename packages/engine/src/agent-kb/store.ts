@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { parse, stringify } from 'yaml';
+import { ZodError } from 'zod';
 import {
   RouteMapSchema,
   TestIdsSchema,
@@ -75,22 +76,51 @@ export function readRouteMap(root: string, route: string, now?: Date): LoadedRou
   return { map, freshness: freshnessOf(map.verifiedAt, now), path };
 }
 
-export function readAllRouteMaps(root: string, now?: Date): LoadedRouteMap[] {
+export interface InvalidRouteMap {
+  readonly path: string;
+  /** One line, so a report can print it as it stands. */
+  readonly reason: string;
+}
+
+export interface RouteMapReading {
+  readonly maps: readonly LoadedRouteMap[];
+  /** Files that exist but could not be used. Silence about them would read as a clean map. */
+  readonly invalid: readonly InvalidRouteMap[];
+}
+
+function reasonOf(error: unknown): string {
+  if (error instanceof ZodError) {
+    const issue = error.issues[0];
+    return issue === undefined
+      ? 'does not match the route map schema'
+      : `${issue.path.join('.') || 'file'}: ${issue.message}`;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  return message.split('\n')[0] ?? message;
+}
+
+export function readAllRouteMapsWithErrors(root: string, now?: Date): RouteMapReading {
   const dir = appMapDir(root);
-  if (!existsSync(dir)) return [];
+  if (!existsSync(dir)) return { maps: [], invalid: [] };
 
   const maps: LoadedRouteMap[] = [];
-  for (const entry of readdirSync(dir)) {
+  const invalid: InvalidRouteMap[] = [];
+  for (const entry of readdirSync(dir).sort()) {
     if (!entry.endsWith('.yaml')) continue;
     const path = join(dir, entry);
     try {
       const map = RouteMapSchema.parse(parse(readFileSync(path, 'utf8')));
       maps.push({ map, freshness: freshnessOf(map.verifiedAt, now), path });
-    } catch {
-      // Skipped rather than crashing every consumer; `doctor` reports it.
+    } catch (error) {
+      invalid.push({ path, reason: reasonOf(error) });
     }
   }
-  return maps.sort((a, b) => a.map.route.localeCompare(b.map.route));
+  return { maps: maps.sort((a, b) => a.map.route.localeCompare(b.map.route)), invalid };
+}
+
+/** The usable maps only. A consumer that must not hide broken files uses the variant above. */
+export function readAllRouteMaps(root: string, now?: Date): LoadedRouteMap[] {
+  return [...readAllRouteMapsWithErrors(root, now).maps];
 }
 
 export function readTestIds(root: string): TestIds | undefined {

@@ -17,6 +17,22 @@ rather than deletion, and stay documented for one major cycle.
   `Re-run with --yes to apply this plan.` Scripts that relied on the old silent
   approval must now pass `--yes`.
 
+### Changed
+
+- **`verify-map` is now `understudy verify`, and it no longer claims what it did not
+  check.** The old report ended with "The map matches the application." even when
+  no environment was given and nothing had been looked at. The verdict is now one
+  of `PASS`, `PARTIAL`, `NOT VERIFIED`, `FAIL` or `EMPTY`, and only `PASS` — every
+  route checked against the running app — says the map matches. Freshness (from
+  age) and live verification are reported separately. Unreadable `.agent-kb` files
+  are now listed and fail the run instead of being skipped silently. `verify-map`
+  still works as an alias and warns on stderr; it will be removed.
+- `verify --ci` takes a mode: `--ci` / `--ci=advisory` exits 1 only on `FAIL`
+  (drift, an unreachable route, an unreadable file); `--ci=strict` exits 1 unless
+  the verdict is `PASS`. Without `--ci` the exit code is still always 0.
+- New `verify --route /a,/b` checks only those routes (the rest count as not
+  checked, so the verdict is `PARTIAL`), and `verify --json` prints the report.
+
 ### Added
 
 - **Snapshot formats are versioned.** `survey` and `verify-map` read the browser

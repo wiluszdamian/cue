@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { readAllRouteMaps } from '@understudy/engine';
 import { survey, SurveyError, type CaptureResult, type SnapshotDriver } from '../src/survey.js';
-import { verifyMap } from '../src/verify-map.js';
+import { verify } from '../src/verify.js';
 
 /**
  * The survey seam: what the driver hands over, and what ends up in `.agent-kb`.
@@ -73,7 +73,7 @@ describe('survey', () => {
   });
 });
 
-describe('verify-map against an unrecognised format', () => {
+describe('verify against an unrecognised format', () => {
   it('reports the route as unreachable instead of throwing or matching', () => {
     survey({
       projectRoot: root,
@@ -82,14 +82,14 @@ describe('verify-map against an unrecognised format', () => {
     });
     expect(readAllRouteMaps(root)).toHaveLength(1);
 
-    const report = verifyMap({
+    const report = verify({
       projectRoot: root,
       baseUrl: 'http://x.test',
       driver: driverReturning({ ok: true, output: '<html></html>', cliVersion: '9.9.9' }),
     });
 
-    expect(report.verdicts[0]).toMatchObject({ route: '/login', kind: 'unreachable' });
-    expect(report.verdicts[0]?.detail).toContain('playwright-cli 9.9.9');
-    expect(report.unreachable).toBe(1);
+    expect(report.routes[0]).toMatchObject({ route: '/login', live: 'unreachable' });
+    expect(report.routes[0]?.detail).toContain('playwright-cli 9.9.9');
+    expect(report.counts.unreachable).toBe(1);
   });
 });

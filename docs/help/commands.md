@@ -74,18 +74,32 @@ npx @understudy/cli locator "log in button"
 npx @understudy/cli locator "submit" --route /checkout
 ```
 
-### `understudy verify-map`
+### `understudy verify`
 
-Check the notes still match the real app.
+Check the notes still match the real app, and say plainly what was not checked.
+(`verify-map` is the old name and still works, with a warning.)
 
 ```bash
-npx @understudy/cli verify-map --base-url http://localhost:3000
-npx @understudy/cli verify-map --base-url $STAGING_URL --ci
-npx @understudy/cli verify-map --base-url $STAGING_URL --refresh
+npx @understudy/cli verify --base-url http://localhost:3000
+npx @understudy/cli verify --base-url $STAGING_URL --route /login,/signup
+npx @understudy/cli verify --base-url $STAGING_URL --ci=strict
+npx @understudy/cli verify --base-url $STAGING_URL --refresh
+npx @understudy/cli verify --json
 ```
 
-`--ci` fails the build on drift. `--refresh` marks unchanged pages as confirmed
-today, so they stop ageing.
+The verdict is one of `PASS`, `PARTIAL`, `NOT VERIFIED`, `FAIL` or `EMPTY`. Only
+`PASS` says the notes match the app, and only when every page was checked.
+
+| Option             | Does                                                                   |
+| ------------------ | ---------------------------------------------------------------------- |
+| `--base-url <url>` | The environment to look at. Without it nothing is checked.             |
+| `--route <a,b>`    | Check only these pages; the others count as not checked (`PARTIAL`).   |
+| `--ci[=advisory]`  | Exit 1 on `FAIL` only: drift, an unreachable page, an unreadable file. |
+| `--ci=strict`      | Exit 1 unless `PASS`, so "nobody looked" is not a green build.         |
+| `--refresh`        | Record today as the confirmation date for pages found unchanged.       |
+| `--json`           | Print the report as JSON.                                              |
+
+Without `--ci` the exit code is always 0.
 
 ## Staying current
 
