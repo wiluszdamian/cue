@@ -90,6 +90,8 @@ export {
 
 export * from './agent-kb/index.js';
 
+export * from './knowledge/index.js';
+
 export {
   AGENT_KB_SCHEMA_VERSION,
   SourcesSchema,
