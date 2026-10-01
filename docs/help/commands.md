@@ -61,6 +61,10 @@ npx @understudy/cli survey http://localhost:3000/login --from snapshot.txt
 `--from` reads a snapshot captured elsewhere — useful when the environment needs
 credentials this machine does not have.
 
+Surveying a live page needs `@playwright/cli`. It is found in the project's
+`node_modules`, then on `PATH`; `--playwright-cli <path>` points at a specific copy.
+It is never run through a shell, so URLs with `&` or `%` arrive intact.
+
 ### `understudy locator <description>`
 
 Look up how to point at something.
