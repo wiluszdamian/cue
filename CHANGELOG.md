@@ -35,6 +35,16 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Knowledge Core model** (`packages/engine/src/knowledge`, exported from
+  `@understudy/engine`). A versioned, typed model of what is known about an
+  application: twelve kinds of fact (application, environment, route, component,
+  role, state, action, locator, test-id, api, term, data-requirement), each citing
+  evidence by id, with a stored status (`inferred`, `observed`, `verified`, `stale`).
+  Facts that rest only on an agent's inference cannot be `observed` or `verified`;
+  references must resolve; a model version newer than this Understudy is refused
+  with an instruction to upgrade. Nothing reads or writes it yet — `.agent-kb`
+  still uses its existing format until the model is wired in.
+
 - **Snapshot formats are versioned.** `survey` and `verify-map` read the browser
   tool's output through a named format (`playwright-cli/markdown-yaml@1`). Text no
   format recognises is an error naming the CLI version, and `survey` writes nothing

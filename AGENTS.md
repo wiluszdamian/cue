@@ -56,6 +56,7 @@ what to consult for each owner, is in docs/reference/ownership.md.
 | `rules/constitution.yaml`                                                                          | The rules we own. **Source of truth.**                |
 | `rules/tags.yaml`                                                                                  | Canonical test tags.                                  |
 | `packages/engine`                                                                                  | Loader, detectors, analyzer, reporters.               |
+| `packages/engine/src/knowledge`                                                                    | The Knowledge Core model. Pure: no I/O, no CLI.       |
 | `packages/eslint-plugin`                                                                           | ESLint rules **generated** from the constitution.     |
 | `packages/mcp`                                                                                     | Three read-only point lookups, over stdio.            |
 | `skills/*/SKILL.md`                                                                                | The skill catalog. Procedures, hand-written.          |
