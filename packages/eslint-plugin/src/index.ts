@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import type { TSESLint } from '@typescript-eslint/utils';
 import { isEnforceable, type Rule } from '@understudy/engine';
 import { buildRule, type UnderstudyRule } from './create-rule.js';
@@ -23,8 +24,20 @@ export const rules: Record<string, UnderstudyRule> = Object.fromEntries(
  */
 export const manualRules: readonly Rule[] = CONSTITUTION.rules.filter((r) => !isEnforceable(r));
 
+/**
+ * Read rather than written down, so it cannot drift from package.json. The same
+ * relative path resolves from `src/` under test and from `dist/` once built.
+ */
+function packageVersion(): string {
+  const manifest: unknown = JSON.parse(
+    readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+  );
+  const version = (manifest as { version?: unknown }).version;
+  return typeof version === 'string' ? version : '0.0.0';
+}
+
 const plugin = {
-  meta: { name: '@understudy/eslint-plugin', version: '0.1.0' },
+  meta: { name: '@understudy/eslint-plugin', version: packageVersion() },
   rules,
 } satisfies TSESLint.FlatConfig.Plugin;
 

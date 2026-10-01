@@ -8,6 +8,20 @@ Rule-specific versioning policy: a new rule at `severity: error` is a major
 change; at `severity: warn`, a minor one. Rules are retired via `deprecated:`
 rather than deletion, and stay documented for one major cycle.
 
+## [Unreleased]
+
+### Changed
+
+- **`init`, `add`, `sync` and `uninstall` no longer assume yes without a terminal.**
+  With no TTY and no `--yes` they print the plan, write nothing and exit 1 with
+  `Re-run with --yes to apply this plan.` Scripts that relied on the old silent
+  approval must now pass `--yes`.
+
+### Fixed
+
+- `@understudy/eslint-plugin` reported `meta.version` `0.1.0`; it now reads the
+  version from its own `package.json`.
+
 ## [0.8.0] — 2026-09-12
 
 First public release. Everything below is new.

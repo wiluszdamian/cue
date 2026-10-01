@@ -6,7 +6,8 @@ _The full list, with what each one is for._
 
 ### `understudy init`
 
-Sets up a project. Shows you the plan first and waits for a yes.
+Sets up a project. Shows you the plan first and waits for a yes. Without a terminal
+it applies nothing unless you pass `--yes`.
 
 ```bash
 npx @understudy/cli init
@@ -20,7 +21,7 @@ npx @understudy/cli init --yes
 | `--all`           | Every assistant found in the project            |
 | `--baseline-only` | Shared setup only, nothing assistant-specific   |
 | `--bare`          | Skip the Playwright folder layout               |
-| `--yes`           | Do not ask                                      |
+| `--yes`           | Do not ask (required when there is no terminal) |
 | `--force`         | Overwrite files you have edited. Use with care. |
 
 ### `understudy doctor`

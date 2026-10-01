@@ -194,7 +194,7 @@ The benchmark harness records and scores; **no benchmark has been run.**
 `understudy-benchmark record` is the only paid network call in the repository,
 and nothing here carries credentials — until a run exists, the docs and the
 landing page say plainly that the project makes no claim about writing better
-tests. The README carries the build order.
+tests. The build order is in `.planning/README.md`.
 
 ## Vocabulary
 

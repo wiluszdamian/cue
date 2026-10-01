@@ -34,4 +34,4 @@ jobs:
       # TODO: open an issue when a version moves past the pinned range in
       # compatibility.yaml, and re-run the conflict detection described in
       # blueprint section 2. Both need compatibility.yaml, which does not exist
-      # yet — see the roadmap in README.md.
+      # yet — see ticket 23 in .planning/README.md.
