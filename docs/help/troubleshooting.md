@@ -65,6 +65,22 @@ a snapshot somewhere that does and pass it in:
 npx @understudy/cli survey http://internal/login --from snapshot.txt
 ```
 
+## `survey` says the output is not a snapshot format it understands
+
+`survey` reads the text that `playwright-cli snapshot` prints, and that text is
+Microsoft's format, not ours. A release that changes it is refused with an error
+naming the CLI version, rather than turned into an empty or partial map. Nothing is
+written.
+
+1. **Check the version.** `npx @playwright/cli --version`. Understudy is tested
+   against the versions that have a directory under
+   `packages/engine/test/snapshots/` (today `0.1.22`).
+2. **Install a tested one:** `npm install --save-dev @playwright/cli@0.1.22`.
+3. **Or capture elsewhere** and pass the text in with `--from <file>`.
+
+A page that parses but contains lines the parser did not understand is still
+surveyed; the lines are listed under `Gaps` in the map so the loss is visible.
+
 ## `init` did not overwrite my file
 
 By design. If you have edited a file Understudy wrote, it leaves it alone and

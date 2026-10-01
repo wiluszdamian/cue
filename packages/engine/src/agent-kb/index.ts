@@ -26,11 +26,18 @@ export {
 export {
   hashSnapshot,
   locatorFor,
+  MARKDOWN_YAML_V1,
+  parseRawSnapshot,
   parseSnapshot,
   routeFromUrl,
   routeToFilename,
+  SNAPSHOT_FORMATS,
+  UnsupportedSnapshotFormatError,
+  type NormalizedBrowserObservation,
   type ParsedSnapshot,
-} from './snapshot.js';
+  type RawSnapshot,
+  type SnapshotFormat,
+} from './snapshot/index.js';
 
 export {
   APP_MAP_DIR,

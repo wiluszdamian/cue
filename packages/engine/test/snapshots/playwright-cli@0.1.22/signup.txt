@@ -1,0 +1,17 @@
+### Page
+- Page URL: http://127.0.0.1:4399/signup
+- Page Title: Create an account
+- Console: 1 errors, 0 warnings
+### Snapshot
+```yaml
+- main [ref=e2]:
+  - heading "Create an account" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - text: Email address
+      - textbox "Email address" [ref=e6]
+    - generic [ref=e7]:
+      - text: Choose a password
+      - textbox "Choose a password" [ref=e8]
+    - button "Create account" [ref=e9]
+```

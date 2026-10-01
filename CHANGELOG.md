@@ -17,6 +17,17 @@ rather than deletion, and stay documented for one major cycle.
   `Re-run with --yes to apply this plan.` Scripts that relied on the old silent
   approval must now pass `--yes`.
 
+### Added
+
+- **Snapshot formats are versioned.** `survey` and `verify-map` read the browser
+  tool's output through a named format (`playwright-cli/markdown-yaml@1`). Text no
+  format recognises is an error naming the CLI version, and `survey` writes nothing
+  in that case; `verify-map` reports the route as unreachable. Lines inside a
+  recognised snapshot that the parser does not understand are listed under `gaps`
+  instead of being dropped.
+- `scripts/capture-snapshots.mjs` re-captures the parser's fixtures from the real
+  `@playwright/cli` (pinned in `examples/demo-app`).
+
 ### Fixed
 
 - **`survey` and `verify-map` no longer run `playwright-cli` through a shell.** The

@@ -1,0 +1,22 @@
+### Page
+- Page URL: http://127.0.0.1:4399/items
+- Page Title: Items
+- Console: 1 errors, 0 warnings
+### Snapshot
+```yaml
+- generic [active] [ref=e1]:
+  - navigation "Main" [ref=e2]:
+    - link "Dashboard" [ref=e3] [cursor=pointer]:
+      - /url: /dashboard
+    - link "Items" [ref=e4] [cursor=pointer]:
+      - /url: /items
+  - main [ref=e5]:
+    - heading "Items" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - text: New item
+        - textbox "New item" [ref=e9]
+      - button "Add item" [ref=e10]
+    - paragraph [ref=e11]: No items yet
+    - list
+```

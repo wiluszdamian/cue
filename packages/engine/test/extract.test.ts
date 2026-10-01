@@ -6,7 +6,7 @@ import { extract } from '../src/agent-kb/extract/run.js';
 import { nextAdapter, openApiAdapter, testIdAdapter } from '../src/agent-kb/extract/adapters.js';
 import { scanSource } from '../src/agent-kb/extract/scan.js';
 import { correlate } from '../src/agent-kb/store.js';
-import { parseSnapshot } from '../src/agent-kb/snapshot.js';
+import { parseSnapshot } from '../src/agent-kb/snapshot/index.js';
 
 /**
  * `extract` reads a repository that may not belong to whoever runs it.

@@ -3,7 +3,8 @@ import {
   correlate,
   describeRedactions,
   hashSnapshot,
-  parseSnapshot,
+  parseRawSnapshot,
+  UnsupportedSnapshotFormatError,
   readTestIds,
   routeFromUrl,
   writeRouteMap,
@@ -22,8 +23,11 @@ import { NOT_FOUND_ADVICE, resolvePlaywrightCli, type ResolvedCommand } from './
  * one-method interface, so everything downstream is testable without a browser.
  */
 
+export type CaptureResult =
+  { ok: true; output: string; cliVersion?: string } | { ok: false; reason: string };
+
 export interface SnapshotDriver {
-  capture(url: string): { ok: true; output: string } | { ok: false; reason: string };
+  capture(url: string): CaptureResult;
 }
 
 /** From `@playwright/cli`. The bare `playwright-cli` on npm is a deprecated different thing. */
@@ -33,7 +37,21 @@ export class PlaywrightCliDriver implements SnapshotDriver {
     private readonly runner: ProcessRunner = nodeRunner,
   ) {}
 
-  capture(url: string): { ok: true; output: string } | { ok: false; reason: string } {
+  private version: string | undefined | null = null;
+
+  /** Best effort, asked once: it only names the tool in an error message. */
+  private cliVersion(): string | undefined {
+    if (this.version === null) {
+      const result = this.runner.run(this.command.executable, [
+        ...this.command.prefixArgs,
+        '--version',
+      ]);
+      this.version = result.ok ? result.stdout.trim().split(/\s+/).pop() : undefined;
+    }
+    return this.version;
+  }
+
+  capture(url: string): CaptureResult {
     // `open <url>`, not `goto`: goto fails with "the browser is not open" on a
     // cold run, which is every run here. open navigates too, and is idempotent.
     const opened = this.run(['open', url]);
@@ -42,7 +60,10 @@ export class PlaywrightCliDriver implements SnapshotDriver {
     const snapshot = this.run(['snapshot']);
     // Best effort: a browser left running is untidy, not a failure.
     this.run(['close']);
-    return snapshot;
+    if (!snapshot.ok) return snapshot;
+
+    const cliVersion = this.cliVersion();
+    return cliVersion === undefined ? snapshot : { ...snapshot, cliVersion };
   }
 
   private run(
@@ -77,7 +98,7 @@ export function createPlaywrightCliDriver(
 export class FileDriver implements SnapshotDriver {
   constructor(private readonly path: string) {}
 
-  capture(): { ok: true; output: string } | { ok: false; reason: string } {
+  capture(): CaptureResult {
     if (!existsSync(this.path)) return { ok: false, reason: `no such file: ${this.path}` };
     return { ok: true, output: readFileSync(this.path, 'utf8') };
   }
@@ -117,7 +138,18 @@ export function survey(options: SurveyOptions): SurveyResult {
     );
   }
 
-  const parsed = parseSnapshot(captured.output);
+  let parsed: ParsedSnapshot;
+  try {
+    parsed = parseRawSnapshot({
+      text: captured.output,
+      capturedAt: (options.now ?? new Date()).toISOString(),
+      ...(captured.cliVersion === undefined ? {} : { cliVersion: captured.cliVersion }),
+    });
+  } catch (error) {
+    // Nothing has been written yet, and nothing will be.
+    if (error instanceof UnsupportedSnapshotFormatError) throw new SurveyError(error.message);
+    throw error;
+  }
   if (parsed.tree.length === 0) {
     throw new SurveyError(
       `${options.url} produced no accessibility snapshot.\n` +
@@ -139,6 +171,7 @@ export function survey(options: SurveyOptions): SurveyResult {
       'No product/testids.yaml, so nothing here is confirmed against the source. Run `understudy extract`.',
     );
   }
+  for (const warning of parsed.warnings) gaps.push(`Snapshot parser: ${warning}`);
   if (parsed.elements.length === 0) {
     gaps.push('The snapshot had no named elements — the page may render behind authentication.');
   }

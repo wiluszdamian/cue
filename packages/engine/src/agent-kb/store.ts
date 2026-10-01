@@ -12,7 +12,7 @@ import {
 import type { Freshness } from '../schema/agent-kb.js';
 import { freshnessOf } from './freshness.js';
 import { redact, type Redaction } from './redact.js';
-import { routeToFilename } from './snapshot.js';
+import { routeToFilename } from './snapshot/index.js';
 
 /**
  * Reading and writing `.agent-kb`. Two invariants live here rather than in the
