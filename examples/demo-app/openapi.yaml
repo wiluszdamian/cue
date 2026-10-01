@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Demo app API
+  version: 1.0.0
+paths:
+  /api/login:
+    post:
+      summary: Start a session
+      responses:
+        '200':
+          description: Signed in
+        '401':
+          description: Bad credentials
+  /api/me:
+    get:
+      summary: The signed-in user
+      responses:
+        '200':
+          description: User
+        '401':
+          description: Not signed in
+  /api/password:
+    post:
+      summary: Change the admin password
+      responses:
+        '200':
+          description: Changed
+        '400':
+          description: Wrong current password
+        '403':
+          description: Not an admin
+  /api/items:
+    get:
+      summary: List items
+      responses:
+        '200':
+          description: Items
+    post:
+      summary: Add an item
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Missing title
+  /api/items/{id}:
+    delete:
+      summary: Delete an item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: No such item

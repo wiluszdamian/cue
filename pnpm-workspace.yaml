@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - examples/*
 
 # esbuild links a platform binary in a postinstall step. It arrives under vitest,
 # so approving it explicitly is what keeps the test run from depending on a hook

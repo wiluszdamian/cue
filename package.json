@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "pnpm -r --filter \"./packages/**\" run build",
-    "typecheck": "node scripts/tsc7.mjs --build --force && pnpm -r --filter \"./packages/**\" run typecheck",
+    "typecheck": "node scripts/tsc7.mjs --build --force && pnpm -r --filter \"./packages/**\" --filter \"./examples/**\" run typecheck",
     "test": "pnpm -r --filter \"./packages/**\" run test",
     "lint": "eslint .",
     "format": "prettier --write .",

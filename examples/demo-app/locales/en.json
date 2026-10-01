@@ -1,0 +1,54 @@
+{
+  "common": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "items": "Items",
+      "security": "Security"
+    },
+    "notFound": "Page not found",
+    "forbidden": "Forbidden"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "forgot": "Forgot password?",
+      "error": "Invalid email or password"
+    },
+    "forgot": {
+      "title": "Reset your password"
+    },
+    "signup": {
+      "title": "Create an account",
+      "email": "Email address",
+      "password": "Choose a password",
+      "submit": "Create account",
+      "invalidEmail": "Enter a valid email address",
+      "created": "Account created"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "loading": "Loading your dashboard…",
+    "welcome": "Welcome back, {name}"
+  },
+  "admin": {
+    "security": {
+      "title": "Security settings",
+      "current": "Current password",
+      "next": "New password",
+      "submit": "Change password",
+      "changed": "Password changed",
+      "wrong": "Current password is incorrect"
+    }
+  },
+  "items": {
+    "title": "Items",
+    "label": "New item",
+    "add": "Add item",
+    "delete": "Delete",
+    "empty": "No items yet"
+  }
+}
