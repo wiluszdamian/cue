@@ -2,7 +2,9 @@ import {
   ageInDays,
   freshnessOf,
   hashSnapshot,
-  parseSnapshot,
+  parseRawSnapshot,
+  UnsupportedSnapshotFormatError,
+  type ParsedSnapshot,
   readAllRouteMaps,
   writeRouteMap,
   type Freshness,
@@ -61,7 +63,20 @@ function verifyRoute(loaded: LoadedRouteMap, options: VerifyOptions, now: Date):
     return { ...base, kind: 'unreachable', detail: captured.reason };
   }
 
-  const parsed = parseSnapshot(captured.output);
+  let parsed: ParsedSnapshot;
+  try {
+    parsed = parseRawSnapshot({
+      text: captured.output,
+      capturedAt: now.toISOString(),
+      ...(captured.cliVersion === undefined ? {} : { cliVersion: captured.cliVersion }),
+    });
+  } catch (error) {
+    // An unreadable answer is not a matching one, and not a crash either.
+    if (error instanceof UnsupportedSnapshotFormatError) {
+      return { ...base, kind: 'unreachable', detail: error.message };
+    }
+    throw error;
+  }
   if (hashSnapshot(parsed.tree) === map.snapshotHash) {
     if (options.refresh === true) {
       writeRouteMap(options.projectRoot, { ...map, verifiedAt: now.toISOString() });

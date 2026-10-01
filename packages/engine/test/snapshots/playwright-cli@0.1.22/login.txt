@@ -1,0 +1,20 @@
+### Page
+- Page URL: http://127.0.0.1:4399/login
+- Page Title: Sign in
+- Console: 1 errors, 0 warnings
+### Snapshot
+```yaml
+- main [ref=e2]:
+  - heading "Sign in" [level=1] [ref=e3]
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - text: Email
+      - textbox "Email" [ref=e6]
+    - generic [ref=e7]:
+      - text: Password
+      - textbox "Password" [ref=e8]
+    - button "Log in" [ref=e9]
+  - paragraph [ref=e10]:
+    - link "Forgot password?" [ref=e11] [cursor=pointer]:
+      - /url: /forgot
+```

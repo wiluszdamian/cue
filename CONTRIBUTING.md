@@ -130,6 +130,16 @@ Widening a rule (catching more) follows the same versioning as adding one.
 Narrowing it is a patch. Either way, add a fixture that covers the case you
 changed — a rule change with no new fixture is a rule change nobody can review.
 
+## Supporting a new `@playwright/cli`
+
+The snapshot format belongs to Microsoft and changes without notice. Bump the
+version pinned in `examples/demo-app/package.json`, run
+`node scripts/capture-snapshots.mjs`, and review the new
+`packages/engine/test/snapshots/playwright-cli@<version>/` directory against the
+old one. If the text parses unchanged, keep both directories (the suite checks
+every one). If it moved, add a format in
+`packages/engine/src/agent-kb/snapshot/` and leave the old one registered.
+
 ## Style
 
 - ESM with `NodeNext`; import specifiers end in `.js`.

@@ -1,0 +1,14 @@
+### Page
+- Page URL: http://127.0.0.1:4399/dashboard
+- Page Title: Dashboard
+### Snapshot
+```yaml
+- generic [active] [ref=f1e1]:
+  - navigation "Main" [ref=f1e2]:
+    - link "Dashboard" [ref=f1e3] [cursor=pointer]:
+      - /url: /dashboard
+    - link "Items" [ref=f1e4] [cursor=pointer]:
+      - /url: /items
+  - main [ref=f1e5]:
+    - heading "Welcome back, Sam" [level=1] [ref=f1e8]
+```

@@ -1,0 +1,24 @@
+### Page
+- Page URL: http://127.0.0.1:4399/admin/settings/security
+- Page Title: Security settings
+### Snapshot
+```yaml
+- generic [active] [ref=f1e1]:
+  - navigation "Main" [ref=f1e2]:
+    - link "Dashboard" [ref=f1e3] [cursor=pointer]:
+      - /url: /dashboard
+    - link "Items" [ref=f1e4] [cursor=pointer]:
+      - /url: /items
+    - link "Security" [ref=f1e5] [cursor=pointer]:
+      - /url: /admin/settings/security
+  - main [ref=f1e6]:
+    - heading "Security settings" [level=1] [ref=f1e7]
+    - generic [ref=f1e8]:
+      - generic [ref=f1e9]:
+        - text: Current password
+        - textbox "Current password" [ref=f1e10]
+      - generic [ref=f1e11]:
+        - text: New password
+        - textbox "New password" [ref=f1e12]
+      - button "Change password" [ref=f1e13]
+```

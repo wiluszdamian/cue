@@ -56,17 +56,19 @@ describe('PlaywrightCliDriver', () => {
     const runner: ProcessRunner = {
       run(executable, args): RunResult {
         calls.push([executable, ...args]);
-        return { ok: true, status: 0, stdout: 'out', stderr: '' };
+        const stdout = args.includes('--version') ? '0.1.22\n' : 'out';
+        return { ok: true, status: 0, stdout, stderr: '' };
       },
     };
     const url = 'http://x.test/a?b=1&c=2';
     const result = new PlaywrightCliDriver(command, runner).capture(url);
 
-    expect(result).toEqual({ ok: true, output: 'out' });
+    expect(result).toEqual({ ok: true, output: 'out', cliVersion: '0.1.22' });
     expect(calls).toEqual([
       ['node', 'cli.js', 'open', url],
       ['node', 'cli.js', 'snapshot'],
       ['node', 'cli.js', 'close'],
+      ['node', 'cli.js', '--version'],
     ]);
   });
 
@@ -88,7 +90,7 @@ describe('PlaywrightCliDriver', () => {
     if (resolved === undefined) throw new Error('the fixture script should resolve');
     const result = new PlaywrightCliDriver(resolved).capture('http://x.test/a?b=1&c=2');
     // The echo script prints the arguments of the call, and `snapshot` is the one returned.
-    expect(result).toEqual({ ok: true, output: '["snapshot"]' });
+    expect(result).toMatchObject({ ok: true, output: '["snapshot"]' });
   });
 });
 

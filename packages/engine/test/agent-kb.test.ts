@@ -11,7 +11,7 @@ import {
   parseSnapshot,
   routeFromUrl,
   routeToFilename,
-} from '../src/agent-kb/snapshot.js';
+} from '../src/agent-kb/snapshot/index.js';
 import { correlate, readRouteMap, writeRouteMap } from '../src/agent-kb/store.js';
 import type { RouteMap } from '../src/schema/agent-kb.js';
 

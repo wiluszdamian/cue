@@ -39,7 +39,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 01 | [Drobne niespójności (confirm bez TTY, wersja pluginu, odnośnik do planu)](tickets/01-hygiene.md) | P0 | 00 | done |
 | 02 | [Bezpieczne uruchamianie playwright-cli (bez shella)](tickets/02-browser-process-hardening.md) | P0.1 | 00 | done |
 | 03 | [Aplikacja demo do E2E i benchmarku](tickets/03-demo-app.md) | P0.2 | 00 | done |
-| 04 | [Wersjonowany parser snapshotów + fixtures](tickets/04-snapshot-parser-versioning.md) | P0.1 | 02, 03 | todo |
+| 04 | [Wersjonowany parser snapshotów + fixtures](tickets/04-snapshot-parser-versioning.md) | P0.1 | 02, 03 | done |
 | 05 | [OpenAPI przez prawdziwy parser](tickets/05-openapi-real-parser.md) | P0.4 | 00 | todo |
 | 06 | [`understudy verify` — rozdzielona semantyka weryfikacji](tickets/06-verify-semantics.md) | P0.3 | 00 | todo |
 | 07 | [Knowledge Core v1 — model domenowy](tickets/07-knowledge-core-model.md) | P0.5 | 00 | todo |
