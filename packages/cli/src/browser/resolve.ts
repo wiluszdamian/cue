@@ -42,7 +42,8 @@ export function scriptBehindShim(shimPath: string): string | undefined {
   const relative = match?.[1];
   if (relative === undefined) return undefined;
 
-  const script = resolve(dirname(shimPath), relative);
+  // Forward slashes: a backslash is only a separator on Windows, which accepts both.
+  const script = resolve(dirname(shimPath), relative.replaceAll('\\', '/'));
   return existsSync(script) ? script : undefined;
 }
 
