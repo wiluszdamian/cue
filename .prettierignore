@@ -21,3 +21,7 @@ plugins/understudy/
 gemini-extension.json
 docs/.next/
 docs/.source/
+
+# Working notes, not product source
+.planning/
+.codex/

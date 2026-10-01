@@ -1,0 +1,18 @@
+{
+  "project": "Project Cue",
+  "package": "Improvement Pack",
+  "created": "2026-09-28T10:46:15.792274+00:00",
+  "files": [
+    "README.md",
+    "01-product-direction.md",
+    "02-target-architecture.md",
+    "03-knowledge-core.md",
+    "04-acquisition-and-survey.md",
+    "05-verification-and-governance.md",
+    "06-agent-interface-and-mcp.md",
+    "07-benchmark-and-evaluation.md",
+    "08-roadmap.md",
+    "09-acceptance-criteria.md",
+    "AGENT-PROMPT.md"
+  ]
+}
