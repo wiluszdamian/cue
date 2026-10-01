@@ -15,6 +15,7 @@ export type KnowledgeIssueCode =
   | 'verified-on-inference'
   | 'status-above-inference'
   | 'dangling-reference'
+  | 'conflict-without-fact'
   | 'id-mismatch';
 
 export interface KnowledgeIssue {
@@ -160,6 +161,27 @@ export function validateKnowledge(kb: KnowledgeBase): KnowledgeIssue[] {
               ? `${fact.id}.${reference.field} names ${reference.target}, which is not in the knowledge base.`
               : `${fact.id}.${reference.field} names ${reference.target}, which is a ${target.kind}, not a ${reference.kind}.`,
         });
+      }
+    }
+  }
+
+  for (const conflict of kb.conflicts ?? []) {
+    if (!factsById.has(conflict.factId)) {
+      issues.push({
+        code: 'conflict-without-fact',
+        factId: conflict.factId,
+        message: `A conflict is recorded for ${conflict.factId}.${conflict.field}, but there is no such fact.`,
+      });
+    }
+    for (const value of conflict.values) {
+      for (const id of value.evidence) {
+        if (!evidenceById.has(id)) {
+          issues.push({
+            code: 'unknown-evidence',
+            factId: conflict.factId,
+            message: `The conflict on ${conflict.factId}.${conflict.field} cites evidence ${id}, which does not exist.`,
+          });
+        }
       }
     }
   }

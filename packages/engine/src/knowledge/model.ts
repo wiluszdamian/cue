@@ -207,12 +207,30 @@ export const KnowledgeFactSchema = z.discriminatedUnion('kind', [
   DataRequirementFactSchema,
 ]);
 
+const ConflictValueSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+
+/**
+ * Two sources disagree about one field of one fact. Kept as a record of the
+ * disagreement, with who said what, rather than resolved by picking a winner:
+ * a merge that silently chooses one is how a wrong locator gets verified.
+ */
+export const ConflictSchema = z.strictObject({
+  factId: nonEmpty,
+  field: nonEmpty,
+  values: z
+    .array(z.strictObject({ value: ConflictValueSchema, evidence: z.array(nonEmpty) }))
+    .min(2),
+});
+
 export const KnowledgeBaseSchema = z.strictObject({
   modelVersion: z.number().int().positive(),
   facts: z.array(KnowledgeFactSchema),
   evidence: z.array(EvidenceSchema),
+  conflicts: z.array(ConflictSchema).optional(),
 });
 
+export type Conflict = z.infer<typeof ConflictSchema>;
+export type ConflictValue = z.infer<typeof ConflictValueSchema>;
 export type FactStatus = z.infer<typeof FactStatusSchema>;
 export type EvidenceType = z.infer<typeof EvidenceTypeSchema>;
 export type KnowledgeEvidence = z.infer<typeof EvidenceSchema>;

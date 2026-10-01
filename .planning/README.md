@@ -43,7 +43,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 05 | [OpenAPI przez prawdziwy parser](tickets/05-openapi-real-parser.md) | P0.4 | 00 | done |
 | 06 | [`understudy verify` — rozdzielona semantyka weryfikacji](tickets/06-verify-semantics.md) | P0.3 | 00 | done |
 | 07 | [Knowledge Core v1 — model domenowy](tickets/07-knowledge-core-model.md) | P0.5 | 00 | done |
-| 08 | [Knowledge Core — wczytywanie istniejącego `.agent-kb` + zapytania](tickets/08-knowledge-core-legacy-adapter.md) | P0.5 | 07 | todo |
+| 08 | [Knowledge Core — wczytywanie istniejącego `.agent-kb` + zapytania](tickets/08-knowledge-core-legacy-adapter.md) | P0.5 | 07 | done |
 | 09 | [`.agent-kb` v2 na dysku: evidence, status, migracja](tickets/09-agent-kb-v2-on-disk.md) | P0.5 | 08 | todo |
 | 10 | [Wspólny analizator locatorów vs KB](tickets/10-locator-analyzer.md) | P0.6 | 08 | todo |
 | 11 | [`understudy check <files>`](tickets/11-check-command.md) | P0.6 | 10 | todo |
