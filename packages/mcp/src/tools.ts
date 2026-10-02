@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  estimateTokens,
   findProductRoot,
   formatLocatorAnswer,
   loadRules,
@@ -30,12 +31,11 @@ export const TOKEN_BUDGET = {
   get_evidence: 300,
   get_freshness: 250,
   find_knowledge: 350,
+  /** The most a caller may ask for; a smaller `maxTokens` is honoured below this. */
+  get_context: 3000,
 } as const;
 
-/** Four characters per token over-estimates here, which is the safe direction. */
-export function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
-}
+export { estimateTokens };
 
 const oneLine = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
@@ -163,6 +163,7 @@ export function resolveLocatorTool(context: ToolContext, element: string, route?
 
 export {
   findKnowledge,
+  getContext,
   getEvidence,
   getFreshness,
   resolveApi,

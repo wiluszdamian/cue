@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   explainRule,
   findKnowledge,
+  getContext,
   getEvidence,
   getFreshness,
   resolveApi,
@@ -13,7 +14,7 @@ import {
 } from './tools.js';
 
 /**
- * The Understudy MCP server: eight tools, all read-only point lookups.
+ * The Understudy MCP server: nine tools, all read-only point lookups.
  *
  * What is not here matters as much — browser exploration goes through
  * `playwright-cli`, never through MCP. This server answers questions cheaply
@@ -81,6 +82,27 @@ export function createServer(context: ToolContext): McpServer {
       annotations: READ_ONLY,
     },
     ({ element, route }) => text(resolveLocatorTool(context, element, route)),
+  );
+
+  server.registerTool(
+    'get_context',
+    {
+      title: 'Context for a task',
+      description:
+        'Everything relevant to a task in one answer that fits a token budget: the page, its known elements, endpoints, vocabulary, the rules, and how fresh each is. Use once at the start of a task, before reading anything else.',
+      inputSchema: {
+        task: z.string().describe('The task in plain words, e.g. "test changing the password".'),
+        max_tokens: z
+          .number()
+          .int()
+          .optional()
+          .describe('Budget for the answer, 200 to 3000. Default 1200.'),
+        route: z.string().optional().describe('A route you already know is the right one.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ task, max_tokens, route }) =>
+      text(getContext(context, task, { maxTokens: max_tokens, route })),
   );
 
   server.registerTool(
