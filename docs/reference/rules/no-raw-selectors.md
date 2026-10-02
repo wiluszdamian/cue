@@ -4,7 +4,7 @@ _No CSS or XPath selector strings_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |                  |
+| Property    | Value            |
 | ----------- | ---------------- |
 | Tier        | `MUST_NOT`       |
 | Severity    | `error`          |

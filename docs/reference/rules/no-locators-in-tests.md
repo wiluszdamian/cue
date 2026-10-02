@@ -4,7 +4,7 @@ _Locators live in page objects, not in tests_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |                       |
+| Property    | Value                 |
 | ----------- | --------------------- |
 | Tier        | `MUST_NOT`            |
 | Severity    | `error`               |

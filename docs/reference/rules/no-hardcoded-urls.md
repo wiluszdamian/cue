@@ -4,7 +4,7 @@ _No hardcoded environment URLs_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |                                                      |
+| Property    | Value                                                |
 | ----------- | ---------------------------------------------------- |
 | Tier        | `MUST_NOT`                                           |
 | Severity    | `warn`                                               |

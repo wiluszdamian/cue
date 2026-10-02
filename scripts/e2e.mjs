@@ -246,12 +246,26 @@ try {
     cpSync(join(demo, dir), join(project, 'suite', dir), { recursive: true });
   }
   const known = ['login', 'signup', 'items'].map((name) => `suite/pages/${name}-page.ts`);
-  const good = cli(project, ['check', ...known, '--ci=strict']);
-  expect(good.status === 0, 'every judgeable locator is known (strict)', good.out);
+  // The page objects also reach for things that only appear after an action (an error, a
+  // status). `survey` cannot click, so the notes know them only from the tests that mention
+  // them: inferred, and said to be unverified rather than passed as known.
+  const good = cli(project, ['check', ...known, '--ci']);
   expect(
-    /\d+ locator\(s\): \d+ known, \d+ undecidable \(not judged\)/.test(good.out),
+    good.status === 0,
+    'nothing in the page objects is unknown or on the wrong page',
+    good.out,
+  );
+  expect(
+    /\d+ locator\(s\): \d+ known, \d+ unverified, \d+ undecidable \(not judged\)/.test(good.out),
     'the summary counts what was judged and what was not (and nothing else)',
     good.out,
+  );
+  const strict = cli(project, ['check', ...known, '--ci=strict']);
+  expect(strict.status === 1, 'strict refuses what no survey has seen', strict.out);
+  expect(
+    strict.out.includes('only inferred') && strict.out.includes('never seen running'),
+    'and says why: a test is evidence, not an observation',
+    strict.out,
   );
 
   writeFileSync(
