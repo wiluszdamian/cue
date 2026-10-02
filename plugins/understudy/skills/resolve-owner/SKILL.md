@@ -79,8 +79,8 @@ has to guess it too.
 - **`agent-kb`** — .agent-kb/ — app-map for what the running application looks like, product/ for what the source says. Every entry carries a freshness marker; an entry marked stale is a lead to verify, not a fact to use.
 - **`playwright-official`** — Read the installed skill. Do not restate or fork its content into this repository — their release is our free update, and a stale copy of it is worse than no copy.
 - **`playwright-mcp`** — Point-in-time browser calls with small results. Not exploration: a full accessibility tree through MCP costs more context than the task it serves.
-- **`reference-skill`** — The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
-- **`external-process`** — Understudy has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Understudy and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.
+- **`reference-skill`** — The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
+- **`external-process`** — Cue has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Cue and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.
 
 <!-- END GENERATED: ownership -->
 

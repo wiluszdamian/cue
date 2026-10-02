@@ -20,20 +20,20 @@ not the ESLint guarantee — both can be installed.
 If a teammate uses something that needs its own small config:
 
 ```bash
-npx @understudy/cli add cursor
-npx @understudy/cli add claude-code
+npx @wiluszdamian/cue-cli add cursor
+npx @wiluszdamian/cue-cli add claude-code
 ```
 
 To see what is set up right now:
 
 ```bash
-npx @understudy/cli list
+npx @wiluszdamian/cue-cli list
 ```
 
 To take one out again:
 
 ```bash
-npx @understudy/cli remove cursor
+npx @wiluszdamian/cue-cli remove cursor
 ```
 
 `remove` uses a record of exactly what was installed, so it takes out what it put
@@ -47,7 +47,7 @@ deleted.
 ```
 [ warn ] Cursor detected but not configured
       Evidence: .cursor/ in this project.
-      fix: understudy add cursor
+      fix: cue add cursor
 ```
 
 A warning, not an error. Detection is a suggestion, never a decision — a folder
@@ -87,10 +87,10 @@ summary of a UI change anybody will get.
   run: npx eslint . # the rules
 
 - name: Environment
-  run: npx @understudy/cli doctor --ci # is everything wired up
+  run: npx @wiluszdamian/cue-cli doctor --ci # is everything wired up
 
 - name: Drift
-  run: npx @understudy/cli sync --check # have the rules moved
+  run: npx @wiluszdamian/cue-cli sync --check # have the rules moved
 ```
 
 Only genuine errors fail the build. Warnings never do — a team that has to

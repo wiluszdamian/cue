@@ -13,27 +13,27 @@ more or less at random. You get a different answer depending on the day.
 
 ## The fix
 
-Understudy keeps a list of topics and who decides each one. It lives in a file
+Cue keeps a list of topics and who decides each one. It lives in a file
 every assistant reads automatically, so the tie-break happens before you notice
 there was a tie.
 
 Ask it directly:
 
 ```bash
-npx @understudy/cli locator "how do I record a trace"
+npx @wiluszdamian/cue-cli locator "how do I record a trace"
 ```
 
 Or in an assistant that has the skills installed, `/resolve-owner`.
 
 ## Who owns what
 
-| Topic                                            | Decided by                                |
-| ------------------------------------------------ | ----------------------------------------- |
-| How your tests are structured, named, tagged     | **Understudy** — your project's rules     |
-| Which button is on which page                    | **Your app's notes**                      |
-| Running, debugging, tracing, recording           | **Official Playwright**                   |
-| Electron, i18n, visual testing, framework quirks | **A best-practices guide**                |
-| Specs, tickets, roadmap                          | **Your team.** Not Understudy's business. |
+| Topic                                            | Decided by                         |
+| ------------------------------------------------ | ---------------------------------- |
+| How your tests are structured, named, tagged     | **Cue** — your project's rules     |
+| Which button is on which page                    | **Your app's notes**               |
+| Running, debugging, tracing, recording           | **Official Playwright**            |
+| Electron, i18n, visual testing, framework quirks | **A best-practices guide**         |
+| Specs, tickets, roadmap                          | **Your team.** Not Cue's business. |
 
 [The full table →](../reference/ownership.md)
 
