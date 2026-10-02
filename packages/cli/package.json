@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Preflight, scaffolding and agent wiring for Cue.",
   "license": "MIT",
   "author": "Damian Wilusz",

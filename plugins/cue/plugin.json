@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "cue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
   "author": { "name": "Cue", "url": "https://github.com/wiluszdamian/cue" },
   "homepage": "https://github.com/wiluszdamian/cue",

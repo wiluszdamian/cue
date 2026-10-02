@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue-eslint-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ESLint rules generated from the Cue constitution. Works with no agent involved.",
   "license": "MIT",
   "author": "Damian Wilusz",

@@ -3,7 +3,7 @@
   "owner": { "name": "Cue" },
   "metadata": {
     "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "pluginRoot": "plugins"
   },
   "plugins": [
@@ -11,7 +11,7 @@
       "name": "cue",
       "source": "cue",
       "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "skills": "./skills"
     }
   ]

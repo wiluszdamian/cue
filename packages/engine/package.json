@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cue core: constitution loader, detectors, analyzer, reporters.",
   "license": "MIT",
   "author": "Damian Wilusz",

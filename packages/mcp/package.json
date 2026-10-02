@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Three point-lookup tools over the Cue rules and knowledge base.",
   "license": "MIT",
   "author": "Damian Wilusz",
