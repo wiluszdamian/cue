@@ -22,7 +22,7 @@ import { CANONICAL_TAGS } from './generated/constitution.js';
  */
 
 const createRule = ESLintUtils.RuleCreator<{ docsAnchor: string }>(
-  (name) => `https://github.com/wiluszdamian/project-cue/blob/main/docs/rules/${name}.md`,
+  (name) => `https://github.com/wiluszdamian/cue/blob/main/docs/rules/${name}.md`,
 );
 
 export type CueRule = TSESLint.RuleModule<'violation'>;

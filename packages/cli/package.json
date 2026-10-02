@@ -4,14 +4,14 @@
   "description": "Preflight, scaffolding and agent wiring for Cue.",
   "license": "MIT",
   "author": "Damian Wilusz",
-  "homepage": "https://github.com/wiluszdamian/project-cue/tree/main/packages/cli#readme",
+  "homepage": "https://github.com/wiluszdamian/cue/tree/main/packages/cli#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiluszdamian/project-cue.git",
+    "url": "git+https://github.com/wiluszdamian/cue.git",
     "directory": "packages/cli"
   },
   "bugs": {
-    "url": "https://github.com/wiluszdamian/project-cue/issues"
+    "url": "https://github.com/wiluszdamian/cue/issues"
   },
   "publishConfig": {
     "access": "public"

@@ -140,4 +140,4 @@ It shows a diff before changing anything.
 
 - [Every rule, explained](../reference/constitution.md)
 - [Common questions](./faq.md)
-- [Report an issue](https://github.com/wiluszdamian/project-cue/issues)
+- [Report an issue](https://github.com/wiluszdamian/cue/issues)

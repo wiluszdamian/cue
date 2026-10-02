@@ -4,14 +4,14 @@
   "description": "Cue core: constitution loader, detectors, analyzer, reporters.",
   "license": "MIT",
   "author": "Damian Wilusz",
-  "homepage": "https://github.com/wiluszdamian/project-cue/tree/main/packages/engine#readme",
+  "homepage": "https://github.com/wiluszdamian/cue/tree/main/packages/engine#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiluszdamian/project-cue.git",
+    "url": "git+https://github.com/wiluszdamian/cue.git",
     "directory": "packages/engine"
   },
   "bugs": {
-    "url": "https://github.com/wiluszdamian/project-cue/issues"
+    "url": "https://github.com/wiluszdamian/cue/issues"
   },
   "publishConfig": {
     "access": "public"

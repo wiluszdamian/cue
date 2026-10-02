@@ -22,7 +22,7 @@ ownership table in `AGENTS.md`.
 | Cursor              | add `wiluszdamian/cue` as a marketplace, install **cue**                              |
 | Codex               | `codex plugin marketplace add wiluszdamian/cue`                                       |
 | Grok                | `grok plugin marketplace add wiluszdamian/cue` then `grok plugin install cue --trust` |
-| Gemini CLI          | `gemini extensions install https://github.com/wiluszdamian/project-cue.git`           |
+| Gemini CLI          | `gemini extensions install https://github.com/wiluszdamian/cue.git`                   |
 | OpenCode            | `npx skills add wiluszdamian/cue -a opencode`                                         |
 | .agents (universal) | `npx skills add wiluszdamian/cue -a universal`                                        |
 

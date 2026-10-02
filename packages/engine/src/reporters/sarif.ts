@@ -41,7 +41,7 @@ function ruleDescriptor(rule: Rule): unknown {
       since: rule.since,
       tags: ['cue', rule.skill],
     },
-    helpUri: `https://github.com/wiluszdamian/project-cue/blob/main/docs/constitution.md#${rule.docsAnchor}`,
+    helpUri: `https://github.com/wiluszdamian/cue/blob/main/docs/constitution.md#${rule.docsAnchor}`,
   };
 }
 
@@ -58,7 +58,7 @@ export const sarifReporter: Reporter = ({ result, constitution }) => {
           tool: {
             driver: {
               name: 'Cue',
-              informationUri: 'https://github.com/wiluszdamian/project-cue',
+              informationUri: 'https://github.com/wiluszdamian/cue',
               rules: enforceable.map(ruleDescriptor),
             },
           },

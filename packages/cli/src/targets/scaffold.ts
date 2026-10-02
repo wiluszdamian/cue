@@ -399,7 +399,7 @@ function testingMd(context: TargetContext): string {
   const pm = context.packageManager;
   return `# Testing
 
-This suite was scaffolded by [Cue](https://github.com/wiluszdamian/project-cue).
+This suite was scaffolded by [Cue](https://github.com/wiluszdamian/cue).
 It is a starting shape, not a finished suite — the login page and example specs
 are templates to replace.
 

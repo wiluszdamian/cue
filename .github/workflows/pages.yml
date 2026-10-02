@@ -4,7 +4,7 @@ name: pages
 #
 # Runs only when the site or the docs it renders change, and by hand. Once, in the
 # repository: Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
-# The site is then at https://wiluszdamian.github.io/project-cue/.
+# The site is then at https://wiluszdamian.github.io/cue/.
 
 on:
   push:

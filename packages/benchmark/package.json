@@ -5,14 +5,14 @@
   "description": "Does Cue actually change what an assistant writes? This measures it.",
   "license": "MIT",
   "author": "Damian Wilusz",
-  "homepage": "https://github.com/wiluszdamian/project-cue/tree/main/packages/benchmark#readme",
+  "homepage": "https://github.com/wiluszdamian/cue/tree/main/packages/benchmark#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiluszdamian/project-cue.git",
+    "url": "git+https://github.com/wiluszdamian/cue.git",
     "directory": "packages/benchmark"
   },
   "bugs": {
-    "url": "https://github.com/wiluszdamian/project-cue/issues"
+    "url": "https://github.com/wiluszdamian/cue/issues"
   },
   "type": "module",
   "exports": {

@@ -18,7 +18,7 @@ export default defineConfig({
           base,
           repoRoot,
           docsDir: fileURLToPath(new URL('../docs', import.meta.url)),
-          repoUrl: 'https://github.com/wiluszdamian/project-cue',
+          repoUrl: 'https://github.com/wiluszdamian/cue',
         },
       ],
     ],

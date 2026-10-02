@@ -116,7 +116,7 @@ tested application actually looks like.
 - **`plugins/cue/`** — generated plugin package with Agent Plugins
   `plugin.json`, Claude / Cursor / Grok / Codex manifests, Gemini
   `gemini-extension.json` and Playwright MCP. Marketplace files live at the
-  repository root so `/plugin marketplace add wiluszdamian/project-cue` works.
+  repository root so `/plugin marketplace add wiluszdamian/cue` works.
 - `cue` is the on-ramp a model may invoke; `compose`, `resolve-owner` and
   `resolve-locator` stay model-invocable. Everything else is orchestration a
   person triggers, enforced by a test.
@@ -313,4 +313,4 @@ tested application actually looks like.
   — two translation files giving different labels for one key, say — the first
   value stays and the disagreement is kept with the evidence on each side.
 
-[1.0.0]: https://github.com/wiluszdamian/project-cue/releases/tag/v1.0.0
+[1.0.0]: https://github.com/wiluszdamian/cue/releases/tag/v1.0.0

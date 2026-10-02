@@ -4,14 +4,14 @@
   "description": "Three point-lookup tools over the Cue rules and knowledge base.",
   "license": "MIT",
   "author": "Damian Wilusz",
-  "homepage": "https://github.com/wiluszdamian/project-cue/tree/main/packages/mcp#readme",
+  "homepage": "https://github.com/wiluszdamian/cue/tree/main/packages/mcp#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiluszdamian/project-cue.git",
+    "url": "git+https://github.com/wiluszdamian/cue.git",
     "directory": "packages/mcp"
   },
   "bugs": {
-    "url": "https://github.com/wiluszdamian/project-cue/issues"
+    "url": "https://github.com/wiluszdamian/cue/issues"
   },
   "publishConfig": {
     "access": "public"

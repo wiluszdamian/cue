@@ -13,20 +13,20 @@ up](./install.md) with `cue init`.
 ## Claude Code
 
 ```bash
-/plugin marketplace add wiluszdamian/project-cue
+/plugin marketplace add wiluszdamian/cue
 /plugin install cue@cue
 ```
 
 ## Cursor
 
-Add `wiluszdamian/project-cue` as a plugin marketplace, then install **cue**.
+Add `wiluszdamian/cue` as a plugin marketplace, then install **cue**.
 Cursor also loads the same package as an [Agent Plugin](https://agent-plugins.org)
 from `plugins/cue/plugin.json`.
 
 ## Codex
 
 ```bash
-codex plugin marketplace add wiluszdamian/project-cue
+codex plugin marketplace add wiluszdamian/cue
 ```
 
 Then `/plugins` and install **cue**. Codex also reads the repo marketplace
@@ -35,14 +35,14 @@ at `.agents/plugins/marketplace.json`.
 ## Grok
 
 ```bash
-grok plugin marketplace add wiluszdamian/project-cue
+grok plugin marketplace add wiluszdamian/cue
 grok plugin install cue --trust
 ```
 
 ## Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/wiluszdamian/project-cue.git
+gemini extensions install https://github.com/wiluszdamian/cue.git
 ```
 
 ## OpenCode
@@ -51,7 +51,7 @@ OpenCode does not have a marketplace this package can publish to. It already
 reads `.opencode/skills/` and `.agents/skills/`:
 
 ```bash
-npx skills add wiluszdamian/project-cue -a opencode
+npx skills add wiluszdamian/cue -a opencode
 ```
 
 ## .agents
@@ -59,7 +59,7 @@ npx skills add wiluszdamian/project-cue -a opencode
 The same command, targeting the directory several agents share:
 
 ```bash
-npx skills add wiluszdamian/project-cue -a universal
+npx skills add wiluszdamian/cue -a universal
 ```
 
 That lands in `.agents/skills/`. Codex, Cursor, Gemini CLI, OpenCode and others

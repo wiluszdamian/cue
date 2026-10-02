@@ -37,8 +37,7 @@ export interface AnalyzeOptions {
   readonly now?: Date;
 }
 
-const DEFAULT_DOCS_BASE =
-  'https://github.com/wiluszdamian/project-cue/blob/main/docs/constitution.md';
+const DEFAULT_DOCS_BASE = 'https://github.com/wiluszdamian/cue/blob/main/docs/constitution.md';
 
 export function docsUrlFor(rule: Rule, base = DEFAULT_DOCS_BASE): string {
   return `${base}#${rule.docsAnchor}`;

@@ -12,7 +12,7 @@
       "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
       "version": "1.0.0",
       "author": { "name": "Cue" },
-      "homepage": "https://github.com/wiluszdamian/project-cue",
+      "homepage": "https://github.com/wiluszdamian/cue",
       "keywords": ["playwright", "testing", "e2e", "typescript", "agent-skills"],
       "category": "development",
       "skills": "./skills",

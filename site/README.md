@@ -41,12 +41,12 @@ The build is plain static files. For GitHub Pages under the repository name,
 build with the base path set:
 
 ```bash
-SITE_BASE=/project-cue pnpm build
+SITE_BASE=/cue pnpm build
 ```
 
 `.github/workflows/pages.yml` does this on every push to `main` that touches `site/` or `docs/`.
 Enable it once under Settings -> Pages -> Source: GitHub Actions. The site is then at
-<https://wiluszdamian.github.io/project-cue/>.
+<https://wiluszdamian.github.io/cue/>.
 
 For a custom domain, leave `SITE_BASE` unset and set `SITE_URL`.
 

@@ -36,7 +36,7 @@ function agentsBody(context: TargetContext): string {
 
 ## Testing conventions (Cue)
 
-This project uses [Cue](https://github.com/wiluszdamian/project-cue). Test
+This project uses [Cue](https://github.com/wiluszdamian/cue). Test
 code follows a constitution that is mechanically enforced — ${enforced.length} of the
 ${rules.constitution.rules.length} rules are ESLint rules, so ignoring them fails the build rather
 than the review.

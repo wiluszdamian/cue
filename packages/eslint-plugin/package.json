@@ -4,14 +4,14 @@
   "description": "ESLint rules generated from the Cue constitution. Works with no agent involved.",
   "license": "MIT",
   "author": "Damian Wilusz",
-  "homepage": "https://github.com/wiluszdamian/project-cue/tree/main/packages/eslint-plugin#readme",
+  "homepage": "https://github.com/wiluszdamian/cue/tree/main/packages/eslint-plugin#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wiluszdamian/project-cue.git",
+    "url": "git+https://github.com/wiluszdamian/cue.git",
     "directory": "packages/eslint-plugin"
   },
   "bugs": {
-    "url": "https://github.com/wiluszdamian/project-cue/issues"
+    "url": "https://github.com/wiluszdamian/cue/issues"
   },
   "publishConfig": {
     "access": "public"

@@ -1,6 +1,6 @@
 # @wiluszdamian/cue
 
-Preflight, scaffolding and agent wiring for [Cue](https://github.com/wiluszdamian/project-cue):
+Preflight, scaffolding and agent wiring for [Cue](https://github.com/wiluszdamian/cue):
 your Playwright conventions as ESLint rules an agent can't skip, plus a knowledge base of
 your app's real routes and selectors.
 
@@ -20,5 +20,5 @@ npx @wiluszdamian/cue doctor
 Every problem `doctor` reports comes with the command that fixes it. Once installed,
 `cue <command>` resolves to the local bin; `cue --help` lists every command.
 
-Documentation: [getting started](https://github.com/wiluszdamian/project-cue/blob/main/docs/start/install.md),
-[commands](https://github.com/wiluszdamian/project-cue/blob/main/docs/help/commands.md).
+Documentation: [getting started](https://github.com/wiluszdamian/cue/blob/main/docs/start/install.md),
+[commands](https://github.com/wiluszdamian/cue/blob/main/docs/help/commands.md).

@@ -1,6 +1,6 @@
 # @wiluszdamian/cue-engine
 
-The core of [Cue](https://github.com/wiluszdamian/project-cue): the constitution loader,
+The core of [Cue](https://github.com/wiluszdamian/cue): the constitution loader,
 detectors, analyzer, reporters and the knowledge base model. The CLI
 ([`@wiluszdamian/cue`](https://www.npmjs.com/package/@wiluszdamian/cue)), the ESLint plugin
 and the MCP server are built on it; most projects install one of those rather than this.
