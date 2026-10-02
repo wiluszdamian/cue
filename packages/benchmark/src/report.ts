@@ -35,6 +35,42 @@ export function formatReport(result: BenchmarkResult): string {
   lines.push(`  with Understudy      ${percent(comparison.groundedRate.understudy)}`);
   lines.push('');
 
+  if (result.conditions.some((condition) => condition.execution !== undefined)) {
+    lines.push('Compiled and run against the demo application (first run, no retries)');
+    for (const condition of result.conditions) {
+      const e = condition.execution;
+      if (e === undefined) continue;
+      lines.push(
+        `  ${condition.condition.padEnd(10)} compiled ${String(e.compiled)}/${String(e.samples)} · ` +
+          `passed first run ${String(e.passedFirstRun)}/${String(e.samples)}` +
+          (e.failedRun > 0 ? ` · ${String(e.failedRun)} failed` : '') +
+          (e.didNotRun > 0 ? ` · ${String(e.didNotRun)} did not run` : ''),
+      );
+    }
+    lines.push('');
+  }
+
+  if (result.conditions.some((condition) => condition.locators !== undefined)) {
+    lines.push('Locators, as the checker judges them (right element, right page, unique)');
+    for (const condition of result.conditions) {
+      const l = condition.locators;
+      if (l === undefined) continue;
+      if (result.surveyedRoutes.length === 0) {
+        // Everything would read as invented, which says nothing about the answers.
+        lines.push(
+          `  ${condition.condition.padEnd(10)} not judged: the knowledge base is empty (${String(l.total)} locator(s))`,
+        );
+        continue;
+      }
+      lines.push(
+        `  ${condition.condition.padEnd(10)} ${String(l.known)}/${String(l.judged)} valid (${percent(l.validRate)})` +
+          ` · ${String(l.unknown)} invented · ${String(l.wrongRoute)} wrong route · ${String(l.ambiguous)} ambiguous` +
+          ` · ${String(l.undecidable)} not judged`,
+      );
+    }
+    lines.push('');
+  }
+
   for (const condition of result.conditions) {
     lines.push(`${condition.condition}:`);
     lines.push(
@@ -45,6 +81,17 @@ export function formatReport(result: BenchmarkResult): string {
     );
     for (const rule of condition.compliance.byRule.slice(0, 5)) {
       lines.push(`    ${String(rule.count).padStart(3)} × ${rule.ruleId}`);
+    }
+    for (const sample of condition.samples) {
+      const e = sample.execution;
+      if (e === undefined || (e.compile.ok && e.run.status === 'passed')) continue;
+      lines.push(
+        `  ${sample.promptId}: ${e.compile.ok ? '' : 'does not compile; '}${e.run.status}` +
+          (e.run.note === undefined ? '' : ` (${e.run.note})`),
+      );
+      for (const message of [...e.compile.errors.slice(0, 2), ...e.run.failures.slice(0, 2)]) {
+        lines.push(`      ${message}`);
+      }
     }
     if (condition.grounding.invented > 0) {
       lines.push(`  invented ${String(condition.grounding.invented)} selector(s):`);

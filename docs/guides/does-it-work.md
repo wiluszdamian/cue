@@ -50,6 +50,27 @@ Then score what was recorded:
 understudy-benchmark ./recordings --project ./my-project
 ```
 
+### Running the answers, not only reading them
+
+Prompt set 2 is a set of tasks on the demo application in this repository
+(`examples/demo-app`). Scored with `--execute`, each answer is also compiled with
+the project's TypeScript and run once, with no retries, in a real browser against
+that application:
+
+```bash
+understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execute
+```
+
+That adds what reading the code cannot tell you: whether it **compiles**, whether it
+**passes the first time**, and which of its locators name the right element on the
+right page (the same judgement `understudy check` makes). A locator the checker cannot
+decide, such as one built from a variable, is counted as not judged, never as
+invented. The checker also does not follow a click to a new page, so a real element
+asserted after navigating is reported as being on the wrong route, apart from the
+invented ones. Install the browser once with
+`pnpm --filter @understudy/demo-app exec playwright install chromium`; the whole
+path is covered by `pnpm --filter @understudy/benchmark test:integration`.
+
 Narrow it deliberately while you work:
 
 ```bash

@@ -25,3 +25,6 @@ Thumbs.db
 
 # Planning documents, kept locally rather than shipped
 understudy-blueprints/
+
+# Scratch workspaces for generated tests run by the benchmark
+.benchmark/

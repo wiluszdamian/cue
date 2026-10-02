@@ -1,7 +1,9 @@
 import {
   analyze,
+  analyzeLocators,
   extractLocators,
   readAllRouteMaps,
+  type KnowledgeIndex,
   type Constitution,
   type LocatorUse,
   type TagSet,
@@ -135,5 +137,81 @@ export function scoreGrounding(
     undecidable,
     groundedRate: judged === 0 ? undefined : grounded / judged,
     inventedLocators,
+  };
+}
+
+/**
+ * The same judgement the checker makes, applied to what a model wrote. Unlike
+ * `GroundingScore` it knows which route a test is on and whether the match is
+ * unique, so "the right element on the right page" is what counts as valid.
+ */
+export interface LocatorScore {
+  readonly total: number;
+  /** Everything the knowledge base could rule on: `total` less `undecidable`. */
+  readonly judged: number;
+  readonly known: number;
+  /** Nothing in the knowledge base matches: invented. */
+  readonly unknown: number;
+  /** Real, but on a page the test is not on. */
+  readonly wrongRoute: number;
+  /** More than one element matches, so Playwright would refuse it. */
+  readonly ambiguous: number;
+  readonly stale: number;
+  readonly unverified: number;
+  /** Not judged: a variable, a regular expression, getByText. Never counted as invented. */
+  readonly undecidable: number;
+  /** known / judged. Undefined when nothing could be judged. */
+  readonly validRate: number | undefined;
+  /** `unknown` and `wrong-route`, as written, so the failure can be read. */
+  readonly invalidLocators: readonly string[];
+}
+
+export function scoreLocators(
+  files: readonly GeneratedFile[],
+  index: KnowledgeIndex,
+  now?: Date,
+): LocatorScore {
+  const count = {
+    known: 0,
+    unknown: 0,
+    'wrong-route': 0,
+    ambiguous: 0,
+    stale: 0,
+    unverified: 0,
+    undecidable: 0,
+  };
+  const invalid: string[] = [];
+  let total = 0;
+
+  for (const file of files) {
+    for (const finding of analyzeLocators({
+      filePath: file.path,
+      source: file.source,
+      index,
+      ...(now === undefined ? {} : { now }),
+    })) {
+      total += 1;
+      count[finding.verdict] += 1;
+      if (finding.verdict === 'unknown' || finding.verdict === 'wrong-route') {
+        invalid.push(
+          `${finding.expression}${finding.verdict === 'wrong-route' ? ' (wrong route)' : ''}`,
+        );
+      }
+    }
+  }
+
+  const judged = total - count.undecidable;
+  return {
+    total,
+    judged,
+    known: count.known,
+    unknown: count.unknown,
+    wrongRoute: count['wrong-route'],
+    ambiguous: count.ambiguous,
+    stale: count.stale,
+    unverified: count.unverified,
+    undecidable: count.undecidable,
+    validRate: judged === 0 ? undefined : count.known / judged,
+    invalidLocators: invalid,
   };
 }

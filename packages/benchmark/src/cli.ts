@@ -4,7 +4,8 @@ import { resolve } from 'node:path';
 import { loadRules } from '@understudy/engine';
 import { CONDITIONS, missingRecordings, RecordedAgent } from './agent.js';
 import { ClaudeAgent, DEFAULT_MODEL } from './live-agent.js';
-import { PROMPTS } from './prompts.js';
+import { DemoExecutor } from './executor.js';
+import { PROMPT_SETS, promptSet, type Prompt } from './prompts.js';
 import { recordRun } from './record-run.js';
 import { formatReport, toJson } from './report.js';
 import { runBenchmark } from './runner.js';
@@ -21,7 +22,11 @@ understudy-benchmark record <recordings-dir> [options]  ask a model, and write t
   --project <path>   the project whose AGENTS.md and .agent-kb to use
   --rules <path>     rules directory (default: <project>/rules)
   --json <file>      also write the full result as JSON            (scoring)
+  --prompt-set <n>   which prompt set: 1 (default; scored, never run) or 2 (the demo application)
   --prompts <a,b>    limit to these prompts, rather than the whole set
+  --execute          compile and run each answer against the demo application   (scoring)
+  --demo <path>      the demo application (default: ./examples/demo-app)        (--execute)
+  --keep-workspaces  leave each answer's files on disk after running it         (--execute)
   --model <id>       model to record with (default: ${DEFAULT_MODEL})
   --force            re-ask for answers already on disk            (record)
 `;
@@ -35,15 +40,23 @@ function has(name: string): boolean {
   return process.argv.includes(`--${name}`);
 }
 
+function chosenSet(): { version: number; prompts: readonly Prompt[] } | undefined {
+  const version = Number(flag('prompt-set') ?? '1');
+  return promptSet(version);
+}
+
 /** Prompts named by `--prompts`, or the whole set. Undefined when none matched. */
-function selectedPrompts(): readonly (typeof PROMPTS)[number][] | undefined {
+function selectedPrompts(): readonly Prompt[] | undefined {
+  const set = chosenSet();
+  if (set === undefined) return undefined;
+
   const only = flag('prompts')
     ?.split(',')
     .map((id) => id.trim())
     .filter((id) => id.length > 0);
-  if (only === undefined) return PROMPTS;
+  if (only === undefined) return set.prompts;
 
-  const prompts = PROMPTS.filter((prompt) => only.includes(prompt.id));
+  const prompts = set.prompts.filter((prompt) => only.includes(prompt.id));
   return prompts.length === 0 ? undefined : prompts;
 }
 
@@ -80,11 +93,22 @@ async function score(recordings: string, projectRoot: string): Promise<number> {
     return 1;
   }
 
+  const set = chosenSet();
+  const executor = has('execute')
+    ? new DemoExecutor({
+        demoRoot: resolve(flag('demo') ?? 'examples/demo-app'),
+        keep: has('keep-workspaces'),
+      })
+    : undefined;
+
   const result = await runBenchmark({
     projectRoot,
     agent: new RecordedAgent(recordings),
     rules,
     prompts,
+    promptSetVersion: set?.version ?? 1,
+    ...(executor === undefined ? {} : { executor }),
+    judgeLocators: (set?.version ?? 1) >= 2,
   });
 
   process.stdout.write(`${formatReport(result)}\n`);
@@ -140,7 +164,14 @@ async function recordCommand(recordings: string, projectRoot: string): Promise<n
 }
 
 function unknownPrompt(): number {
-  process.stderr.write(`No prompt matched. Known: ${PROMPTS.map((p) => p.id).join(', ')}\n`);
+  const set = chosenSet();
+  if (set === undefined) {
+    process.stderr.write(
+      `No prompt set "${flag('prompt-set') ?? ''}". Known: ${PROMPT_SETS.map((s) => String(s.version)).join(', ')}\n`,
+    );
+    return 2;
+  }
+  process.stderr.write(`No prompt matched. Known: ${set.prompts.map((p) => p.id).join(', ')}\n`);
   return 2;
 }
 

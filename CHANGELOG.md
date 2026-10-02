@@ -67,6 +67,16 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **The benchmark can run what a model wrote.** A second prompt set (`--prompt-set 2`,
+  seven tasks on the demo application, several tied to a defect it can be given) and
+  `--execute` compile each answer with the project's TypeScript and run it once, with
+  no retries, in a real browser, reporting compile success and first-run pass per
+  condition and per answer. Locators are judged by the same analyzer as `understudy
+  check` (right element, right page, unique), with those it cannot decide counted
+  separately and never as invented. A path in a model's answer that leaves the workspace
+  is refused. `pnpm --filter @understudy/benchmark test:integration` runs the real thing.
+  Nothing has been measured with a model yet.
+
 - `scripts/e2e.mjs` runs the whole user path against a real browser, from `init` to a
   deliberately broken app, and CI runs it on Ubuntu for every push (Windows weekly).
   The demo app gained a `login-button-renamed` mutation, so that `verify` has a page
