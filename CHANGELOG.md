@@ -12,6 +12,12 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **`doctor` looks at the knowledge, not only the setup.** Unreadable or unsupported files,
+  pages in the older format, facts that are old or whose code changed, sources that disagree,
+  locators in your tests that the notes do not know, test ids that left the source, one element
+  noted twice, and pages known only from the code. A healthy knowledge base is still one line,
+  every problem comes with a command that exists, and only an unreadable file fails `--ci`.
+
 - **`get_context`** (MCP) and **`understudy context "<task>"`**: one answer, at the start of a
   task, with the page it is about, the matching elements, endpoints, vocabulary, the rules, and
   how fresh each part is, inside a token budget the caller sets (200 to 3000). Retrieval is by

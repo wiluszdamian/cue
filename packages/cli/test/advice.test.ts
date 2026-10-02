@@ -15,7 +15,14 @@ import { COMMANDS, isCommand, NOT_IMPLEMENTED_MARKER } from '../src/commands.js'
 const SRC = join(import.meta.dirname, '..', 'src');
 
 /** Files that hand instructions to a user. */
-const ADVICE_FILES = ['doctor.ts', 'init.ts', 'sync.ts', 'survey.ts', 'targets/baseline.ts'];
+const ADVICE_FILES = [
+  'doctor.ts',
+  'doctor-knowledge.ts',
+  'init.ts',
+  'sync.ts',
+  'survey.ts',
+  'targets/baseline.ts',
+];
 
 interface Mention {
   readonly file: string;

@@ -52,7 +52,25 @@ npx @understudy/cli doctor --offline
 ```
 
 `--ci` fails the build when there are errors. `--offline` skips anything that
-needs the network.
+needs the network. `--source <path>` says where the product source is, if it is not here.
+
+Besides the setup, it looks at whether the notes in `.agent-kb` can be believed. A healthy
+knowledge base is one line; each problem adds one, with its fix:
+
+| Check                          | What it says                                                                     | Fix                          | In `--ci` |
+| ------------------------------ | -------------------------------------------------------------------------------- | ---------------------------- | --------- |
+| `kb:files`, `kb:product-files` | A file in `.agent-kb` could not be read or has an unsupported version.           | `survey --route` / `extract` | error     |
+| `kb:legacy`                    | A page is saved in the older format, with no evidence per element.               | `survey --route <route>`     | warning   |
+| `kb:fresh`                     | Facts not confirmed for over a month, or whose code changed since (max 5 shown). | `survey --stale`             | warning   |
+| `kb:conflicts`                 | Two sources disagree about a fact. Neither is picked for you.                    | `survey --route <route>`     | warning   |
+| `kb:tests`                     | Locators in your tests that the notes do not know (max 5 shown).                 | `check`                      | warning   |
+| `kb:test-ids`                  | Test ids in the notes that the source no longer contains.                        | `extract --source <dir>`     | warning   |
+| `kb:duplicates`                | One element noted under two ids.                                                 | `survey --route <route>`     | warning   |
+| `kb:coverage`                  | Pages known from the code that nobody has looked at.                             | `survey --route <route>`     | warning   |
+
+Only an unreadable file is an error, because it is knowledge the tools cannot use at all.
+The rest are warnings: they say how far to trust the notes, and a team that has to silence
+warnings to ship stops reading them.
 
 ### `understudy add` / `remove` / `list`
 
