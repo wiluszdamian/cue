@@ -81,6 +81,27 @@ written.
 A page that parses but contains lines the parser did not understand is still
 surveyed; the lines are listed under `Gaps` in the map so the loss is visible.
 
+## `doctor` says a tool version is outside the tested range
+
+Understudy uses tools it does not own: `@playwright/cli` to look at pages,
+`@playwright/test` to run them, and `@playwright/mcp` for browser calls from an agent.
+`compatibility.yaml` in the repository lists, for each, the range it claims to work
+with and the version it was last run against.
+
+`understudy doctor` compares what is installed in your project with those ranges. A tool
+outside its range is a warning, not an error: it may well work, and nothing here has
+shown that it does. The warning carries the command that installs the version that was
+tested, for example `pnpm add -D @playwright/cli@0.1.22`.
+
+The MCP configuration `init` writes names exact versions too, and not `@latest`: ours is
+the release that wrote the file, and Playwright MCP is the version that was tested. After
+upgrading Understudy, `understudy sync` shows the diff that moves them.
+
+The project checks the other direction weekly. The `upstream` workflow looks up the newest
+release of each tool and fails, saying which one and what to do, when it has moved outside
+its range. That is a prompt to run the suite against the new release and then widen the
+range, or to hold it and say why.
+
 ## `init` did not overwrite my file
 
 By design. If you have edited a file Understudy wrote, it leaves it alone and

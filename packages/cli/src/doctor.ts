@@ -1,7 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Rules } from '@understudy/engine';
+import { judgeVersions, type Rules } from '@understudy/engine';
 import { detectAgents, type TargetId } from './agents.js';
+import { COMPATIBILITY } from './generated/compatibility.js';
 import { knowledgeChecks, probeKnowledge } from './doctor-knowledge.js';
 import { inspect } from './install.js';
 import { MANIFEST_PATH, type Manifest } from './manifest.js';
@@ -297,6 +298,61 @@ function checkOfficialSkills(ctx: DoctorContext): CheckResult {
   };
 }
 
+/** The version a package has on disk in this project, or `undefined` when it is not installed. */
+function installedVersion(projectRoot: string, name: string): string | undefined {
+  const file = join(projectRoot, 'node_modules', ...name.split('/'), 'package.json');
+  if (!existsSync(file)) return undefined;
+  try {
+    const version = (JSON.parse(readFileSync(file, 'utf8')) as { version?: unknown }).version;
+    return typeof version === 'string' ? version : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The tools whose version decides whether survey, verify and the generated tests behave. */
+const VERSIONED_TOOLS = ['@playwright/cli', '@playwright/test'] as const;
+
+/**
+ * Installed versions against the ones this release was tested with. A tool that is not
+ * installed is not this check's business (`playwright-cli available` covers it); one that
+ * is, and sits outside the range, is a warning with the command that installs the
+ * version that was tested, not an error: it may well work.
+ */
+function checkToolVersions(ctx: DoctorContext): CheckResult[] {
+  const installed: Record<string, string> = {};
+  for (const name of VERSIONED_TOOLS) {
+    const version = installedVersion(ctx.projectRoot, name);
+    if (version !== undefined) installed[name] = version;
+  }
+
+  const findings = judgeVersions(COMPATIBILITY, installed);
+  if (findings.length === 0) return [];
+
+  const problems = findings.filter((finding) => finding.verdict !== 'inside');
+  if (problems.length === 0) {
+    return [
+      {
+        id: 'tool-versions',
+        title: 'Tool versions',
+        status: 'ok',
+        detail: `${findings.map((f) => `${f.tool} ${f.version}`).join(', ')} — inside the tested ranges.`,
+      },
+    ];
+  }
+
+  return problems.map((finding) => ({
+    id: `tool-version:${finding.tool}`,
+    title: `${finding.tool} version`,
+    status: finding.verdict === 'not-judged' ? ('unchecked' as const) : ('warn' as const),
+    detail:
+      finding.verdict === 'not-judged'
+        ? `${finding.version} is not a plain release, so it was not compared with the tested range ${finding.range}.`
+        : `${finding.version} is outside ${finding.range}, which is what this release of Understudy was run against (last tested: ${finding.tested}). It may work; nothing here has shown that it does.`,
+    fix: addDevCommand(ctx.detection.manager, [`${finding.tool}@${finding.tested}`]),
+  }));
+}
+
 /** An agent someone uses but nobody wired up silently ignores the conventions. */
 function checkTargetCoverage(ctx: DoctorContext): CheckResult[] {
   const installed = new Set<TargetId>(ctx.manifest?.targets ?? []);
@@ -376,6 +432,7 @@ export function runChecks(ctx: DoctorContext): CheckResult[] {
     checkContentFresh(ctx),
     ...checkTargetCoverage(ctx),
     checkPlaywrightCli(ctx),
+    ...checkToolVersions(ctx),
     checkOfficialSkills(ctx),
     ...knowledgeChecks(probeKnowledge(ctx.projectRoot, ctx.now, ctx.source)),
   ];

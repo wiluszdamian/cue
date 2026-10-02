@@ -99,6 +99,22 @@ export * from './verification/index.js';
 export * from './discovery/index.js';
 
 export {
+  COMPATIBILITY_SCHEMA_VERSION,
+  CompatibilitySchema,
+  compareVersions,
+  describeUpstreamDrift,
+  isReadableRange,
+  judgeVersions,
+  loadCompatibility,
+  parseCompatibility,
+  satisfies,
+  type Compatibility,
+  type ToolCompatibility,
+  type VersionFinding,
+  type VersionVerdict,
+} from './compatibility.js';
+
+export {
   AGENT_KB_SCHEMA_VERSION,
   ROUTE_MAP_VERSION,
   RouteMapFileV2Schema,

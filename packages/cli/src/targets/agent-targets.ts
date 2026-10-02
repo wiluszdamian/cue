@@ -1,3 +1,4 @@
+import { COMPATIBILITY } from '../generated/compatibility.js';
 import type { DesiredFile } from '../install.js';
 import type { PackageManager } from '../package-manager.js';
 import type { Target, TargetContext } from './types.js';
@@ -8,11 +9,22 @@ import type { Target, TargetContext } from './types.js';
  * removed exactly; JSON cannot, so those files are only ever created.
  */
 
-/** Complements: an agent with only the browser server guesses selectors. */
-const MCP_PACKAGES = {
-  understudy: '@understudy/mcp@latest',
-  playwright: '@playwright/mcp@latest',
-} as const;
+/**
+ * Complements: an agent with only the browser server guesses selectors.
+ *
+ * Both are pinned. `@latest` would run whatever was published this morning on the
+ * strength of a config written months ago, and the first sign of a breaking release
+ * would be an agent that stopped answering. Our own server is pinned to the release
+ * that wrote the file; the browser server to the version compatibility.yaml was
+ * tested with. `understudy sync` moves both when the package is upgraded.
+ */
+function mcpPackages(understudyVersion: string): { understudy: string; playwright: string } {
+  const playwright = COMPATIBILITY.tools['@playwright/mcp'];
+  return {
+    understudy: `@understudy/mcp@${understudyVersion}`,
+    playwright: `@playwright/mcp@${playwright?.tested ?? 'latest'}`,
+  };
+}
 
 function mcpRunner(manager: PackageManager, pkg: string): { command: string; args: string[] } {
   switch (manager) {
@@ -27,19 +39,27 @@ function mcpRunner(manager: PackageManager, pkg: string): { command: string; arg
   }
 }
 
-function mcpServers(manager: PackageManager): Record<string, { command: string; args: string[] }> {
+function mcpServers(
+  manager: PackageManager,
+  understudyVersion: string,
+): Record<string, { command: string; args: string[] }> {
+  const packages = mcpPackages(understudyVersion);
   return {
-    understudy: mcpRunner(manager, MCP_PACKAGES.understudy),
-    playwright: mcpRunner(manager, MCP_PACKAGES.playwright),
+    understudy: mcpRunner(manager, packages.understudy),
+    playwright: mcpRunner(manager, packages.playwright),
   };
 }
 
-export function mcpJson(manager: PackageManager, key = 'mcpServers'): string {
-  return `${JSON.stringify({ [key]: mcpServers(manager) }, null, 2)}\n`;
+export function mcpJson(
+  manager: PackageManager,
+  understudyVersion: string,
+  key = 'mcpServers',
+): string {
+  return `${JSON.stringify({ [key]: mcpServers(manager, understudyVersion) }, null, 2)}\n`;
 }
 
-function mcpToml(manager: PackageManager): string {
-  const servers = mcpServers(manager);
+function mcpToml(manager: PackageManager, understudyVersion: string): string {
+  const servers = mcpServers(manager, understudyVersion);
   const block = (name: string): string =>
     [
       `[mcp_servers.${name}]`,
@@ -85,7 +105,7 @@ export const claudeCodeTarget: Target = {
       {
         path: '.mcp.json',
         target: 'claude-code',
-        content: mcpJson(context.packageManager),
+        content: mcpJson(context.packageManager, context.understudyVersion),
         reason: 'Understudy point lookups, and Playwright MCP for browser calls',
       },
     ];
@@ -102,7 +122,7 @@ export const cursorTarget: Target = {
       {
         path: '.cursor/mcp.json',
         target: 'cursor',
-        content: mcpJson(context.packageManager),
+        content: mcpJson(context.packageManager, context.understudyVersion),
         reason: 'Understudy point lookups, and Playwright MCP for browser calls',
       },
     ];
@@ -119,7 +139,7 @@ export const codexTarget: Target = {
       {
         path: '.codex/config.toml',
         target: 'codex',
-        content: mcpToml(context.packageManager),
+        content: mcpToml(context.packageManager, context.understudyVersion),
         region: { begin: TOML_BEGIN, end: TOML_END },
         reason: 'Understudy point lookups, and Playwright MCP for browser calls',
       },
@@ -137,7 +157,7 @@ export const opencodeTarget: Target = {
       {
         path: 'opencode.json',
         target: 'opencode',
-        content: mcpJson(context.packageManager, 'mcp'),
+        content: mcpJson(context.packageManager, context.understudyVersion, 'mcp'),
         reason: 'Understudy point lookups, and Playwright MCP for browser calls',
       },
     ];
@@ -154,7 +174,7 @@ export const geminiTarget: Target = {
       {
         path: '.gemini/settings.json',
         target: 'gemini',
-        content: mcpJson(context.packageManager),
+        content: mcpJson(context.packageManager, context.understudyVersion),
         reason: 'Understudy point lookups, and Playwright MCP for browser calls',
       },
     ];
