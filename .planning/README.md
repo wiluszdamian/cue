@@ -59,7 +59,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 21 | [MCP: `get_context`](tickets/21-mcp-get-context.md) | P1.4 | 20 | done |
 | 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | done |
 | 23 | [Macierz kompatybilności i pinowanie wersji](tickets/23-compatibility-matrix.md) | P1.6 | 04 | done |
-| 24 | [i18n przez prawdziwy parser (zagnieżdżone klucze)](tickets/24-i18n-real-parser.md) | P1 | 05 | todo |
+| 24 | [i18n przez prawdziwy parser (zagnieżdżone klucze)](tickets/24-i18n-real-parser.md) | P1 | 05 | done |
 | 25 | [Wiedza z istniejących testów i Page Objects](tickets/25-extract-existing-tests.md) | P1 | 09, 10, 19 | todo |
 
 P2 (bez ticketów, do rozpisania po P1): [backlog-p2.md](backlog-p2.md).

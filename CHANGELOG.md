@@ -12,6 +12,14 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Translation catalogues are read by a parser.** `extract` used to match one `key: "label"`
+  per line, so a nested catalogue gave the last segment (`submit`) and a minified one gave
+  nothing. JSON and YAML now give the full dotted key (`auth.login.submit`) with the line of
+  its value, list items as `steps.0`, placeholders (`{{name}}`, ICU plurals) exactly as written,
+  and the same answer for the same catalogue in either format. A file that cannot be parsed is
+  a gap and the rest are still read. With several locales the English label is kept and the
+  others are named as left out, because a term does not record its locale.
+
 - **`compatibility.yaml`**: the range and the tested version of each tool Understudy composes
   (`@playwright/cli`, `@playwright/mcp`, `@playwright/test`, typescript-eslint). The MCP
   configuration `init` writes and the plugin manifests now pin exact versions instead of
