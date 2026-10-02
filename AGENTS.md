@@ -128,7 +128,22 @@ section. A workaround nobody is watching becomes permanent.
 
 ## Publishing
 
-Release with `pnpm release`. Never `npm publish`.
+A release is a tag, and CI does the rest. Never `npm publish`.
+
+```bash
+pnpm release:bump 0.9.0          # VERSION, every package.json, the changelog heading
+pnpm generate                    # the pinned MCP version and plugin manifests follow VERSION
+git commit -am "release v0.9.0"
+git tag v0.9.0
+git push --follow-tags
+```
+
+`.github/workflows/release.yml` runs on the tag: `scripts/release.mjs check` fails unless the
+tag, `VERSION`, the changelog and every manifest say the same number; then build, `pnpm verify`,
+`pnpm -r publish` (the four public packages, together, with provenance) and a GitHub release
+whose notes are that version's changelog section. It needs the `NPM_TOKEN` secret. Run the
+workflow by hand with `dry_run` to rehearse everything but the upload; `pnpm release:dry` does
+the publish step locally.
 
 Two things make the npm path quietly wrong:
 

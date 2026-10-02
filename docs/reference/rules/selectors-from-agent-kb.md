@@ -4,7 +4,7 @@ _Selectors come from .agent-kb or from fresh exploration_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |                                                                               |
+| Property    | Value                                                                         |
 | ----------- | ----------------------------------------------------------------------------- |
 | Tier        | `MUST`                                                                        |
 | Severity    | `warn`                                                                        |

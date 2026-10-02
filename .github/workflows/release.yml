@@ -1,0 +1,75 @@
+name: release
+
+# Pushing a tag such as v0.9.0 publishes every public package to npm and creates the
+# GitHub release, in that order, from one commit. Prepare the commit with
+# `pnpm release:prepare 0.9.0`; the tag is then the only manual step.
+#
+# Needs one secret: NPM_TOKEN, an npm automation token with publish rights on the
+# @wiluszdamian scope.
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Run everything except the upload
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write # npm provenance: the package says which commit and workflow built it
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+
+      # A tag that disagrees with the code publishes nothing. On a manual run there is no tag,
+      # so the version in the repository is the one that is checked.
+      - name: The tag, VERSION, changelog and every package agree
+        run: node scripts/release.mjs check "${TAG:-v$(cat VERSION)}"
+
+      - run: pnpm run build
+      - name: Everything verified, generated files included
+        run: pnpm run verify
+        env:
+          CI: 'true'
+
+      - name: Publish to npm
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            pnpm -r publish --dry-run --no-git-checks --access public
+          else
+            pnpm -r publish --no-git-checks --access public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: GitHub release
+        if: env.TAG != '' && env.DRY_RUN != 'true'
+        run: |
+          version="${TAG#v}"
+          node scripts/release.mjs notes "$version" > release-notes.md
+          flags=""
+          case "$version" in *-*) flags="--prerelease" ;; esac
+          gh release create "$TAG" --title "Cue $version" --notes-file release-notes.md --verify-tag $flags
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

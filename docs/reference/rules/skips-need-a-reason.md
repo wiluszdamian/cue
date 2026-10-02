@@ -4,7 +4,7 @@ _A skipped test must say why and when it comes back_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |              |
+| Property    | Value        |
 | ----------- | ------------ |
 | Tier        | `MUST`       |
 | Severity    | `warn`       |

@@ -4,7 +4,7 @@ _Every test carries a canonical tag_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |                       |
+| Property    | Value                 |
 | ----------- | --------------------- |
 | Tier        | `MUST`                |
 | Severity    | `error`               |
