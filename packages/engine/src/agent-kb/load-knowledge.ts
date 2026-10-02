@@ -3,16 +3,26 @@ import { join, relative, sep } from 'node:path';
 import { parse } from 'yaml';
 import type { ZodType } from 'zod';
 import {
+  FromTestsSchema,
   SurfaceSchema,
   TestIdsSchema,
   VocabularySchema,
   type RouteMap,
+  type FromTests,
   type Surface,
   type TestIds,
   type Vocabulary,
 } from '../schema/agent-kb.js';
 import { KnowledgeBuilder } from '../knowledge/builder.js';
-import { apiId, locatorId, routeId, termId, testIdFactId } from '../knowledge/ids.js';
+import {
+  apiId,
+  locatorId,
+  namedId,
+  normaliseName,
+  routeId,
+  termId,
+  testIdFactId,
+} from '../knowledge/ids.js';
 import type { FactConfidence, FactStatus, KnowledgeBase } from '../knowledge/model.js';
 import { validateKnowledge } from '../knowledge/validate.js';
 import { PRODUCT_DIR, readAllRouteMapsWithErrors } from './store.js';
@@ -123,6 +133,13 @@ export function loadKnowledge(root: string, now?: Date): LoadedKnowledge {
     issues,
   );
 
+  const fromTests: FromTests | undefined = readYaml(
+    productPath('from-tests.yaml'),
+    FromTestsSchema,
+    shown(productPath('from-tests.yaml')),
+    issues,
+  );
+
   /** Evidence for a `file:line` the product source gave, typed by what the file is. */
   const sourceEvidence = (
     reference: string,
@@ -190,6 +207,71 @@ export function loadKnowledge(root: string, now?: Date): LoadedKnowledge {
       label: term.label,
       status: 'observed',
       evidence: [sourceEvidence(term.source, vocabulary?.commit)],
+    });
+  }
+
+  // ------------------------------------------------------------ existing tests
+  // A claim somebody once wrote into a test. Read last, so that when a survey has seen the same
+  // element, what it saw is what stands and the test's version is only recorded beside it. The
+  // status is always inferred: a test may be dead, and agreeing with itself proves nothing.
+  for (const entry of fromTests?.locators ?? []) {
+    const { file, line } = splitReference(entry.source);
+    const evidence = builder.addEvidence({
+      type: entry.origin,
+      file,
+      ...(line === undefined ? {} : { line }),
+      ...(entry.symbol === undefined ? {} : { symbol: entry.symbol }),
+      ...(fromTests?.commit === undefined ? {} : { commit: fromTests.commit }),
+    });
+    builder.addFact({
+      id: routeId(entry.route),
+      kind: 'route',
+      path: entry.route,
+      status: 'inferred',
+      evidence: [evidence],
+    });
+    builder.addFact({
+      id: locatorId(entry.route, entry.role, entry.name),
+      kind: 'locator',
+      route: routeId(entry.route),
+      role: entry.role,
+      ...(entry.name === undefined ? {} : { name: entry.name }),
+      expression: entry.expression,
+      status: 'inferred',
+      evidence: [evidence],
+    });
+  }
+
+  for (const entry of fromTests?.actions ?? []) {
+    const { file, line } = splitReference(entry.source);
+    const evidence = builder.addEvidence({
+      type: 'page-object',
+      file,
+      ...(line === undefined ? {} : { line }),
+      symbol: entry.symbol,
+      ...(fromTests?.commit === undefined ? {} : { commit: fromTests.commit }),
+    });
+    builder.addFact({
+      id: routeId(entry.route),
+      kind: 'route',
+      path: entry.route,
+      status: 'inferred',
+      evidence: [evidence],
+    });
+    // The locators the method uses are facts in their own right (above); the action names the
+    // first of them, because an action holds one reference.
+    const used = (fromTests?.locators ?? []).find(
+      (candidate) =>
+        candidate.route === entry.route && entry.locators.includes(candidate.expression),
+    );
+    builder.addFact({
+      id: namedId('action', `${entry.route}#${normaliseName(entry.intent)}`),
+      kind: 'action',
+      route: routeId(entry.route),
+      intent: entry.intent,
+      ...(used === undefined ? {} : { locator: locatorId(used.route, used.role, used.name) }),
+      status: 'inferred',
+      evidence: [evidence],
     });
   }
 

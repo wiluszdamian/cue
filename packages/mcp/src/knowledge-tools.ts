@@ -337,3 +337,43 @@ export function getContext(
     },
   ).text;
 }
+
+// ------------------------------------------------------------- resolve_action
+
+/** What a page object method is known to do, found by what it is called. */
+export function resolveAction(context: ToolContext, intent: string, route?: string): string {
+  const index = indexOf(context);
+  const wantedRoute = route?.trim();
+
+  const found = index
+    .actions()
+    .filter(
+      (action) =>
+        wantedRoute === undefined ||
+        wantedRoute === '' ||
+        routeToFilename(action.route.replace(/^route:/, '')) === routeToFilename(wantedRoute),
+    )
+    .map((action) => ({ action, score: nameSimilarity(action.intent, '', intent) }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (found.length === 0) {
+    return unknown(
+      `No known action matches "${clip(intent)}".`,
+      'actions are read from page objects: run `understudy extract --source <dir>` if the project has them.',
+      [`Actions known: ${String(index.actions().length)}.`],
+    );
+  }
+
+  const lines = found.slice(0, MAX_HITS).map(({ action }) => {
+    const locator = action.locator === undefined ? undefined : index.fact(action.locator);
+    const source = index.evidenceFor(action.id)[0];
+    return [
+      `${action.intent} · ${action.route.replace(/^route:/, '')} · ${action.status}`,
+      ...(locator?.kind === 'locator' ? [`  uses ${clip(locator.expression, 90)}`] : []),
+      ...(source === undefined ? [] : [`  from ${describeEvidence(source)}`]),
+    ].join('\n');
+  });
+  if (found.length > MAX_HITS) lines.push(`…and ${String(found.length - MAX_HITS)} more`);
+  return lines.join('\n');
+}

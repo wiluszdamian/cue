@@ -210,6 +210,7 @@ describe('the server', () => {
       'get_context',
       'get_evidence',
       'get_freshness',
+      'resolve_action',
       'resolve_api',
       'resolve_locator',
       'resolve_owner',

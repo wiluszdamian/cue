@@ -7,6 +7,9 @@ import { GROUNDED_EVIDENCE, type KnowledgeBase, type KnowledgeFact } from './mod
  * only its shape would accept a "verified" locator that rests on a guess.
  */
 
+/** Evidence that is somebody's earlier claim about the application, not the application. */
+const TEST_DERIVED: ReadonlySet<string> = new Set(['existing-test', 'page-object']);
+
 export type KnowledgeIssueCode =
   | 'duplicate-fact-id'
   | 'duplicate-evidence-id'
@@ -116,7 +119,15 @@ export function validateKnowledge(kb: KnowledgeBase): KnowledgeIssue[] {
     }
 
     const known = cited.flatMap(({ evidence }) => (evidence === undefined ? [] : [evidence]));
-    const grounded = known.some((evidence) => GROUNDED_EVIDENCE.has(evidence.type));
+    // A test is a claim somebody once wrote down; it can be dead, or failing, or wrong. Standing
+    // behind a fact together with the application or the source it is fine, alone it is not enough.
+    const grounded = known.some(
+      (evidence) => GROUNDED_EVIDENCE.has(evidence.type) && !TEST_DERIVED.has(evidence.type),
+    );
+    const onlyTests = !grounded && known.some((evidence) => TEST_DERIVED.has(evidence.type));
+    const lacking = onlyTests
+      ? 'only existing tests stand behind it, and a test may be dead. Tests alone cannot verify a fact'
+      : "nothing other than an agent's inference stands behind it. Inference alone cannot verify a fact";
 
     if (fact.status === 'verified') {
       if (fact.verifiedAt === undefined) {
@@ -130,14 +141,14 @@ export function validateKnowledge(kb: KnowledgeBase): KnowledgeIssue[] {
         issues.push({
           code: 'verified-on-inference',
           factId: fact.id,
-          message: `${fact.id} is verified, but nothing other than an agent's inference stands behind it. Inference alone cannot verify a fact: observe it, or cite its source.`,
+          message: `${fact.id} is verified, but ${lacking}: observe it, or cite its source.`,
         });
       }
     } else if (fact.status === 'observed' && !grounded && known.length > 0) {
       issues.push({
         code: 'status-above-inference',
         factId: fact.id,
-        message: `${fact.id} is marked observed, but only an agent's inference stands behind it. That is inferred until something real is seen.`,
+        message: `${fact.id} is marked observed, but ${lacking}, so it is inferred until something real is seen.`,
       });
     }
 

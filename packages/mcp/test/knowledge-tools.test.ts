@@ -18,6 +18,7 @@ import {
   getEvidence,
   getFreshness,
   loadContext,
+  resolveAction,
   resolveApi,
   resolveRoute,
   TOKEN_BUDGET,
@@ -335,5 +336,64 @@ describe('get_context', () => {
     expect(
       estimateTokens(getContext(context, 'log in', { maxTokens: 10 ** 9 })),
     ).toBeLessThanOrEqual(TOKEN_BUDGET.get_context);
+  });
+});
+
+describe('resolve_action', () => {
+  beforeEach(() => {
+    mkdirSync(join(root, '.agent-kb', 'product'), { recursive: true });
+    writeFileSync(
+      join(root, '.agent-kb', 'product', 'from-tests.yaml'),
+      JSON.stringify({
+        schemaVersion: 1,
+        locators: [
+          {
+            route: '/settings',
+            role: 'button',
+            name: 'Change password',
+            expression: "getByRole('button', { name: 'Change password' })",
+            source: 'pages/settings-page.ts:8',
+            origin: 'page-object',
+            symbol: 'SettingsPage.changeButton',
+          },
+        ],
+        actions: [
+          {
+            route: '/settings',
+            intent: 'change password',
+            symbol: 'SettingsPage.changePassword',
+            source: 'pages/settings-page.ts:18',
+            locators: ["getByRole('button', { name: 'Change password' })"],
+          },
+        ],
+      }),
+    );
+    clearKnowledgeCache();
+  });
+
+  it('finds what a page object already does, with the locator and where it is written', () => {
+    const answer = resolveAction(context, 'change the password');
+    expect(answer).toContain('change password · /settings · inferred');
+    expect(answer).toContain("uses getByRole('button', { name: 'Change password' })");
+    expect(answer).toContain('from page-object pages/settings-page.ts:18');
+  });
+
+  it('can be narrowed to a page', () => {
+    expect(resolveAction(context, 'change password', '/login')).toContain('status: unknown');
+    expect(resolveAction(context, 'change password', '/settings')).toContain('change password');
+  });
+
+  it('says unknown, with the command that would find out', () => {
+    const answer = resolveAction(context, 'export the ledger');
+    expect(answer).toContain('status: unknown');
+    expect(answer).toContain('understudy extract');
+  });
+
+  it('stays inside budget, found or not', () => {
+    for (const query of ['change password', 'nothing', 'x'.repeat(5000)]) {
+      expect(estimateTokens(resolveAction(context, query, query))).toBeLessThanOrEqual(
+        TOKEN_BUDGET.resolve_action,
+      );
+    }
   });
 });

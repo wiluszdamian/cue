@@ -172,7 +172,8 @@ advice and the suite stayed green.
 
 `packages/mcp` serves read-only point lookups over stdio: `explain_rule`,
 `resolve_owner`, `resolve_locator`, and the knowledge lookups `resolve_route`,
-`resolve_api`, `get_evidence`, `get_freshness` and `find_knowledge`. It ships in the plugin
+`resolve_action`, `resolve_api`, `get_evidence`, `get_freshness`, `find_knowledge` and
+`get_context`. It ships in the plugin
 manifests and in every agent config `understudy init` writes, next to Playwright
 MCP rather than instead of it: that one drives a browser, this one answers
 questions about the rules and the knowledge base without one.
@@ -188,7 +189,7 @@ Two things about it are load-bearing:
   every release with nobody noticing.
 
 Every unknown answers `status: unknown` plus the command that would find out, never
-a value that was made up. There is no `resolve_action`/`resolve_role`/`resolve_state`
+a value that was made up. There is no `resolve_role`/`resolve_state`/`resolve_component`
 until acquisition produces such facts: a tool that always says unknown costs context.
 
 Later tools — `list_rules`, `validate_source`, `describe_feature`,

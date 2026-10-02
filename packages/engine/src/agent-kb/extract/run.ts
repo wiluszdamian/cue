@@ -1,8 +1,15 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { stringify } from 'yaml';
-import type { Sources, SurfaceEntry, Term, TestIdEntry } from '../../schema/agent-kb.js';
+import type {
+  Sources,
+  SurfaceEntry,
+  Term,
+  TestActionEntry,
+  TestIdEntry,
+  TestLocatorEntry,
+} from '../../schema/agent-kb.js';
 import { redact, type Redaction } from '../redact.js';
 import { PRODUCT_DIR } from '../store.js';
 import { ADAPTERS, type Adapter, type AdapterContext } from './adapters.js';
@@ -27,6 +34,8 @@ export interface ExtractResult {
   readonly testIds: readonly TestIdEntry[];
   readonly surface: readonly SurfaceEntry[];
   readonly terms: readonly Term[];
+  /** Role locators and page object actions read from existing tests; evidence, not truth. */
+  readonly fromTests: { readonly locators: number; readonly actions: number };
   readonly gaps: readonly string[];
   readonly filesRead: number;
   readonly written: readonly string[];
@@ -73,6 +82,7 @@ export function extract(options: ExtractOptions): ExtractResult {
       testIds: [],
       surface: [],
       terms: [],
+      fromTests: { locators: 0, actions: 0 },
       gaps: [
         `No product source at ${sourceRoot}. Nothing could be established from code.`,
         'This is the black-box case: use `understudy survey <url>` and any OpenAPI document instead.',
@@ -99,6 +109,8 @@ export function extract(options: ExtractOptions): ExtractResult {
   const testIds = new Map<string, TestIdEntry>();
   const surface: SurfaceEntry[] = [];
   const terms: Term[] = [];
+  const testLocators = new Map<string, TestLocatorEntry>();
+  const testActions = new Map<string, TestActionEntry>();
 
   for (const adapter of chosen) {
     const result = adapter.extract(context);
@@ -106,6 +118,14 @@ export function extract(options: ExtractOptions): ExtractResult {
       if (!testIds.has(entry.testId)) testIds.set(entry.testId, entry);
     surface.push(...(result.surface ?? []));
     terms.push(...(result.terms ?? []));
+    for (const entry of result.fromTests?.locators ?? []) {
+      const key = `${entry.route}\u0000${entry.role}\u0000${entry.name ?? ''}`;
+      if (!testLocators.has(key)) testLocators.set(key, entry);
+    }
+    for (const entry of result.fromTests?.actions ?? []) {
+      const key = `${entry.route}\u0000${entry.symbol}`;
+      if (!testActions.has(key)) testActions.set(key, entry);
+    }
     gaps.push(...(result.gaps ?? []));
   }
 
@@ -141,6 +161,21 @@ export function extract(options: ExtractOptions): ExtractResult {
       terms,
     }),
   ];
+  // Rewritten every time, so a suite that no longer says anything does not leave old claims behind.
+  const fromTestsPath = join(productDir, 'from-tests.yaml');
+  if (testLocators.size > 0 || testActions.size > 0) {
+    files.push(
+      writeYaml(productDir, 'from-tests.yaml', {
+        schemaVersion: 1,
+        ...(commit === undefined ? {} : { commit }),
+        locators: [...testLocators.values()],
+        actions: [...testActions.values()],
+      }),
+    );
+  } else if (existsSync(fromTestsPath)) {
+    rmSync(fromTestsPath);
+  }
+
   for (const file of files) {
     written.push(file.path);
     redactions.push(...file.redactions);
@@ -165,6 +200,7 @@ export function extract(options: ExtractOptions): ExtractResult {
     testIds: [...testIds.values()],
     surface,
     terms,
+    fromTests: { locators: testLocators.size, actions: testActions.size },
     gaps,
     filesRead: scan.files.length,
     written,
@@ -191,6 +227,11 @@ export function formatExtractResult(result: ExtractResult): string {
       `${String(result.surface.filter((e) => e.kind === 'endpoint').length)} endpoint(s)`,
   );
   lines.push(`  ${String(result.terms.length)} user-visible label(s)`);
+  if (result.fromTests.locators > 0 || result.fromTests.actions > 0) {
+    lines.push(
+      `  ${String(result.fromTests.locators)} locator(s) and ${String(result.fromTests.actions)} page object action(s) from existing tests (inferred until a survey agrees)`,
+    );
+  }
   lines.push(`  commit ${result.commit ?? 'unknown'}`);
 
   if (result.redactions.length > 0) {

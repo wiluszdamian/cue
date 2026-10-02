@@ -371,7 +371,7 @@ describe('an empty or unparseable file', () => {
 });
 
 describe('speed', () => {
-  it('checks 200 locators against 2,000 facts in well under 200 ms', () => {
+  it('checks 200 locators against 2,000 facts in well under a second', () => {
     const entries: Entry[] = Array.from({ length: 2000 }, (_, i) => ({
       route: `/page-${String(i % 40)}`,
       role: 'button',
@@ -388,6 +388,7 @@ describe('speed', () => {
     const elapsed = performance.now() - started;
 
     expect(findings).toHaveLength(200);
-    expect(elapsed).toBeLessThan(200);
+    // Measured at ~100 ms alone; the margin is for a machine busy running the other suites.
+    expect(elapsed).toBeLessThan(600);
   });
 });

@@ -174,6 +174,44 @@ export const SurfaceSchema = z.strictObject({
   entries: z.array(SurfaceEntrySchema).default([]),
 });
 
+/** One locator an existing test or page object uses, with the route it was on. */
+export const TestLocatorEntrySchema = z.strictObject({
+  route: z.string().min(1),
+  role: z.string().min(1),
+  name: z.string().optional(),
+  /** As the knowledge base writes it, e.g. `getByRole('button', { name: 'Log in' })`. */
+  expression: z.string().min(1),
+  /** `file:line` in the test or page object. */
+  source: z.string().min(1),
+  origin: z.enum(['existing-test', 'page-object']),
+  /** The class and method the locator sits in, for a page object. */
+  symbol: z.string().min(1).optional(),
+});
+
+/** A page object method that does something on a page: `changePassword`. */
+export const TestActionEntrySchema = z.strictObject({
+  route: z.string().min(1),
+  /** The method name in words: `change password`. */
+  intent: z.string().min(1),
+  /** `Class.method`. */
+  symbol: z.string().min(1),
+  source: z.string().min(1),
+  /** The locators the method uses, as expressions. */
+  locators: z.array(z.string().min(1)).default([]),
+});
+
+/**
+ * `product/from-tests.yaml` — what existing tests and page objects say about the
+ * application. Evidence, not truth: a test may be dead or failing, so everything read
+ * from here starts as inferred and stays there until something outside the tests agrees.
+ */
+export const FromTestsSchema = z.strictObject({
+  schemaVersion: z.literal(AGENT_KB_SCHEMA_VERSION),
+  commit: z.string().optional(),
+  locators: z.array(TestLocatorEntrySchema).default([]),
+  actions: z.array(TestActionEntrySchema).default([]),
+});
+
 /** A user-visible label, usually from an i18n catalogue. */
 export const TermSchema = z.strictObject({
   key: z.string().min(1),
@@ -202,6 +240,9 @@ export const SourcesSchema = z.strictObject({
 export type SurfaceEntry = z.infer<typeof SurfaceEntrySchema>;
 export type Surface = z.infer<typeof SurfaceSchema>;
 export type Term = z.infer<typeof TermSchema>;
+export type TestLocatorEntry = z.infer<typeof TestLocatorEntrySchema>;
+export type TestActionEntry = z.infer<typeof TestActionEntrySchema>;
+export type FromTests = z.infer<typeof FromTestsSchema>;
 export type Vocabulary = z.infer<typeof VocabularySchema>;
 export type Sources = z.infer<typeof SourcesSchema>;
 

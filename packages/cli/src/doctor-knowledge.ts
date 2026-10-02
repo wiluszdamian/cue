@@ -241,9 +241,9 @@ function coverage(probe: KnowledgeProbe): CheckResult[] {
   const unseen = probe.index
     .routes()
     .filter(
-      (route) =>
-        probe.index.locatorsOn(route.path).length === 0 &&
-        !probe.index.evidenceFor(route.id).some((item) => item.type === 'browser'),
+      // Elements read from existing tests do not count as having looked: they are what the
+      // tests expected, and only a survey shows what is there.
+      (route) => !probe.index.evidenceFor(route.id).some((item) => item.type === 'browser'),
     )
     .map((route) => route.path);
   if (unseen.length === 0) return [];

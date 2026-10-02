@@ -1,6 +1,8 @@
 import type { SurfaceEntry, TermEntryLike, TestIdEntry } from './types.js';
+import type { TestActionEntry, TestLocatorEntry } from '../../schema/agent-kb.js';
 import { readCatalogue } from './i18n.js';
 import { readOpenApi } from './openapi.js';
+import { readExistingTests } from './tests.js';
 import { reference, type SourceFileRef } from './scan.js';
 
 /**
@@ -18,6 +20,10 @@ export interface AdapterResult {
   readonly surface?: readonly SurfaceEntry[];
   readonly terms?: readonly TermEntryLike[];
   readonly gaps?: readonly string[];
+  readonly fromTests?: {
+    readonly locators: readonly TestLocatorEntry[];
+    readonly actions: readonly TestActionEntry[];
+  };
 }
 
 export interface Adapter {
@@ -271,9 +277,53 @@ export const i18nAdapter: Adapter = {
   },
 };
 
+// ----------------------------------------------------------- existing tests
+
+const TEST_FILE = /\.(spec|test)\.(ts|tsx|mts|cts)$/;
+const ROUTE_NOTE = 'understudy-route:';
+
+/** A page object is a class holding a `Page`; the cheap sign of one is the type written out. */
+const HOLDS_PAGE = /:\s*Page\b/;
+
+const looksLikeTests = (file: SourceFileRef): boolean =>
+  TEST_FILE.test(file.path) ||
+  file.lines.some((line) => line.includes(ROUTE_NOTE)) ||
+  (/\.(ts|tsx|mts|cts)$/.test(file.path) && file.lines.some((line) => HOLDS_PAGE.test(line)));
+
+/**
+ * What the suite already says about the application: the role locators its tests and
+ * page objects use, the page each is on, and what the page object methods do with
+ * them. Evidence and nothing more — a test can be dead — so everything it yields is
+ * loaded as inferred, and only a survey of the same element can raise it.
+ */
+export const existingTestsAdapter: Adapter = {
+  id: 'existing-tests',
+  summary: 'role locators and page object methods from the tests that already exist',
+
+  detect({ files }) {
+    return files.some(looksLikeTests);
+  },
+
+  extract({ files }) {
+    const locators: TestLocatorEntry[] = [];
+    const actions: TestActionEntry[] = [];
+    const gaps: string[] = [];
+
+    for (const file of files.filter(looksLikeTests)) {
+      const read = readExistingTests(file);
+      locators.push(...read.locators);
+      actions.push(...read.actions);
+      gaps.push(...read.gaps);
+    }
+
+    return { fromTests: { locators, actions }, ...(gaps.length > 0 ? { gaps } : {}) };
+  },
+};
+
 export const ADAPTERS: readonly Adapter[] = [
   testIdAdapter,
   nextAdapter,
   openApiAdapter,
   i18nAdapter,
+  existingTestsAdapter,
 ];

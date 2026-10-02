@@ -12,6 +12,15 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Existing tests and page objects are read as evidence.** `extract` now records the role
+  locators the suite already uses (with the page each was on) and the actions its page objects
+  perform, in `.agent-kb/product/from-tests.yaml`. They load as `inferred` and cite the file,
+  line and class; a survey of the same element raises them and keeps the test as one more
+  reason, and a spelling that differs between the test and the page is kept as a conflict. A
+  test alone can never make a fact `observed` or `verified` (the knowledge model refuses it). A
+  locator that only a test has seen is judged `unverified`, not `stale`. New MCP tool
+  `resolve_action` answers "what does the project already do on this page".
+
 - **Translation catalogues are read by a parser.** `extract` used to match one `key: "label"`
   per line, so a nested catalogue gave the last segment (`submit`) and a minified one gave
   nothing. JSON and YAML now give the full dotted key (`auth.login.submit`) with the line of

@@ -33,6 +33,7 @@ export const TOKEN_BUDGET = {
   find_knowledge: 350,
   /** The most a caller may ask for; a smaller `maxTokens` is honoured below this. */
   get_context: 3000,
+  resolve_action: 350,
 } as const;
 
 export { estimateTokens };
@@ -166,6 +167,7 @@ export {
   getContext,
   getEvidence,
   getFreshness,
+  resolveAction,
   resolveApi,
   resolveRoute,
 } from './knowledge-tools.js';
