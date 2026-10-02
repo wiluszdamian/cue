@@ -94,6 +94,9 @@ export * from './knowledge/index.js';
 
 export {
   AGENT_KB_SCHEMA_VERSION,
+  ROUTE_MAP_VERSION,
+  RouteMapFileV2Schema,
+  RouteMapV1Schema,
   SourcesSchema,
   SurfaceSchema,
   VocabularySchema,

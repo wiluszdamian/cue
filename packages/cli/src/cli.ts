@@ -67,6 +67,7 @@ Options
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
   --base-url <url>     environment to verify the map against
+  --env <name>         name this environment (staging) in what survey and verify record
   --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked)
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
@@ -290,6 +291,7 @@ async function main(): Promise<number> {
       const result = survey({
         projectRoot,
         url,
+        environment: asString(flags['env']),
         driver:
           from === undefined
             ? createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli']))
@@ -333,6 +335,7 @@ async function main(): Promise<number> {
       const report = verify({
         projectRoot,
         baseUrl,
+        environment: asString(flags['env']),
         driver:
           from !== undefined
             ? new FileDriver(from)

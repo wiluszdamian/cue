@@ -6,7 +6,6 @@ import {
   SurfaceSchema,
   TestIdsSchema,
   VocabularySchema,
-  type KbElement,
   type RouteMap,
   type Surface,
   type TestIds,
@@ -14,9 +13,9 @@ import {
 } from '../schema/agent-kb.js';
 import { KnowledgeBuilder } from '../knowledge/builder.js';
 import { apiId, locatorId, routeId, termId, testIdFactId } from '../knowledge/ids.js';
-import type { FactConfidence, KnowledgeBase } from '../knowledge/model.js';
+import type { FactConfidence, FactStatus, KnowledgeBase } from '../knowledge/model.js';
 import { validateKnowledge } from '../knowledge/validate.js';
-import { PRODUCT_DIR, correlate, readAllRouteMapsWithErrors } from './store.js';
+import { PRODUCT_DIR, readAllRouteMapsWithErrors } from './store.js';
 
 /**
  * Reading `.agent-kb` as it exists today (the v1 files) into the Knowledge Core.
@@ -87,10 +86,11 @@ function readYaml<T>(
   return undefined;
 }
 
-const CONFIDENCE: Record<'confirmed' | 'runtime-only' | 'inferred', FactConfidence> = {
-  confirmed: { level: 'high', reason: 'seen running and present in the product source' },
-  'runtime-only': { level: 'medium', reason: 'seen running, absent from the product source' },
+const CONFIDENCE: Record<FactStatus, FactConfidence> = {
+  verified: { level: 'high', reason: 'seen running and present in the product source' },
+  observed: { level: 'medium', reason: 'seen running, absent from the product source' },
   inferred: { level: 'low', reason: 'not seen running, or not seen anywhere' },
+  stale: { level: 'low', reason: 'a check against the running application failed' },
 };
 
 export function loadKnowledge(root: string, now?: Date): LoadedKnowledge {
@@ -139,16 +139,9 @@ export function loadKnowledge(root: string, now?: Date): LoadedKnowledge {
   };
 
   // ---------------------------------------------------------------- route maps
-  const sourceOfTestId = new Map(testIds?.testIds.map((entry) => [entry.testId, entry.source]));
-
-  for (const { map, path } of reading.maps) {
-    mapRoute(builder, map, shown(path), correlate(map.elements, testIds), {
-      sourceOfTestId,
-      commit: testIds?.commit,
-      sourceEvidence,
-      issues,
-    });
-  }
+  // The reader has already given every element its standing and evidence, whichever
+  // version the file was, and confirmed it against the test ids as it always did.
+  for (const { map, path } of reading.maps) mapRoute(builder, map, shown(path), issues);
 
   // --------------------------------------------------------------- product files
   for (const entry of testIds?.testIds ?? []) {
@@ -220,19 +213,11 @@ export function loadKnowledge(root: string, now?: Date): LoadedKnowledge {
   return { kb, issues };
 }
 
-interface MapContext {
-  readonly sourceOfTestId: ReadonlyMap<string, string>;
-  readonly commit: string | undefined;
-  readonly sourceEvidence: (reference: string, commit: string | undefined) => string;
-  readonly issues: LoadIssue[];
-}
-
 function mapRoute(
   builder: KnowledgeBuilder,
   map: RouteMap,
   mapPath: string,
-  elements: readonly KbElement[],
-  context: MapContext,
+  issues: LoadIssue[],
 ): void {
   const observedAt = isoOrUndefined(map.exploredAt);
   const verifiedAt = isoOrUndefined(map.verifiedAt);
@@ -241,7 +226,7 @@ function mapRoute(
     ['verifiedAt', map.verifiedAt, verifiedAt],
   ] as const) {
     if (ok === undefined) {
-      context.issues.push({
+      issues.push({
         path: mapPath,
         severity: 'warning',
         message: `${field} "${value}" is not a date, so it counts for nothing and the route reads as stale`,
@@ -249,14 +234,23 @@ function mapRoute(
     }
   }
 
+  // The map's evidence, re-recorded under the builder's ids (which hash the content).
+  const evidenceIds = new Map<string, string>();
+  for (const { id, ...rest } of map.evidence ?? []) evidenceIds.set(id, builder.addEvidence(rest));
+  const cited = (ids: readonly string[]): string[] =>
+    ids.flatMap((id) => {
+      const mapped = evidenceIds.get(id);
+      return mapped === undefined ? [] : [mapped];
+    });
+
+  // What the route itself rests on: that somebody looked at it, then.
   const browser = builder.addEvidence({
     type: 'browser',
     route: map.route,
+    ...(map.environment === undefined ? {} : { environment: map.environment }),
     snapshotHash: map.snapshotHash,
     ...(observedAt === undefined ? {} : { observedAt }),
   });
-  // The file itself, for entries whose only support is that the file says so.
-  const imported = builder.addEvidence({ type: 'import', file: mapPath });
   const route = routeId(map.route);
 
   builder.addFact({
@@ -270,10 +264,10 @@ function mapRoute(
   });
 
   const seen = new Set<string>();
-  for (const element of elements) {
+  for (const element of map.elements) {
     const id = locatorId(map.route, element.role, element.name);
     if (seen.has(id)) {
-      context.issues.push({
+      issues.push({
         path: mapPath,
         severity: 'warning',
         message: `${element.locator} appears more than once (names are compared ignoring case); the first is kept`,
@@ -282,12 +276,9 @@ function mapRoute(
     }
     seen.add(id);
 
-    const testIdSource =
-      element.testId === undefined ? undefined : context.sourceOfTestId.get(element.testId);
-    const source =
-      testIdSource === undefined ? undefined : context.sourceEvidence(testIdSource, context.commit);
-
-    const { status, evidence, confidence } = standing(element, browser, source, imported);
+    const status = element.status ?? 'observed';
+    const evidence = cited(element.evidence ?? []);
+    const confirmedAt = isoOrUndefined(element.verifiedAt ?? map.verifiedAt);
 
     builder.addFact({
       id,
@@ -299,42 +290,11 @@ function mapRoute(
       expression: element.locator,
       ...(element.testId === undefined ? {} : { testId: element.testId }),
       status,
-      evidence,
-      confidence,
-      // For an element the route map's date *is* the date it was last confirmed.
-      ...(verifiedAt === undefined ? {} : { verifiedAt }),
+      // An element that cites nothing still rests on the route having been looked at.
+      evidence: evidence.length > 0 ? evidence : [browser],
+      confidence: CONFIDENCE[status],
+      ...(confirmedAt === undefined ? {} : { verifiedAt: confirmedAt }),
+      ...(element.dependencies === undefined ? {} : { dependencies: element.dependencies }),
     });
-  }
-}
-
-function standing(
-  element: KbElement,
-  browser: string,
-  source: string | undefined,
-  imported: string,
-): {
-  status: 'verified' | 'observed' | 'inferred';
-  evidence: string[];
-  confidence: FactConfidence;
-} {
-  switch (element.confidence) {
-    case 'confirmed':
-      return {
-        status: 'verified',
-        // With the product's reference when it can be found; otherwise the map's own
-        // word for it, which is exactly as strong as it ever was.
-        evidence: [browser, source ?? imported],
-        confidence: CONFIDENCE.confirmed,
-      };
-    case 'runtime-only':
-      return { status: 'observed', evidence: [browser], confidence: CONFIDENCE['runtime-only'] };
-    case 'code-only':
-      return {
-        status: 'inferred',
-        evidence: [source ?? imported],
-        confidence: CONFIDENCE.inferred,
-      };
-    case 'unknown':
-      return { status: 'inferred', evidence: [imported], confidence: CONFIDENCE.inferred };
   }
 }

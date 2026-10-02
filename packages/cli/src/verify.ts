@@ -2,8 +2,10 @@ import {
   ageInDays,
   freshnessOf,
   hashSnapshot,
+  locatorId,
   parseRawSnapshot,
   readAllRouteMapsWithErrors,
+  recordLiveCheck,
   UnsupportedSnapshotFormatError,
   writeRouteMap,
   type Freshness,
@@ -72,6 +74,8 @@ export interface VerifyOptions {
   readonly driver?: SnapshotDriver | undefined;
   /** Record `verifiedAt` on routes that a live check found unchanged. */
   readonly refresh?: boolean;
+  /** A name such as `staging`, recorded with what a `--refresh` learns. */
+  readonly environment?: string | undefined;
   /** Check only these routes. The rest are reported as not checked, which makes the run PARTIAL. */
   readonly only?: readonly string[] | undefined;
   readonly now?: Date;
@@ -122,10 +126,27 @@ function verifyRoute(loaded: LoadedRouteMap, options: VerifyOptions, now: Date):
     throw error;
   }
 
-  if (hashSnapshot(parsed.tree) === map.snapshotHash) {
-    if (options.refresh === true) {
-      writeRouteMap(options.projectRoot, { ...map, verifiedAt: now.toISOString() });
-    }
+  const snapshotHash = hashSnapshot(parsed.tree);
+  const tool = {
+    name: 'playwright-cli',
+    ...(captured.cliVersion === undefined ? {} : { version: captured.cliVersion }),
+    format: parsed.format,
+  };
+  const record = (missingIds: ReadonlySet<string>): void =>
+    void writeRouteMap(
+      options.projectRoot,
+      recordLiveCheck(map, {
+        at: now,
+        snapshotHash,
+        missing: missingIds,
+        environment: options.environment,
+        tool,
+      }),
+    );
+
+  if (snapshotHash === map.snapshotHash) {
+    // What the check found is written down only when asked: verifying does not edit files.
+    if (options.refresh === true) record(new Set());
     return {
       ...base,
       live: 'unchanged',
@@ -135,9 +156,13 @@ function verifyRoute(loaded: LoadedRouteMap, options: VerifyOptions, now: Date):
 
   // A copy edit moves the hash; what matters is which recorded elements are gone.
   const live = new Set(parsed.elements.map((e) => `${e.role} ${e.name ?? ''}`));
-  const missing = map.elements
-    .filter((e) => !live.has(`${e.role} ${e.name ?? ''}`))
-    .map((e) => e.locator);
+  const gone = map.elements.filter((e) => !live.has(`${e.role} ${e.name ?? ''}`));
+  const missing = gone.map((e) => e.locator);
+
+  // A lost element is kept and marked stale, not removed: "this used to be here" is knowledge.
+  if (options.refresh === true && gone.length > 0) {
+    record(new Set(gone.map((e) => e.id ?? locatorId(map.route, e.role, e.name))));
+  }
 
   return {
     ...base,
