@@ -67,6 +67,11 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- `scripts/prepare-benchmark-project.mjs` builds the project a benchmark is run against
+  (Understudy installed, and a knowledge base of the demo application made with `extract`
+  and `survey`), and `benchmarks/RUNBOOK.md` is the procedure for the first real,
+  paid run. The default benchmark model is now `claude-opus-5-5`.
+
 - **Benchmark: repetitions, defects, and a report.** `record --runs N` asks for several
   answers per prompt and condition (default 1, since each is a paid call; the total is
   printed first), and scoring finds how many it has and reports the spread across runs.

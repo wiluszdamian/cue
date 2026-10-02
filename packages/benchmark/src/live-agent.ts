@@ -12,7 +12,7 @@ import {
  * repository, and it runs only on `record`.
  */
 
-export const DEFAULT_MODEL = 'claude-opus-5';
+export const DEFAULT_MODEL = 'claude-opus-5-5';
 
 /**
  * Identical in both conditions, and naming no rule, tag or page object — advice
