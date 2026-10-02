@@ -17,15 +17,16 @@
   "scripts": {
     "build": "node ../../scripts/tsc7.mjs --build tsconfig.build.json",
     "typecheck": "node ../../scripts/tsc7.mjs -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",
-    "@understudy/engine": "workspace:*"
+    "@understudy/engine": "workspace:*",
+    "typescript": "6.0.3"
   },
   "devDependencies": {
     "@types/node": "^26.5.0",
-    "typescript": "6.0.3",
     "typescript7": "npm:typescript@^7.0.2",
     "vitest": "^4.1.11"
   },

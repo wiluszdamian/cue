@@ -1,14 +1,28 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { readAllRouteMaps, type Rules } from '@understudy/engine';
+import {
+  indexKnowledge,
+  loadKnowledge,
+  readAllRouteMaps,
+  type KnowledgeIndex,
+  type Rules,
+} from '@understudy/engine';
 import { CONDITIONS, type Agent, type AgentResponse, type Condition } from './agent.js';
+import {
+  summariseExecution,
+  type ExecutionResult,
+  type ExecutionSummary,
+  type Executor,
+} from './execution.js';
 import { PROMPTS, PROMPT_SET_VERSION, type Prompt } from './prompts.js';
 import {
   scoreCompliance,
   scoreGrounding,
+  scoreLocators,
   type ComplianceScore,
   type GeneratedFile,
   type GroundingScore,
+  type LocatorScore,
 } from './scoring.js';
 
 /**
@@ -19,11 +33,29 @@ import {
  * absent are. No clear difference means the premise is wrong.
  */
 
+/** One answer, scored every way it can be. */
+export interface SampleResult {
+  readonly promptId: string;
+  readonly condition: Condition;
+  /** Where each generated file went. */
+  readonly files: readonly string[];
+  readonly compliance: ComplianceScore;
+  /** Against the knowledge base, with route context. Present when one was used. */
+  readonly locators?: LocatorScore;
+  /** Present when the answer was compiled and run. */
+  readonly execution?: ExecutionResult;
+}
+
 export interface ConditionResult {
   readonly condition: Condition;
   readonly compliance: ComplianceScore;
   readonly grounding: GroundingScore;
   readonly responses: readonly AgentResponse[];
+  readonly samples: readonly SampleResult[];
+  /** Every locator in the condition, judged by the checker. */
+  readonly locators?: LocatorScore;
+  /** Compile and first-run numbers. Present only when the answers were executed. */
+  readonly execution?: ExecutionSummary;
 }
 
 export interface BenchmarkResult {
@@ -73,6 +105,16 @@ export interface RunOptions {
   readonly rules: Rules;
   /** Defaults to the full set. Narrow it while iterating. */
   readonly prompts?: readonly Prompt[];
+  /** Which prompt set `prompts` belongs to, recorded with the result. Defaults to 1. */
+  readonly promptSetVersion?: number;
+  /**
+   * Compiles and runs each answer. Without one the answers are scored statically,
+   * as they always were.
+   */
+  readonly executor?: Executor;
+  /** Judge locators against `.agent-kb`. Always on when answers are executed. */
+  readonly judgeLocators?: boolean;
+  readonly now?: Date;
 }
 
 export async function runBenchmark(options: RunOptions): Promise<BenchmarkResult> {
@@ -80,35 +122,72 @@ export async function runBenchmark(options: RunOptions): Promise<BenchmarkResult
   const conditions: ConditionResult[] = [];
   let model = 'unknown';
 
-  for (const condition of CONDITIONS) {
-    const responses: AgentResponse[] = [];
-    const files: GeneratedFile[] = [];
+  const index: KnowledgeIndex | undefined =
+    options.executor !== undefined || options.judgeLocators === true
+      ? indexKnowledge(loadKnowledge(options.projectRoot, options.now).kb)
+      : undefined;
 
-    for (const prompt of prompts) {
-      const response = await options.agent.run({
-        prompt,
+  try {
+    for (const condition of CONDITIONS) {
+      const responses: AgentResponse[] = [];
+      const files: GeneratedFile[] = [];
+      const samples: SampleResult[] = [];
+      const executions: ExecutionResult[] = [];
+
+      for (const prompt of prompts) {
+        const response = await options.agent.run({
+          prompt,
+          condition,
+          context: buildContext(options.projectRoot, condition),
+        });
+        responses.push(response);
+        model = response.model;
+
+        const sampleFiles: GeneratedFile[] = [
+          ...(response.files ?? [
+            { path: `tests/app/functional/${prompt.id}.spec.ts`, source: response.code },
+          ]),
+        ];
+        files.push(...sampleFiles);
+
+        const execution =
+          options.executor === undefined
+            ? undefined
+            : await options.executor.execute({
+                promptId: prompt.id,
+                condition,
+                files: sampleFiles,
+              });
+        if (execution !== undefined) executions.push(execution);
+
+        samples.push({
+          promptId: prompt.id,
+          condition,
+          files: sampleFiles.map((file) => file.path),
+          compliance: scoreCompliance(sampleFiles, options.rules.constitution, options.rules.tags),
+          ...(index === undefined
+            ? {}
+            : { locators: scoreLocators(sampleFiles, index, options.now) }),
+          ...(execution === undefined ? {} : { execution }),
+        });
+      }
+
+      conditions.push({
         condition,
-        context: buildContext(options.projectRoot, condition),
+        compliance: scoreCompliance(files, options.rules.constitution, options.rules.tags),
+        grounding: scoreGrounding(files, options.projectRoot),
+        responses,
+        samples,
+        ...(index === undefined ? {} : { locators: scoreLocators(files, index, options.now) }),
+        ...(options.executor === undefined ? {} : { execution: summariseExecution(executions) }),
       });
-      responses.push(response);
-      model = response.model;
-      files.push(
-        ...(response.files ?? [
-          { path: `tests/app/functional/${prompt.id}.spec.ts`, source: response.code },
-        ]),
-      );
     }
-
-    conditions.push({
-      condition,
-      compliance: scoreCompliance(files, options.rules.constitution, options.rules.tags),
-      grounding: scoreGrounding(files, options.projectRoot),
-      responses,
-    });
+  } finally {
+    await options.executor?.close?.();
   }
 
   return {
-    promptSetVersion: PROMPT_SET_VERSION,
+    promptSetVersion: options.promptSetVersion ?? PROMPT_SET_VERSION,
     prompts: prompts.length,
     agent: options.agent.name,
     model,
