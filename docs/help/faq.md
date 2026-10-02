@@ -42,14 +42,20 @@ Yes. They live in one file, `rules/constitution.yaml`. Change it, run
 `pnpm generate`, and the checks, the documentation and the assistant instructions
 all update together.
 
-## Some rules are not enforced. Why list them?
+## Does every rule actually get checked?
 
-One rule — "every selector must come from your app's notes" — cannot be checked
-by a program. No tool can tell an invented test id from a real one just by
-reading the code.
+Ten rules are checked from the code alone. The eleventh — "every selector must come
+from your app's notes" — can only be checked against those notes, so it needs an
+`.agent-kb` to run: no tool can tell an invented test id from a real one by reading
+the code.
 
-It is written down anyway, and clearly marked as not enforced. Being honest about
-which half has teeth is what makes the enforced half believable.
+Where there is an `.agent-kb`, the linter checks `getByRole`, `getByTestId` and
+`getByLabel` against it. Where there is none, the rule stays silent — and
+`cue check` says so, rather than reporting a clean run. Locators the code
+cannot settle (a variable, a regular expression, `getByText`, CSS) are never
+judged. A rule that cannot be checked at all would be written down and marked as not
+enforced; being honest about which half has teeth is what makes the enforced half
+believable.
 
 ## Will it slow my tests down?
 

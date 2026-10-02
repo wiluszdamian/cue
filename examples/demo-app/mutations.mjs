@@ -4,5 +4,6 @@ export const MUTATIONS = [
   'wrong-password-accepted',
   'signup-validation-off',
   'button-renamed',
+  'login-button-renamed',
   'route-moved',
 ];

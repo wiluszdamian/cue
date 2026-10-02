@@ -23,22 +23,41 @@ npx @wiluszdamian/cue-cli survey http://localhost:3000/login
 It opens the page, notes everything you can interact with, and saves it:
 
 ```yaml title=".agent-kb/app-map/login.yaml"
+schemaVersion: 2
 route: /login
 title: Sign in
 verifiedAt: 2026-09-10T18:39:26.471Z
+evidence:
+  - id: ev_3f2a91c07b44
+    type: browser
+    route: /login
+    observedAt: 2026-09-10T18:39:26.471Z
+    tool: { name: playwright-cli, version: 0.1.22 }
 elements:
-  - role: textbox
+  - id: 'locator:/login#textbox:email'
+    role: textbox
     name: Email
     locator: "getByRole('textbox', { name: 'Email' })"
-    confidence: runtime-only
-  - role: button
+    status: observed
+    evidence: [ev_3f2a91c07b44]
+    verifiedAt: 2026-09-10T18:39:26.471Z
+  - id: 'locator:/login#button:log in'
+    role: button
     name: Log in
     locator: "getByRole('button', { name: 'Log in' })"
-    confidence: runtime-only
+    status: observed
+    evidence: [ev_3f2a91c07b44]
+    verifiedAt: 2026-09-10T18:39:26.471Z
 links:
   - name: Forgot password?
     href: /forgot
 ```
+
+Every element says **what it rests on** (`evidence`), **where it stands** (`status`) and
+**when it was last confirmed**. Files written by earlier versions of Cue
+(`schemaVersion: 1`, with a `confidence` instead) are still read, and become version 2
+the next time something saves them. A file from a newer Cue is refused with a
+message to upgrade, rather than read as far as it goes.
 
 Now anyone — you or an assistant — can look up a real answer instead of
 inventing one.
@@ -87,11 +106,18 @@ Run: cue survey <url>
 
 ## What "confidence" is telling you
 
-| Confidence     | Meaning                                                                              |
-| -------------- | ------------------------------------------------------------------------------------ |
-| `confirmed`    | It's in your app's code **and** it appeared on the page. Solid.                      |
-| `runtime-only` | Seen on the page, but not found in your code. Might come from a library, might move. |
-| `code-only`    | In your code, never actually seen. Might be dead, might be behind a feature flag.    |
+Lookups still answer in these terms; they are worked out from each element's `status`
+and `evidence`.
+
+| Confidence     | Meaning                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| `confirmed`    | It's in your app's code **and** it appeared on the page. Solid. (`verified`)                       |
+| `runtime-only` | Seen on the page, but not found in your code. Might come from a library, might move. (`observed`)  |
+| `code-only`    | In your code, never actually seen. Might be dead, might be behind a feature flag. (`inferred`)     |
+| `unknown`      | Nothing supports it, or a check against the running app failed (`stale`). Never used as an answer. |
+
+`stale` is what `verify --refresh` writes for an element the page no longer shows. It is
+kept rather than deleted, because "this used to be here" is worth knowing.
 
 ## Keep it committed
 

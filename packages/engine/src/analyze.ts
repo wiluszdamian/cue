@@ -1,5 +1,5 @@
 import { parse, type TSESTree } from '@typescript-eslint/typescript-estree';
-import type { AnalysisResult, AnalysisSkip, Diagnostic } from './diagnostic.js';
+import type { AnalysisResult, AnalysisSkip, Diagnostic, NotChecked } from './diagnostic.js';
 import { sortDiagnostics } from './diagnostic.js';
 import { matchSelector, parseSelector, type CompiledSelector } from './detectors/esquery.js';
 import { getFixer } from './detectors/fixers.js';
@@ -10,8 +10,11 @@ import {
   type EnforceableRule,
   type Rule,
 } from './schema/constitution.js';
+import type { KnowledgeIndex } from './knowledge/index.js';
 import type { TagSet } from './schema/tags.js';
 import { normalizePath, scopeMatcher } from './scope.js';
+import { analyzeLocators } from './verification/locator-analyzer.js';
+import { findingToDiagnostic } from './verification/diagnostics.js';
 
 export interface SourceFile {
   readonly path: string;
@@ -25,6 +28,13 @@ export interface AnalyzeOptions {
   readonly docsBaseUrl?: string;
   /** Skip rules whose id is listed. Used by the ESLint plugin, which owns them. */
   readonly disabled?: readonly string[];
+  /**
+   * What is known about the application. Rules that check against it cannot run
+   * without it, and say so in the result instead of passing.
+   */
+  readonly knowledge?: KnowledgeIndex;
+  /** For judging how recently knowledge was confirmed. Defaults to the present. */
+  readonly now?: Date;
 }
 
 const DEFAULT_DOCS_BASE =
@@ -137,6 +147,32 @@ function runAstRule(
   return found;
 }
 
+function runKnowledgeRule(
+  compiled: CompiledRule,
+  file: SourceFile,
+  index: KnowledgeIndex,
+  now: Date | undefined,
+  docsBase: string,
+): Diagnostic[] {
+  const { rule } = compiled;
+  if (rule.detector.kind !== 'knowledge') return [];
+
+  const lead = rule.message.replace(/\s+/g, ' ').trim();
+  const url = docsUrlFor(rule, docsBase);
+  return analyzeLocators({
+    filePath: file.path,
+    source: file.text,
+    index,
+    ...(now === undefined ? {} : { now }),
+  }).flatMap((finding) => {
+    const diagnostic = findingToDiagnostic(finding, file.path, url, {
+      severity: rule.severity,
+      lead,
+    });
+    return diagnostic === undefined ? [] : [{ ...diagnostic, ruleId: rule.id }];
+  });
+}
+
 function runRegexRule(compiled: CompiledRule, file: SourceFile, docsBase: string): Diagnostic[] {
   const { rule } = compiled;
   if (rule.detector.kind !== 'regex') return [];
@@ -179,6 +215,7 @@ export function analyze(options: AnalyzeOptions): AnalysisResult {
 
   const diagnostics: Diagnostic[] = [];
   const skipped: AnalysisSkip[] = [];
+  const notChecked = new Map<string, NotChecked>();
   let filesAnalyzed = 0;
 
   for (const input of options.files) {
@@ -218,19 +255,33 @@ export function analyze(options: AnalyzeOptions): AnalysisResult {
     };
 
     for (const c of applicable) {
-      diagnostics.push(
-        ...(c.rule.detector.kind === 'ast'
-          ? ast
-            ? runAstRule(c, file, ast, ctx, docsBase)
-            : []
-          : runRegexRule(c, file, docsBase)),
-      );
+      switch (c.rule.detector.kind) {
+        case 'ast':
+          if (ast) diagnostics.push(...runAstRule(c, file, ast, ctx, docsBase));
+          break;
+        case 'regex':
+          diagnostics.push(...runRegexRule(c, file, docsBase));
+          break;
+        case 'knowledge':
+          if (options.knowledge === undefined) {
+            notChecked.set(c.rule.id, {
+              ruleId: c.rule.id,
+              reason: 'no knowledge base was given, so nothing was checked against it',
+            });
+          } else {
+            diagnostics.push(
+              ...runKnowledgeRule(c, file, options.knowledge, options.now, docsBase),
+            );
+          }
+          break;
+      }
     }
   }
 
   return {
     diagnostics: sortDiagnostics(diagnostics),
     skipped,
+    notChecked: [...notChecked.values()],
     filesAnalyzed,
     durationMs: Math.round(performance.now() - startedAt),
   };

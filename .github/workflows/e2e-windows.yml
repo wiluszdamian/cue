@@ -1,0 +1,28 @@
+name: e2e-windows
+
+# The same scenario as the `e2e` job in ci.yml, on Windows, where a command that
+# goes through a shell and a `.cmd` shim fail in ways Linux never shows. Windows
+# minutes cost double, so this runs weekly and on demand rather than on every push.
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm --filter @understudy/demo-app exec playwright install chromium
+      - run: node scripts/e2e.mjs

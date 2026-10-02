@@ -1,20 +1,23 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { stringify } from 'yaml';
+import { parse, stringify } from 'yaml';
 import { freshnessAdvice, freshnessOf } from '../src/agent-kb/freshness.js';
 import { loadKnowledge } from '../src/agent-kb/load-knowledge.js';
 import { resolveLocator, type LocatorAnswer } from '../src/agent-kb/resolve-locator.js';
-import {
-  correlate,
-  readAllRouteMaps,
-  readRouteMap,
-  readTestIds,
-  writeRouteMap,
-} from '../src/agent-kb/store.js';
+import { correlate, readTestIds, writeRouteMap } from '../src/agent-kb/store.js';
 import { indexKnowledge, validateKnowledge } from '../src/knowledge/index.js';
-import type { KbElement, RouteMap } from '../src/schema/agent-kb.js';
+import { RouteMapV1Schema, type KbElement, type RouteMap } from '../src/schema/agent-kb.js';
+import { routeToFilename } from '../src/agent-kb/snapshot/index.js';
 
 /**
  * Loading the files that exist today into the Knowledge Core, and answering
@@ -333,6 +336,46 @@ describe('files that cannot be used', () => {
 });
 
 /**
+ * Writes a route map the way version 1 did: the old fields and nothing else. The
+ * parity test needs real v1 files, both to compare against the old algorithm and so
+ * that the answers go through the migration.
+ */
+function writeLegacy(map: RouteMap): void {
+  const legacy = {
+    schemaVersion: 1,
+    route: map.route,
+    title: map.title,
+    exploredAt: map.exploredAt,
+    verifiedAt: map.verifiedAt,
+    snapshotHash: map.snapshotHash,
+    elements: map.elements.map((item) => ({
+      role: item.role,
+      ...(item.name === undefined ? {} : { name: item.name }),
+      ...(item.level === undefined ? {} : { level: item.level }),
+      locator: item.locator,
+      ...(item.testId === undefined ? {} : { testId: item.testId }),
+      confidence: item.confidence,
+    })),
+    links: [],
+    gaps: [],
+  };
+  write(`.agent-kb/app-map/${routeToFilename(map.route)}.yaml`, stringify(legacy));
+}
+
+/** The old reader: every file under app-map parsed with the version 1 schema, sorted by route. */
+function legacyMaps(): { route: string; verifiedAt: string; elements: KbElement[] }[] {
+  const dir = join(root, '.agent-kb', 'app-map');
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((name) => name.endsWith('.yaml'))
+    .flatMap((name) => {
+      const parsed = RouteMapV1Schema.safeParse(parse(readFileSync(join(dir, name), 'utf8')));
+      return parsed.success ? [parsed.data] : [];
+    })
+    .sort((a, b) => a.route.localeCompare(b.route));
+}
+
+/**
  * The algorithm as it was before the Knowledge Core, kept verbatim as an oracle:
  * route maps and test ids read straight from the files, correlated, scored.
  */
@@ -360,18 +403,29 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
     return wanted.includes(item.role.toLowerCase()) ? nameHits + 1 : nameHits;
   };
 
+  // The answer has only ever carried these fields; the reader now attaches more.
+  const plain = (item: KbElement): KbElement => ({
+    role: item.role,
+    ...(item.name === undefined ? {} : { name: item.name }),
+    ...(item.level === undefined ? {} : { level: item.level }),
+    locator: item.locator,
+    ...(item.testId === undefined ? {} : { testId: item.testId }),
+    confidence: item.confidence,
+  });
+
   const ids = readTestIds(root);
+  const all = legacyMaps();
   const maps =
     route === undefined
-      ? readAllRouteMaps(root, now)
-      : [readRouteMap(root, route, now)].flatMap((m) => (m ? [m] : []));
-  const knownRoutes = readAllRouteMaps(root, now).map((m) => m.map.route);
+      ? all
+      : all.filter((m) => routeToFilename(m.route) === routeToFilename(route));
+  const knownRoutes = all.map((m) => m.route);
 
   const candidates = maps.flatMap((loaded) =>
-    correlate(loaded.map.elements, ids).map((item) => ({
+    correlate(loaded.elements.map(plain), ids).map((item) => ({
       element: item,
-      route: loaded.map.route,
-      freshness: freshnessOf(loaded.map.verifiedAt, now),
+      route: loaded.route,
+      freshness: freshnessOf(loaded.verifiedAt, now),
       score: score(item),
     })),
   );
@@ -386,7 +440,7 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
       remedy:
         route === undefined
           ? 'understudy survey <url>   # map the route this element is on'
-          : `understudy survey <url>${route}   # this route has not been surveyed`,
+          : `understudy survey --route ${route} --base-url <url>   # this route has not been surveyed`,
       knownRoutes,
     };
   }
@@ -398,6 +452,8 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
     confidence: best.element.confidence,
     advice: freshnessAdvice(best.freshness, best.route),
     alternatives: matches.slice(1, 4).map((m) => m.element),
+    // The old algorithm knew nothing of the code behind an element.
+    changes: [],
   };
 }
 
@@ -432,8 +488,7 @@ describe('resolving a locator is unchanged by the move', () => {
         ['login-password', 'src/Login.tsx:10'],
       ]),
     );
-    writeRouteMap(
-      root,
+    writeLegacy(
       routeMap('/login', [
         element('heading', 'Sign in', 'runtime-only', { level: 1 }),
         element('textbox', 'Email', 'runtime-only'),
@@ -443,8 +498,7 @@ describe('resolving a locator is unchanged by the move', () => {
         element('link', 'Forgot password?', 'runtime-only'),
       ]),
     );
-    writeRouteMap(
-      root,
+    writeLegacy(
       routeMap(
         '/signup',
         [
@@ -455,11 +509,10 @@ describe('resolving a locator is unchanged by the move', () => {
         12,
       ),
     );
-    writeRouteMap(
-      root,
+    writeLegacy(
       routeMap('/admin/settings/security', [element('button', 'Change password', 'confirmed')], 45),
     );
-    writeRouteMap(root, {
+    writeLegacy({
       ...routeMap('/undated', [element('button', 'Ghost', 'runtime-only')]),
       verifiedAt: 'never',
     });

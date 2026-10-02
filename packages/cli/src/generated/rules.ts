@@ -273,18 +273,19 @@ export const CONSTITUTION = {
     {
       id: 'selectors-from-agent-kb',
       tier: 'MUST',
-      severity: 'error',
+      severity: 'warn',
       title: 'Selectors come from .agent-kb or from fresh exploration',
       rationale:
-        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. Not mechanically detectable — a linter cannot tell an invented test-id from a real one — so this rule documents the obligation and leaves enforcement to understudy verify and review.\n',
+        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; understudy check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.\n',
       detector: {
-        kind: 'manual',
+        kind: 'knowledge',
+        check: 'locators',
       },
       scope: ['**/*.ts'],
       exclude: [],
       autofix: false,
       message:
-        'Every selector must trace to .agent-kb/app-map/ or .agent-kb/product/testids.yaml, or to an exploration run in this session. If it is not there, run understudy survey <url> and record it — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n',
+        'This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run understudy survey <url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n',
       skill: 'locator-policy',
       docsAnchor: 'selectors-from-agent-kb',
       examples: {

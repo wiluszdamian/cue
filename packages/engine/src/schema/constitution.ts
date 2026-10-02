@@ -40,9 +40,20 @@ const ManualDetectorSchema = z.strictObject({
   kind: z.literal('manual'),
 });
 
+/**
+ * Checked against what is known about the application, not against the code alone.
+ * It needs a knowledge base to run: without one it reports that it did not, rather
+ * than passing. `check` names the question; there is one so far.
+ */
+const KnowledgeDetectorSchema = z.strictObject({
+  kind: z.literal('knowledge'),
+  check: z.enum(['locators']),
+});
+
 export const DetectorSchema = z.discriminatedUnion('kind', [
   AstDetectorSchema,
   RegexDetectorSchema,
+  KnowledgeDetectorSchema,
   ManualDetectorSchema,
 ]);
 
@@ -77,6 +88,11 @@ export const RuleSchema = z
     message: 'a manual rule cannot be autofixable',
     path: ['autofix'],
   })
+  .refine((rule) => !(rule.autofix && rule.detector.kind === 'knowledge'), {
+    message:
+      'a rule checked against the knowledge base cannot be autofixed: only a survey knows the right locator',
+    path: ['autofix'],
+  })
   .refine((rule) => !(rule.detector.kind === 'manual' && rule.severity === 'warn'), {
     message:
       'a manual rule is documentation, not a soft warning — give it the severity it would have if it were enforceable',
@@ -102,11 +118,14 @@ export type Severity = z.infer<typeof SeveritySchema>;
 export type Detector = z.infer<typeof DetectorSchema>;
 export type AstDetector = z.infer<typeof AstDetectorSchema>;
 export type RegexDetector = z.infer<typeof RegexDetectorSchema>;
+export type KnowledgeDetector = z.infer<typeof KnowledgeDetectorSchema>;
 export type Rule = z.infer<typeof RuleSchema>;
 export type Constitution = z.infer<typeof ConstitutionSchema>;
 
 /** A rule whose detector produces diagnostics. Excludes `manual`. */
-export type EnforceableRule = Rule & { detector: AstDetector | RegexDetector };
+export type EnforceableRule = Rule & {
+  detector: AstDetector | RegexDetector | KnowledgeDetector;
+};
 
 export function isEnforceable(rule: Rule): rule is EnforceableRule {
   return rule.detector.kind !== 'manual';

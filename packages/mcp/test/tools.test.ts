@@ -129,10 +129,18 @@ describe('explain_rule', () => {
   });
 
   it('says when a rule no linter can check is still binding', () => {
-    const manual = rules.constitution.rules.find((r) => r.detector.kind === 'manual');
-    expect(manual).toBeDefined();
-    // An agent told a rule is enforced iterates against the linter. Not this one.
-    expect(explainRule(context, manual?.id ?? '')).toContain('Not mechanically enforced');
+    // There may be none: every rule can become mechanical. Then there is nothing to say.
+    for (const manual of rules.constitution.rules.filter((r) => r.detector.kind === 'manual')) {
+      // An agent told a rule is enforced iterates against the linter. Not this one.
+      expect(explainRule(context, manual.id)).toContain('Not mechanically enforced');
+    }
+  });
+
+  it('says what a rule checked against the knowledge base does not cover', () => {
+    const answer = explainRule(context, 'selectors-from-agent-kb');
+    expect(answer).toContain('Checked against .agent-kb only');
+    expect(answer).toContain('understudy check');
+    expect(answer).not.toContain('Not mechanically enforced');
   });
 
   it('lists the rules when given an id that does not exist', () => {
@@ -190,13 +198,23 @@ describe('resolve_locator', () => {
 });
 
 describe('the server', () => {
-  it('registers exactly the three tools v1 promises', () => {
+  it('registers exactly the tools it documents', () => {
     const server = createServer(context);
     // The only way to see what a client sees without standing up a transport.
     const registered = Object.keys(
       (server as unknown as { _registeredTools: Record<string, unknown> })._registeredTools,
     ).sort();
-    expect(registered).toEqual(['explain_rule', 'resolve_locator', 'resolve_owner']);
+    expect(registered).toEqual([
+      'explain_rule',
+      'find_knowledge',
+      'get_context',
+      'get_evidence',
+      'get_freshness',
+      'resolve_api',
+      'resolve_locator',
+      'resolve_owner',
+      'resolve_route',
+    ]);
   });
 
   it('declares every tool read-only', () => {

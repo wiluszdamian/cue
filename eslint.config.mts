@@ -22,6 +22,8 @@ export default defineConfig([
     // build and `astro check`, kept out of the monorepo's type-aware lint.
     'site/',
     'coverage/',
+    // Scratch workspaces the benchmark writes generated tests into, removed afterwards.
+    '**/.benchmark/',
     // Deliberately wrong: they are the rules' test data, and `fixtures/**` falls
     // inside one rule's scope, so linting them fails the suite on its own inputs.
     'packages/*/test/fixtures/',

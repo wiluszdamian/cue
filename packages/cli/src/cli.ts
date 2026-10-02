@@ -22,7 +22,33 @@ import {
   survey,
   SurveyError,
 } from './survey.js';
+import {
+  changedFiles,
+  buildTaskContext,
+  cachedKnowledgeIndex,
+  findProductRoot,
+  indexKnowledge,
+  loadKnowledge,
+  selectSurveyTargets,
+  workingTreeFiles,
+} from '@understudy/engine';
+import {
+  formatPlan,
+  formatResults,
+  parseBaseUrl,
+  surveyTargets,
+  targetsExitCode,
+} from './survey-targets.js';
+import { productFiles } from './product-files.js';
+import {
+  CHECK_FORMATS,
+  check,
+  formatCheck,
+  locatorCheckExitCode,
+  type CheckFormat,
+} from './check.js';
 import { decideConfirmation, REFUSED_MESSAGE } from './confirm.js';
+import { discover, formatDiscovery, formatDiscoverySummary } from './discover.js';
 import { formatVerifyReport, verify, verifyExitCode, type CiMode } from './verify.js';
 import {
   extract,
@@ -45,10 +71,14 @@ const USAGE = `understudy <command> [options]
   list                 show available and installed targets
   explain <rule-id>    why a rule exists, and what to do instead
   survey <url>         map a live route into .agent-kb
+  survey --route|--stale|--affected-by  look at some pages again, not the whole app
   extract              read the product source into .agent-kb
+  discover             what is in this repository and what Understudy could learn from it
+  check [files...]     check the locators in tests against the knowledge base
   verify               check the map against the application (and say what was not checked)
   verify-map           old name for verify
   locator <element>    look up a selector, with freshness and confidence
+  context <task>       what is known that bears on a task, within a token budget
   uninstall            remove everything init installed
 
 Options
@@ -60,14 +90,24 @@ Options
   --force              overwrite files that were edited by hand
   --ci[=advisory|strict] non-zero exit: doctor errors; verify drift (strict: also unverified)
   --json               print the verify report as JSON
+  --format <name>      check output: human | agent | json | sarif | github
   --check              report drift without writing (sync)
   --offline            skip checks that need the network
   --from <file>        survey from a captured snapshot instead of a browser
   --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
-  --base-url <url>     environment to verify the map against
-  --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked)
+  --base-url <url>     environment to verify the map against, or to survey routes of
+                       (or set UNDERSTUDY_BASE_URL)
+  --env <name>         name this environment (staging) in what survey and verify record
+  --source <path>      the product source: where discover and extract read from, and what verify
+                       compares the map with
+  --affected-by <range> check only the routes read from files changed over this git range (verify)
+  --max-tokens <n>     the budget for context (200 to 3000, default 1200)
+  --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked);
+                       with survey, the pages to look at again
+  --stale              survey: the pages with something stale or read from changed code
+  --dry-run            survey: show the plan, open nothing
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
   --cwd <path>         project root (default: current directory)
@@ -142,6 +182,98 @@ async function confirm(question: string, assumeYes: boolean): Promise<Answer> {
   }
 }
 
+/**
+ * `survey --route | --stale | --affected-by`: look at some pages again, not the whole
+ * application. The plan is shown before anything is opened, and `--dry-run` stops there.
+ */
+function runTargetedSurvey(input: {
+  projectRoot: string;
+  routes: string | undefined;
+  stale: boolean;
+  range: string | undefined;
+  flags: Readonly<Record<string, string | true>>;
+}): number {
+  const { projectRoot, flags } = input;
+  const out = (text: string): void => void process.stdout.write(`${text}\n`);
+  const err = (text: string): void => void process.stderr.write(`${text}\n`);
+
+  if (flags['from'] !== undefined) {
+    err(
+      '--from is for one page at a time: use it with a URL, not with --route, --stale or --affected-by.',
+    );
+    return 2;
+  }
+
+  // The address of the environment: needed to open pages, never written down.
+  const rawBase = asString(flags['base-url']) ?? process.env['UNDERSTUDY_BASE_URL'];
+  if (rawBase === undefined || rawBase === '') {
+    err(
+      'Surveying a route needs the address of the environment: --base-url <url>, or set UNDERSTUDY_BASE_URL.\n' +
+        'It is used to open the pages and is not saved in .agent-kb.',
+    );
+    return 2;
+  }
+  const base = parseBaseUrl(rawBase);
+  if (!base.ok) {
+    err(base.reason);
+    return 2;
+  }
+
+  // Where the code behind the map is, for "possibly stale" and for --affected-by.
+  const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+  let changedPaths: string[] | undefined;
+  if (input.range !== undefined) {
+    if (productRoot === undefined) {
+      err('--affected-by reads git history in the product: pass --source <path> to it.');
+      return 2;
+    }
+    const changed = changedFiles(input.range, productRoot);
+    if (!changed.ok) {
+      err(changed.reason);
+      return 2;
+    }
+    changedPaths = changed.files;
+  }
+
+  const index = indexKnowledge(loadKnowledge(projectRoot).kb);
+  const targets = selectSurveyTargets(
+    index,
+    {
+      ...(input.routes === undefined
+        ? {}
+        : { routes: input.routes.split(',').map((route) => route.trim()) }),
+      ...(input.stale ? { stale: true } : {}),
+      ...(changedPaths === undefined ? {} : { changedPaths }),
+    },
+    { files: productRoot === undefined ? undefined : workingTreeFiles(productRoot) },
+  );
+
+  if (targets.length === 0) {
+    out(
+      changedPaths !== undefined
+        ? `Nothing to survey: none of the ${String(changedPaths.length)} changed file(s) is one a surveyed page was read from.`
+        : 'Nothing to survey: no surveyed page is stale or read from code that has changed.',
+    );
+    return 0;
+  }
+
+  out(formatPlan(targets, base.url));
+  if (flags['dry-run'] === true) {
+    out('\nDry run: nothing was opened or written.');
+    return 0;
+  }
+
+  const results = surveyTargets({
+    projectRoot,
+    baseUrl: base.url,
+    driver: createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli'])),
+    targets,
+    environment: asString(flags['env']),
+  });
+  out(formatResults(results));
+  return targetsExitCode(results);
+}
+
 async function main(): Promise<number> {
   const { command, positional, flags } = parseArgs(process.argv.slice(2));
   const out = (text: string): void => void process.stdout.write(`${text}\n`);
@@ -202,6 +334,9 @@ async function main(): Promise<number> {
         ...(flags['force'] === true ? { force: true } : {}),
       });
 
+      // What the plan is being made around, before the plan itself. Read-only.
+      out(formatDiscoverySummary(discover({ root: projectRoot })));
+      out('');
       out(describePlan(prepared));
       out('');
 
@@ -282,14 +417,36 @@ async function main(): Promise<number> {
 
     case 'survey': {
       const url = positional[0];
-      if (url === undefined) {
-        err('survey needs a URL, e.g. understudy survey https://staging.example.com/login');
+      const routes = asString(flags['route']);
+      const stale = flags['stale'] === true;
+      const range = asString(flags['affected-by']);
+      const targeted = routes !== undefined || stale || range !== undefined;
+
+      if (flags['action'] !== undefined) {
+        err(
+          'survey --action is not implemented yet: nothing records actions so far. ' +
+            'Use --route <path> for the page the action is on.',
+        );
         return 2;
       }
+      if (url !== undefined && targeted) {
+        err('Give survey a URL or one of --route, --stale and --affected-by, not both.');
+        return 2;
+      }
+      if (url === undefined && !targeted) {
+        err(
+          'survey needs a URL, e.g. understudy survey https://staging.example.com/login,\n' +
+            'or says which pages to look at again: --route /login, --stale, or --affected-by <git range>.',
+        );
+        return 2;
+      }
+      if (url === undefined) return runTargetedSurvey({ projectRoot, routes, stale, range, flags });
+
       const from = asString(flags['from']);
       const result = survey({
         projectRoot,
         url,
+        environment: asString(flags['env']),
         driver:
           from === undefined
             ? createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli']))
@@ -318,6 +475,43 @@ async function main(): Promise<number> {
       return 0;
     }
 
+    case 'discover': {
+      const report = discover({ root: projectRoot, source: asString(flags['source']) });
+      out(flags['json'] === true ? JSON.stringify(report, null, 2) : formatDiscovery(report));
+      // It only looks. What it found is for the person to act on.
+      return 0;
+    }
+
+    case 'check': {
+      const ci = flags['ci'];
+      if (ci !== undefined && ci !== true && ci !== 'advisory' && ci !== 'strict') {
+        err('--ci takes advisory or strict, e.g. --ci=strict');
+        return 2;
+      }
+      const format = asString(flags['format']) ?? 'human';
+      if (!(CHECK_FORMATS as readonly string[]).includes(format)) {
+        err(`--format takes one of: ${CHECK_FORMATS.join(', ')}`);
+        return 2;
+      }
+      const report = check({
+        projectRoot,
+        targets: positional,
+        files: productFiles(projectRoot, asString(flags['source'])),
+      });
+      out(
+        formatCheck(
+          report,
+          format as CheckFormat,
+          resolveRules(projectRoot).constitution,
+          projectRoot,
+        ),
+      );
+      // Without --ci a check informs; with it, it can fail the build.
+      return ci === undefined
+        ? 0
+        : locatorCheckExitCode(report, ci === 'strict' ? 'strict' : 'advisory');
+    }
+
     case 'verify-map':
     case 'verify': {
       if (command === 'verify-map') {
@@ -330,9 +524,31 @@ async function main(): Promise<number> {
       }
       const baseUrl = asString(flags['base-url']);
       const from = asString(flags['from']);
+
+      // Where the code behind the map is, to see whether it has changed since.
+      const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+      const files = productRoot === undefined ? undefined : workingTreeFiles(productRoot);
+      let changedPaths: string[] | undefined;
+      const range = asString(flags['affected-by']);
+      if (range !== undefined) {
+        if (productRoot === undefined) {
+          err('--affected-by reads git history in the product: pass --source <path> to it.');
+          return 2;
+        }
+        const changed = changedFiles(range, productRoot);
+        if (!changed.ok) {
+          err(changed.reason);
+          return 2;
+        }
+        changedPaths = changed.files;
+      }
+
       const report = verify({
         projectRoot,
         baseUrl,
+        files,
+        changedPaths,
+        environment: asString(flags['env']),
         driver:
           from !== undefined
             ? new FileDriver(from)
@@ -357,11 +573,41 @@ async function main(): Promise<number> {
       }
       out(
         formatLocatorAnswer(
-          resolveLocator({ projectRoot, query, route: asString(flags['route']) }),
+          resolveLocator({
+            projectRoot,
+            query,
+            route: asString(flags['route']),
+            files: productFiles(projectRoot, asString(flags['source'])),
+          }),
         ),
       );
       // An unknown element is a finding, not a crash: the output says which
       // route to survey.
+      return 0;
+    }
+
+    case 'context': {
+      const task = positional.join(' ');
+      if (task.length === 0) {
+        err('context needs a task, e.g. understudy context "test changing the password"');
+        return 2;
+      }
+      const rawBudget = asString(flags['max-tokens']);
+      const maxTokens = rawBudget === undefined ? undefined : Number(rawBudget);
+      if (maxTokens !== undefined && !Number.isInteger(maxTokens)) {
+        err('--max-tokens takes a whole number, e.g. --max-tokens 800');
+        return 2;
+      }
+      const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+      out(
+        buildTaskContext(
+          cachedKnowledgeIndex(projectRoot),
+          resolveRules(projectRoot).constitution.rules,
+          { task, maxTokens, route: asString(flags['route']) },
+          { files: productRoot === undefined ? undefined : workingTreeFiles(productRoot) },
+        ).text,
+      );
+      // Not knowing is an answer, with its own next step in the text.
       return 0;
     }
 
@@ -491,6 +737,7 @@ async function main(): Promise<number> {
           detection,
           understudyVersion: VERSION,
           ...(flags['offline'] === true ? { offline: true } : {}),
+          source: asString(flags['source']),
         }),
       );
 

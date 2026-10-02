@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
+import { hashContent } from '../working-tree.js';
 
 /**
  * Reading a product repository that may not be yours. Three guarantees live here
@@ -101,7 +101,7 @@ export function scanSource(root: string, limit = 5000): ScanResult {
         files.push({
           path: relative(root, path).split(sep).join('/'),
           lines: text.split('\n'),
-          hash: createHash('sha256').update(text.replace(/\r\n/g, '\n'), 'utf8').digest('hex'),
+          hash: hashContent(text),
         });
       } catch {
         notes.push(`could not read ${relative(root, path)}`);

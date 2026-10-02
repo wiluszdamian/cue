@@ -49,7 +49,7 @@ data, or addresses its UI is ours.
   rationale: >
     What goes wrong in practice if this is ignored. Concrete, not moral.
   detector:
-    kind: ast # ast | regex | manual
+    kind: ast # ast | regex | knowledge | manual
     selector: "CallExpression[callee.property.name='waitForTimeout']"
     refine: optional-registered-refinement
   scope: ['**/*.ts']
@@ -76,6 +76,10 @@ Notes that save a review round-trip:
   agent to work around it. Name the replacement.
 - **Scope is anchored.** `tests/**/*.ts` is matched as `**/tests/**/*.ts`, so it
   works against both repo-relative paths (the engine) and absolute ones (ESLint).
+- **`kind: knowledge`** checks against `.agent-kb` rather than the code alone, and
+  needs an index passed to `analyze`; without one the result lists the rule under
+  `notChecked` instead of passing. A fixture for it carries its own `.agent-kb/`
+  next to `good.ts` and `bad.ts`.
 - **`kind: manual`** is the honest choice for a rule no linter can check. It gets
   documented and never reported. Do not invent a weak detector to make a manual
   rule look enforced.
@@ -129,6 +133,17 @@ produce, and CI runs it.
 Widening a rule (catching more) follows the same versioning as adding one.
 Narrowing it is a patch. Either way, add a fixture that covers the case you
 changed — a rule change with no new fixture is a rule change nobody can review.
+
+## The end-to-end check
+
+`node scripts/e2e.mjs` runs the whole path against a real browser: it builds a project
+in a directory with a space in its name, extracts from the demo app, surveys it (one
+URL carries `&` and `%`), looks a locator up, checks the reference page objects, runs
+the demo's Playwright tests, verifies the map, then breaks the app and verifies again.
+Run `pnpm build` first, and install Chromium once with
+`pnpm --filter @understudy/demo-app exec playwright install chromium`. CI runs it on
+Ubuntu for every push and on Windows weekly (`e2e-windows.yml`); pass `--keep` to leave
+the project it built behind for inspection.
 
 ## Supporting a new `@playwright/cli`
 

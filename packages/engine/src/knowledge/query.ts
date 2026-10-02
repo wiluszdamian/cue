@@ -2,7 +2,9 @@ import { freshnessOf, type FreshnessLevel } from './freshness.js';
 import { routeId } from './ids.js';
 import type {
   Conflict,
+  EvidenceType,
   FactOfKind,
+  FactStatus,
   KnowledgeBase,
   KnowledgeEvidence,
   KnowledgeFact,
@@ -31,6 +33,24 @@ export type TermFact = FactOfKind<'term'>;
  * - `unknown` — neither, or a check failed.
  */
 export type Coverage = 'confirmed' | 'runtime-only' | 'code-only' | 'unknown';
+
+/**
+ * The one place that turns a standing into a coverage. A fact that is only
+ * inferred counts as `code-only` when something other than a model's guess says
+ * it is in the source, and as `unknown` otherwise.
+ */
+export function coverageFrom(status: FactStatus, evidenceTypes: readonly EvidenceType[]): Coverage {
+  switch (status) {
+    case 'verified':
+      return 'confirmed';
+    case 'observed':
+      return 'runtime-only';
+    case 'inferred':
+      return evidenceTypes.includes('source-code') ? 'code-only' : 'unknown';
+    case 'stale':
+      return 'unknown';
+  }
+}
 
 export interface KnowledgeIndex {
   /** In the order they were added, which for a loaded `.agent-kb` is by route. */
@@ -93,20 +113,11 @@ export function indexKnowledge(kb: KnowledgeBase): KnowledgeIndex {
     fact: (id) => facts.get(id),
     evidenceFor,
 
-    coverage: (fact) => {
-      switch (fact.status) {
-        case 'verified':
-          return 'confirmed';
-        case 'observed':
-          return 'runtime-only';
-        case 'inferred':
-          return evidenceFor(fact.id).some((item) => item.type === 'source-code')
-            ? 'code-only'
-            : 'unknown';
-        case 'stale':
-          return 'unknown';
-      }
-    },
+    coverage: (fact) =>
+      coverageFrom(
+        fact.status,
+        evidenceFor(fact.id).map((item) => item.type),
+      ),
 
     freshness: (fact, now) =>
       fact.verifiedAt === undefined ? 'stale' : freshnessOf(fact.verifiedAt, now),

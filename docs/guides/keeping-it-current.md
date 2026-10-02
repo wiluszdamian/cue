@@ -67,6 +67,34 @@ Every note records when it was last confirmed.
 A stale note is not deleted, because a good idea of where to look still beats no
 idea at all. It just stops being presented as certain.
 
+## When the code behind a note changes
+
+Age is only part of it. A button can be renamed the day after you surveyed it, and a
+month-old note about code nobody touched is fine. So a note that was confirmed by a
+`data-testid` in your source also remembers **which file that came from**, and
+`verify`, `locator` and `check` compare it with the file as it is now.
+
+A route whose notes were read from a file that has since changed (or gone) is
+**possibly stale**, and the report names the file:
+
+```bash
+npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000 --source ../my-app
+```
+
+Where the code lives is the place `extract` read it from, if that is still there, or
+whatever you pass as `--source`. If it cannot be found, `verify` says so instead of
+staying quiet. A route the live check just found unchanged is not in doubt any more,
+whatever happened to the source.
+
+To look only at what a change could have broken, give it the git range:
+
+```bash
+npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000 --source ../my-app --affected-by main..HEAD
+```
+
+Only the routes read from a changed file are checked; the others are listed as not
+checked, so the result is `PARTIAL` rather than a claim about the whole app.
+
 ## When the rules themselves change
 
 If Cue updates, or your team changes a rule, your project's copy of the

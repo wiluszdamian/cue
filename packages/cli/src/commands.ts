@@ -17,9 +17,12 @@ export const COMMANDS = [
   'explain',
   'survey',
   'extract',
+  'check',
+  'discover',
   'verify',
   'verify-map',
   'locator',
+  'context',
   'uninstall',
 ] as const;
 

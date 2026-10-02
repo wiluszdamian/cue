@@ -12,7 +12,7 @@ import {
  * repository, and it runs only on `record`.
  */
 
-export const DEFAULT_MODEL = 'claude-opus-5';
+export const DEFAULT_MODEL = 'claude-opus-5-5';
 
 /**
  * Identical in both conditions, and naming no rule, tag or page object — advice
@@ -32,10 +32,11 @@ export const INSTRUCTIONS = [
 ].join('\n');
 
 /** A seam rather than a client, so a test can drive `ClaudeAgent` without a key. */
-export type Completion = (input: {
-  readonly system: string;
-  readonly user: string;
-}) => Promise<{ readonly text: string; readonly model: string }>;
+export type Completion = (input: { readonly system: string; readonly user: string }) => Promise<{
+  readonly text: string;
+  readonly model: string;
+  readonly usage?: { readonly inputTokens?: number; readonly outputTokens?: number };
+}>;
 
 export interface ClaudeAgentOptions {
   readonly model?: string;
@@ -73,7 +74,14 @@ export function anthropicCompletion(options: ClaudeAgentOptions = {}): Completio
       );
     }
 
-    return { text, model: response.model };
+    return {
+      text,
+      model: response.model,
+      usage: {
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+      },
+    };
   };
 }
 
@@ -86,10 +94,12 @@ export class ClaudeAgent implements Agent {
   }
 
   async run(request: AgentRequest): Promise<AgentResponse> {
-    const { text, model } = await this.complete({
+    const started = performance.now();
+    const { text, model, usage } = await this.complete({
       system: systemPrompt(request),
       user: request.prompt.text,
     });
+    const durationMs = Math.round(performance.now() - started);
 
     const files = parseFiles(text, request.prompt.id);
 
@@ -100,6 +110,9 @@ export class ClaudeAgent implements Agent {
       files,
       model: model === '' ? (this.options.model ?? DEFAULT_MODEL) : model,
       recordedAt: new Date().toISOString(),
+      ...(request.run === undefined ? {} : { run: request.run }),
+      ...(usage === undefined ? {} : { usage }),
+      durationMs,
     };
   }
 }

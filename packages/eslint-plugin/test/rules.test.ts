@@ -1,8 +1,14 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { analyze, isEnforceable, loadRules } from '@understudy/engine';
+import {
+  analyze,
+  indexKnowledge,
+  isEnforceable,
+  loadKnowledge,
+  loadRules,
+} from '@understudy/engine';
 import { afterAll, describe, expect, it } from 'vitest';
 import { rules } from '../src/index.js';
 
@@ -32,11 +38,27 @@ const enforceable = rulesData.constitution.rules.filter(isEnforceable);
 const VIRTUAL_PATH = 'tests/app/functional/fixture.spec.ts';
 const filename = join(process.cwd(), ...VIRTUAL_PATH.split('/'));
 
+/** A fixed "now" so a fixture's knowledge base does not age out from under the test. */
+const NOW = new Date('2026-10-01T12:00:00Z');
+
+/**
+ * A rule that checks against the knowledge base finds it by walking up from the file
+ * being linted, so its fixture is linted from inside the directory that holds one.
+ */
+const hasKnowledge = (ruleId: string): boolean => existsSync(join(fixtures, ruleId, '.agent-kb'));
+const filenameFor = (ruleId: string): string =>
+  hasKnowledge(ruleId) ? join(fixtures, ruleId, ...VIRTUAL_PATH.split('/')) : filename;
+
 const readFixture = (ruleId: string, variant: 'good' | 'bad'): string =>
   readFileSync(join(fixtures, ruleId, `${variant}.ts`), 'utf8');
 
 function engineDiagnostics(ruleId: string, code: string) {
+  const knowledge = hasKnowledge(ruleId)
+    ? indexKnowledge(loadKnowledge(join(fixtures, ruleId), NOW).kb)
+    : undefined;
   return analyze({
+    now: NOW,
+    ...(knowledge === undefined ? {} : { knowledge }),
     files: [{ path: VIRTUAL_PATH, text: code }],
     constitution: rulesData.constitution,
     tags: rulesData.tags,
@@ -59,8 +81,10 @@ describe('every enforceable rule is exported', () => {
 
   it('carries the constitution message verbatim, so a block explains itself', () => {
     for (const rule of enforceable) {
+      const message = rule.message.replace(/\s+/g, ' ').trim();
+      // A rule checked against the knowledge base adds what it found after the message.
       expect(rules[rule.id]?.meta.messages.violation).toBe(
-        rule.message.replace(/\s+/g, ' ').trim(),
+        rule.detector.kind === 'knowledge' ? `${message} {{detail}}` : message,
       );
     }
   });
@@ -72,11 +96,11 @@ for (const rule of enforceable) {
   const expected = engineDiagnostics(rule.id, bad);
 
   ruleTester.run(rule.id, rules[rule.id] as never, {
-    valid: [{ code: good, filename }],
+    valid: [{ code: good, filename: filenameFor(rule.id) }],
     invalid: [
       {
         code: bad,
-        filename,
+        filename: filenameFor(rule.id),
         errors: expected.map((d) => ({
           messageId: 'violation' as const,
           line: d.line,

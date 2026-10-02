@@ -1,17 +1,23 @@
 # @understudy/mcp
 
-Three point lookups over the Understudy rules and the project knowledge base.
+Point lookups over the Understudy rules and the project knowledge base.
 
 Everything here is read-only, and every answer is short on purpose. An MCP
 answer is paid for out of the same context window the actual task needs, so each
 tool has a token ceiling that `test/tools.test.ts` asserts against every
 reachable output rather than against one sample.
 
-| Tool              | Answers                                                         | Ceiling    |
-| ----------------- | --------------------------------------------------------------- | ---------- |
-| `explain_rule`    | why a rule exists and what to write instead                     | 400 tokens |
-| `resolve_owner`   | which source of guidance governs a topic when several disagree  | 300 tokens |
-| `resolve_locator` | the real selector for an element, with freshness and confidence | 350 tokens |
+| Tool              | Answers                                                            | Ceiling                    |
+| ----------------- | ------------------------------------------------------------------ | -------------------------- |
+| `explain_rule`    | why a rule exists and what to write instead                        | 400 tokens                 |
+| `resolve_owner`   | which source of guidance governs a topic when several disagree     | 300 tokens                 |
+| `resolve_locator` | the real selector for an element, with freshness and confidence    | 350 tokens                 |
+| `resolve_route`   | a page: title, standing, freshness with reasons, elements, sources | 350 tokens                 |
+| `resolve_api`     | endpoints matching a path, with the file each came from            | 350 tokens                 |
+| `get_evidence`    | why a fact is believed: source lines, surveys, tests               | 300 tokens                 |
+| `get_freshness`   | when a fact was confirmed, and what changed since                  | 250 tokens                 |
+| `find_knowledge`  | up to five facts matching a few words                              | 350 tokens                 |
+| `get_context`     | everything relevant to a task, within the budget the caller gives  | 3000 tokens (default 1200) |
 
 ## What this server deliberately does not do
 

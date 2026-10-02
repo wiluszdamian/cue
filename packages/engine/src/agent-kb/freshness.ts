@@ -1,4 +1,5 @@
 import type { Freshness } from '../schema/agent-kb.js';
+import { surveyCommand } from './advice.js';
 
 /**
  * The age arithmetic moved into the Knowledge Core, which needs it without
@@ -24,7 +25,7 @@ export function freshnessAdvice(freshness: Freshness, route: string): string {
     case 'stale':
       return (
         `Not confirmed in over ${String(STALE_AFTER_DAYS)} days. Treat this as a candidate, not a fact: ` +
-        `run \`understudy survey\` on ${route} before relying on it, and do not write in a confident voice until you have.`
+        `run \`${surveyCommand(route)}\` before relying on it, and do not write in a confident voice until you have.`
       );
   }
 }
