@@ -1,0 +1,21 @@
+---
+import { render } from 'astro:content';
+import Docs from '../../layouts/Docs.astro';
+import { getDocs } from '../../lib/docs';
+
+export async function getStaticPaths() {
+  const pages = await getDocs();
+  return pages.map((page) => ({
+    params: { slug: page.slug === '' ? undefined : page.slug },
+    props: { slug: page.slug },
+  }));
+}
+
+const { slug } = Astro.props;
+const page = (await getDocs()).find((p) => p.slug === slug)!;
+const { Content } = await render(page.entry);
+---
+
+<Docs slug={slug}>
+  <Content />
+</Docs>

@@ -1706,3 +1706,93 @@ td.no,
   color: var(--ink);
   font-weight: 600;
 }
+
+/* ---------- Docs prose, rendered from /docs/*.md ---------- */
+.prose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.prose > * {
+  margin: 0;
+}
+.prose h2 {
+  margin-top: 22px;
+}
+.prose h3 {
+  font-size: var(--step-1);
+  margin-top: 10px;
+  scroll-margin-top: 80px;
+}
+.prose ol {
+  margin: 0;
+  padding-left: 1.3em;
+  display: grid;
+  gap: 8px;
+}
+.prose a {
+  color: var(--blue);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+.prose blockquote:not(.callout) {
+  border-left: 3px solid var(--rule);
+  padding-left: 14px;
+  color: var(--pencil);
+}
+.prose aside.callout > * {
+  margin: 0;
+}
+.prose aside.callout > strong {
+  display: block;
+}
+.prose .table table {
+  width: 100%;
+}
+.prose pre.astro-code {
+  background: linear-gradient(180deg, var(--console-2), var(--console)) !important;
+  border: 1px solid var(--console-edge);
+  border-radius: 12px;
+  padding: 14px 18px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.75;
+  box-shadow: 0 16px 32px -24px rgba(5, 12, 20, 0.6);
+}
+.prose pre.astro-code code {
+  font-family: inherit;
+  font-variation-settings: 'MONO' 1;
+  background: none;
+  padding: 0;
+  border: 0;
+}
+.prose .code-title {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--console-ink);
+  background: var(--console-2);
+  border: 1px solid var(--console-edge);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  padding: 8px 18px;
+  margin-bottom: -16px;
+  font-variation-settings: 'MONO' 1;
+}
+.prose .code-title + pre.astro-code {
+  border-radius: 0 0 12px 12px;
+}
+.docs-edit {
+  font-size: var(--step--1);
+  color: var(--pencil);
+}
+.docs-edit:hover {
+  color: var(--ink);
+}

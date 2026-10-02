@@ -50,8 +50,8 @@ you to say yes. Nothing happens until you agree.
 
 ## Everything here
 
-The site that used to render these pages is gone; this index is the way around
-them.
+The site in `site/` renders these same files, in this order; on GitHub, this
+index is the way around them.
 
 **Getting started**
 

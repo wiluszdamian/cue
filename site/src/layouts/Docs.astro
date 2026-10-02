@@ -1,12 +1,14 @@
 ---
 import Base from './Base.astro';
-import { DOCS, GROUPS } from '../lib/docs';
+import { getDocs, groupsOf } from '../lib/docs';
 import { url } from '../lib/url';
 
 interface Props {
   slug: string;
 }
 const { slug } = Astro.props;
+const DOCS = await getDocs();
+const GROUPS = groupsOf(DOCS);
 const index = DOCS.findIndex((d) => d.slug === slug);
 const page = DOCS[index];
 if (!page) throw new Error(`No docs entry for "${slug}"`);
@@ -49,8 +51,10 @@ const href = (s: string) => url(s === '' ? 'docs/' : `docs/${s}/`);
       <article>
         <span class="crumb">{page.group}</span>
         <h1>{page.title}</h1>
-        <p class="desc">{page.description}</p>
-        <slot />
+        {page.description && <p class="desc">{page.description}</p>}
+        <div class="prose">
+          <slot />
+        </div>
       </article>
 
       <footer class="docs-foot">
@@ -78,6 +82,12 @@ const href = (s: string) => url(s === '' ? 'docs/' : `docs/${s}/`);
             )
           }
         </div>
+        <a
+          class="docs-edit"
+          href={`https://github.com/wiluszdamian/project-cue/blob/main/docs/${page.slug || 'index'}.md`}
+          target="_blank"
+          rel="noopener noreferrer">Edit this page on GitHub ↗</a
+        >
         <p class="docs-credit">
           Authored by <a href="https://github.com/wiluszdamian" target="_blank" rel="noopener noreferrer">Damian Wilusz</a>
         </p>
