@@ -70,6 +70,15 @@ function isPageName(name: string): boolean {
   return name === 'page' || name === 'frame';
 }
 
+/** `test.skip('title', { tag }, fn)` / `test.skip('title', fn)`: no reason, the second argument is the body. */
+function isDeclarationBody(node: TSESTree.Node): boolean {
+  return (
+    node.type === AST_NODE_TYPES.ObjectExpression ||
+    node.type === AST_NODE_TYPES.ArrowFunctionExpression ||
+    node.type === AST_NODE_TYPES.FunctionExpression
+  );
+}
+
 const ISSUE_REFERENCE = /([A-Z][A-Z0-9]+-\d+)|(#\d+)|(https?:\/\/\S+)/;
 
 /** Acceptable when conditional — `test.skip(cond, 'why')` — or ticketed on or above the line. */
@@ -78,8 +87,17 @@ export const skipLacksIssueReference: Refinement = (node, ctx) => {
 
   // `test.skip(condition, 'why')` states its reason in the call itself.
   if (node.arguments.length >= 2) {
-    const reason = stringLiteralValue(node.arguments[1]);
-    if (reason !== undefined && reason.trim().length > 0) return false;
+    // A reason that is only known at runtime (`${x}`, a constant, `r ?? ''`, `a + b`)
+    // still counts; only a literally empty one does not.
+    const reason = node.arguments[1];
+    const literal = stringLiteralValue(reason);
+    if (
+      literal === undefined
+        ? reason !== undefined && !isDeclarationBody(reason)
+        : literal.trim().length > 0
+    ) {
+      return false;
+    }
   }
 
   const line = node.loc.start.line;
