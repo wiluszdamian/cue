@@ -8,8 +8,6 @@ Rule-specific versioning policy: a new rule at `severity: error` is a major
 change; at `severity: warn`, a minor one. Rules are retired via `deprecated:`
 rather than deletion, and stay documented for one major cycle.
 
-## [Unreleased]
-
 ## [1.0.0] - 2026-10-02
 
 The first release. Everything below is new.

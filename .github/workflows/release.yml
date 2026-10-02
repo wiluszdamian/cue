@@ -60,7 +60,14 @@ jobs:
           fi
 
       - name: Set the version everywhere and date the changelog
-        run: node scripts/release.mjs bump "$VERSION"
+        run: |
+          # A commit that already says this version (bumped by hand, changelog written) is
+          # released as it is.
+          if [ "$(cat VERSION)" = "$VERSION" ]; then
+            echo "VERSION already says ${VERSION}; nothing to bump."
+          else
+            node scripts/release.mjs bump "$VERSION"
+          fi
 
       - run: pnpm run build
       - name: Regenerate what follows the version (pinned MCP version, plugin manifests)
@@ -79,7 +86,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "release v${VERSION}"
+          git diff --cached --quiet || git commit -m "release v${VERSION}"
           git tag -a "v${VERSION}" -m "v${VERSION}"
 
       - name: Publish to npm
