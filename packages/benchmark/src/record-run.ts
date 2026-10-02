@@ -21,6 +21,8 @@ export interface RecordOptions {
   readonly conditions?: readonly Condition[];
   /** Ask again for answers that are already on disk, replacing them. */
   readonly force?: boolean;
+  /** How many answers to ask for per prompt and condition. Defaults to 1. */
+  readonly runs?: number;
   readonly log?: (line: string) => void;
 }
 
@@ -36,6 +38,7 @@ export async function recordRun(options: RecordOptions): Promise<RecordSummary> 
   const prompts = options.prompts ?? PROMPTS;
   const conditions = options.conditions ?? CONDITIONS;
   const log = options.log ?? (() => undefined);
+  const runs = options.runs ?? 1;
 
   const written: string[] = [];
   let kept = 0;
@@ -45,21 +48,26 @@ export async function recordRun(options: RecordOptions): Promise<RecordSummary> 
   for (const condition of conditions) {
     const context = buildContext(options.projectRoot, condition);
 
-    for (const prompt of prompts) {
-      const path = recordingPath(options.dir, prompt.id, condition);
-      if (options.force !== true && existsSync(path)) {
-        kept += 1;
-        log(`  kept    ${condition}/${prompt.id}`);
-        continue;
-      }
+    // Repetition outermost within a condition: stopping early leaves every prompt
+    // answered once, rather than the first few answered five times.
+    for (let run = 1; run <= runs; run += 1) {
+      for (const prompt of prompts) {
+        const label = `${condition}/${prompt.id}${runs > 1 ? ` #${String(run)}` : ''}`;
+        const path = recordingPath(options.dir, prompt.id, condition, run);
+        if (options.force !== true && existsSync(path)) {
+          kept += 1;
+          log(`  kept     ${label}`);
+          continue;
+        }
 
-      try {
-        const response = await options.agent.run({ prompt, condition, context });
-        written.push(record(options.dir, response));
-        log(`  recorded ${condition}/${prompt.id}`);
-      } catch (error) {
-        log(`  FAILED  ${condition}/${prompt.id}: ${message(error)}`);
-        return { written, kept, failed: { promptId: prompt.id, condition } };
+        try {
+          const response = await options.agent.run({ prompt, condition, context, run });
+          written.push(record(options.dir, { ...response, run }));
+          log(`  recorded ${label}`);
+        } catch (error) {
+          log(`  FAILED   ${label}: ${message(error)}`);
+          return { written, kept, failed: { promptId: prompt.id, condition } };
+        }
       }
     }
   }

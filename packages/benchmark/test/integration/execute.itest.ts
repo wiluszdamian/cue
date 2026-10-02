@@ -206,8 +206,20 @@ describe('a whole run', () => {
     // it is why "wrong route" is reported apart from "invented".
     expect(understudy?.locators).toMatchObject({ unknown: 0, wrongRoute: 1, known: 3 });
 
+    // demo-login names the defect auth-silent-fail. The answer that failed on the correct
+    // application has nothing to break; the one that passed stops passing once login
+    // silently does nothing, which is what a good test of login should do.
+    expect(bare?.mutations).toEqual({ eligible: 1, detected: 0, missed: 0, notApplicable: 1 });
+    expect(understudy?.mutations).toEqual({
+      eligible: 1,
+      detected: 1,
+      missed: 0,
+      notApplicable: 0,
+    });
+
     const text = formatReport(result);
     expect(text).toContain('passed first run 0/1');
     expect(text).toContain('passed first run 1/1');
-  }, 120_000);
+    expect(text).toContain('Caught the defect put into the application');
+  }, 180_000);
 });

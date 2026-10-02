@@ -67,6 +67,17 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Benchmark: repetitions, defects, and a report.** `record --runs N` asks for several
+  answers per prompt and condition (default 1, since each is a paid call; the total is
+  printed first), and scoring finds how many it has and reports the spread across runs.
+  Prompts that name a defect of the demo application are run a second time with it
+  switched on, and a test that still passes is reported as one that does not notice it.
+  `--report <dir>` writes `report.md` and `report.json` with the commit, tool versions and
+  model, both conditions side by side, every failure linked to its recording, the metrics
+  that were not measured (never shown as zero), and what the numbers cannot show. Answers
+  written by hand are labelled as such at the top. Recordings made before this are read as
+  they were.
+
 - **The benchmark can run what a model wrote.** A second prompt set (`--prompt-set 2`,
   seven tasks on the demo application, several tied to a defect it can be given) and
   `--execute` compile each answer with the project's TypeScript and run it once, with

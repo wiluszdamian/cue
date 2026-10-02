@@ -8,6 +8,7 @@
 
 export {
   CONDITIONS,
+  detectRuns,
   extractCode,
   missingRecordings,
   record,
@@ -79,8 +80,21 @@ export {
   type BenchmarkResult,
   type Comparison,
   type ConditionResult,
+  type MutationCheck,
+  type MutationOutcome,
+  type MutationSummary,
+  type NotMeasured,
   type RunOptions,
+  type RunSummary,
   type SampleResult,
+  type TokenUsage,
 } from './runner.js';
 
-export { formatReport, toJson } from './report.js';
+export { formatMarkdown, formatReport, toJson } from './report.js';
+export {
+  collectMetadata,
+  spread,
+  type MetadataSources,
+  type RunMetadata,
+  type Spread,
+} from './metadata.js';
