@@ -66,7 +66,7 @@ function rulePage(rule) {
   return `${heading(rule.id, oneLine(rule.title))}
 ${GENERATED}
 
-| | |
+| Property | Value |
 |---|---|
 | Tier | \`${rule.tier}\` |
 | Severity | \`${rule.severity}\` |
@@ -216,7 +216,7 @@ ${owned.map((t) => `- ${t.topic}${t.precedence === 'absolute' ? ' — **wins ove
     const owner = byOwner.get(topic.owner);
     return `### ${topic.topic}
 
-| | |
+| Property | Value |
 |---|---|
 | Decided by | \`${topic.owner}\` (${owner?.name ?? 'unknown'}) |
 | Precedence | \`${topic.precedence}\`${topic.precedence === 'absolute' ? ' — outranks every other source' : ''} |${topic.channel ? `\n| Reached via | \`${topic.channel}\` |` : ''}${topic.skills.length > 0 ? `\n| Constitution skills | ${topic.skills.map((s) => `\`${s}\``).join(', ')} |` : ''}

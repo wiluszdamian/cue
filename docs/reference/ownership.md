@@ -130,7 +130,7 @@ Decides 1 topic:
 
 ### page object model and locator organisation
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -140,7 +140,7 @@ Locators live in page objects, exposed as getters, in three sections. A spec nam
 
 ### test structure, tagging and assertions
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -150,7 +150,7 @@ Canonical tags come from rules/tags.yaml. Web-first assertions only, no hard wai
 
 ### locator strategy and selector priority
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -160,7 +160,7 @@ Which _kind_ of locator to reach for is ours. Which selector actually exists in 
 
 ### fixtures, dependency injection and environment configuration
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -170,7 +170,7 @@ One import point for the merged test object. baseURL belongs to the config, neve
 
 ### API testing and response schemas
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -180,7 +180,7 @@ Strict schemas, complete negative cases. A schema that ignores unknown keys is n
 
 ### type safety in the suite
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -190,7 +190,7 @@ A test suite's types are load-bearing for correctness, not convenience.
 
 ### test data strategy
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -200,7 +200,7 @@ Not yet backed by a constitution rule — the three-level rule for factories ver
 
 ### how the knowledge base gets populated
 
-|                     |                                          |
+| Property            | Value                                    |
 | ------------------- | ---------------------------------------- |
 | Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
@@ -210,7 +210,7 @@ Which command feeds which part of .agent-kb, and what a freshness marker obliges
 
 ### application-specific selectors and test ids
 
-|            |                                          |
+| Property   | Value                                    |
 | ---------- | ---------------------------------------- |
 | Decided by | `agent-kb` (The project knowledge base)  |
 | Precedence | `absolute` — outranks every other source |
@@ -219,7 +219,7 @@ No model has ever seen this application. A plausible selector fails at runtime i
 
 ### application behaviour, routes and domain vocabulary
 
-|            |                                          |
+| Property   | Value                                    |
 | ---------- | ---------------------------------------- |
 | Decided by | `agent-kb` (The project knowledge base)  |
 | Precedence | `absolute` — outranks every other source |
@@ -228,7 +228,7 @@ No model has ever seen this application. A plausible selector fails at runtime i
 
 ### running, filtering and debugging tests
 
-|            |                                                            |
+| Property   | Value                                                      |
 | ---------- | ---------------------------------------------------------- |
 | Decided by | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence | `default`                                                  |
@@ -237,7 +237,7 @@ Read the installed skill. Do not restate or fork its content into this repositor
 
 ### tracing, video, screenshots and reports
 
-|            |                                                            |
+| Property   | Value                                                      |
 | ---------- | ---------------------------------------------------------- |
 | Decided by | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence | `default`                                                  |
@@ -246,7 +246,7 @@ Read the installed skill. Do not restate or fork its content into this repositor
 
 ### authentication state, request mocking and network interception
 
-|            |                                                            |
+| Property   | Value                                                      |
 | ---------- | ---------------------------------------------------------- |
 | Decided by | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence | `default`                                                  |
@@ -255,7 +255,7 @@ Read the installed skill. Do not restate or fork its content into this repositor
 
 ### browser exploration and inspecting a live page
 
-|             |                                                            |
+| Property    | Value                                                      |
 | ----------- | ---------------------------------------------------------- |
 | Decided by  | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence  | `default`                                                  |
@@ -265,7 +265,7 @@ Through `playwright-cli`, not through MCP. Microsoft's own guidance is that CLI-
 
 ### Playwright configuration, projects and parallelism
 
-|            |                                                            |
+| Property   | Value                                                      |
 | ---------- | ---------------------------------------------------------- |
 | Decided by | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence | `default`                                                  |
@@ -274,7 +274,7 @@ How the options work is theirs. Which values this repo uses is Cue's — see "fi
 
 ### single scripted browser actions from an agent
 
-|             |                                   |
+| Property    | Value                             |
 | ----------- | --------------------------------- |
 | Decided by  | `playwright-mcp` (Playwright MCP) |
 | Precedence  | `default`                         |
@@ -284,7 +284,7 @@ Only for point-in-time calls with small results. Anything exploratory goes to pl
 
 ### Electron, browser extensions and desktop targets
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -293,7 +293,7 @@ The owner of general Playwright practice — the areas Cue has no opinion about 
 
 ### canvas, WebGL, service workers and other exotic surfaces
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -302,7 +302,7 @@ The owner of general Playwright practice — the areas Cue has no opinion about 
 
 ### internationalisation and accessibility testing
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -311,7 +311,7 @@ The owner of general Playwright practice — the areas Cue has no opinion about 
 
 ### GraphQL, security testing and performance auditing
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -320,7 +320,7 @@ The owner of general Playwright practice — the areas Cue has no opinion about 
 
 ### visual regression and component testing
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -329,7 +329,7 @@ The owner of general Playwright practice — the areas Cue has no opinion about 
 
 ### framework-specific testing concerns
 
-|            |                                                               |
+| Property   | Value                                                         |
 | ---------- | ------------------------------------------------------------- |
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
@@ -338,7 +338,7 @@ Framework quirks are theirs. What this repo's application does is agent-kb's, an
 
 ### product specification, ticket breakdown and general code review
 
-|            |                                                          |
+| Property   | Value                                                    |
 | ---------- | -------------------------------------------------------- |
 | Decided by | `external-process` (Your team's own engineering process) |
 | Precedence | `default`                                                |
