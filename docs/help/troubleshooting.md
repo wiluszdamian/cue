@@ -5,7 +5,7 @@ _The problems people actually hit, and what to do about them._
 ## Start here
 
 ```bash
-npx @understudy/cli doctor
+npx @wiluszdamian/cue-cli doctor
 ```
 
 It checks everything and gives you the exact command for each problem. Most of
@@ -16,7 +16,7 @@ this page is just the longer explanation behind those lines.
 First, read the full reasoning:
 
 ```bash
-npx @understudy/cli explain no-hard-waits
+npx @wiluszdamian/cue-cli explain no-hard-waits
 ```
 
 The message tells you what to write instead. If it genuinely does not fit your
@@ -30,10 +30,10 @@ rule, and the fix belongs in the rule rather than in a workaround.
 
 ## "No entry for ..." when I look up an element
 
-Understudy has not seen that page yet.
+Cue has not seen that page yet.
 
 ```bash
-npx @understudy/cli survey http://localhost:3000/the-page
+npx @wiluszdamian/cue-cli survey http://localhost:3000/the-page
 ```
 
 This is working as intended. It would rather tell you it does not know than
@@ -44,7 +44,7 @@ invent something that fails later and looks like a broken app.
 That page has not been confirmed in over a month.
 
 ```bash
-npx @understudy/cli survey http://localhost:3000/that-page
+npx @wiluszdamian/cue-cli survey http://localhost:3000/that-page
 ```
 
 The old note is not wrong, necessarily — but it has stopped being something to
@@ -62,7 +62,7 @@ If the environment needs a VPN or credentials this machine does not have, captur
 a snapshot somewhere that does and pass it in:
 
 ```bash
-npx @understudy/cli survey http://internal/login --from snapshot.txt
+npx @wiluszdamian/cue-cli survey http://internal/login --from snapshot.txt
 ```
 
 ## `survey` says the output is not a snapshot format it understands
@@ -72,7 +72,7 @@ Microsoft's format, not ours. A release that changes it is refused with an error
 naming the CLI version, rather than turned into an empty or partial map. Nothing is
 written.
 
-1. **Check the version.** `npx @playwright/cli --version`. Understudy is tested
+1. **Check the version.** `npx @playwright/cli --version`. Cue is tested
    against the versions that have a directory under
    `packages/engine/test/snapshots/` (today `0.1.22`).
 2. **Install a tested one:** `npm install --save-dev @playwright/cli@0.1.22`.
@@ -83,19 +83,19 @@ surveyed; the lines are listed under `Gaps` in the map so the loss is visible.
 
 ## `doctor` says a tool version is outside the tested range
 
-Understudy uses tools it does not own: `@playwright/cli` to look at pages,
+Cue uses tools it does not own: `@playwright/cli` to look at pages,
 `@playwright/test` to run them, and `@playwright/mcp` for browser calls from an agent.
 `compatibility.yaml` in the repository lists, for each, the range it claims to work
 with and the version it was last run against.
 
-`understudy doctor` compares what is installed in your project with those ranges. A tool
+`cue doctor` compares what is installed in your project with those ranges. A tool
 outside its range is a warning, not an error: it may well work, and nothing here has
 shown that it does. The warning carries the command that installs the version that was
 tested, for example `pnpm add -D @playwright/cli@0.1.22`.
 
 The MCP configuration `init` writes names exact versions too, and not `@latest`: ours is
 the release that wrote the file, and Playwright MCP is the version that was tested. After
-upgrading Understudy, `understudy sync` shows the diff that moves them.
+upgrading Cue, `cue sync` shows the diff that moves them.
 
 The project checks the other direction weekly. The `upstream` workflow looks up the newest
 release of each tool and fails, saying which one and what to do, when it has moved outside
@@ -104,13 +104,13 @@ range, or to hold it and say why.
 
 ## `init` did not overwrite my file
 
-By design. If you have edited a file Understudy wrote, it leaves it alone and
+By design. If you have edited a file Cue wrote, it leaves it alone and
 tells you.
 
 To deliberately take the new version and lose your changes:
 
 ```bash
-npx @understudy/cli init --force
+npx @wiluszdamian/cue-cli init --force
 ```
 
 It will show you what it is about to discard first.
@@ -131,7 +131,7 @@ Start with the trace from the failed run, which the workflow uploads for you.
 The rules moved and this project has not caught up.
 
 ```bash
-npx @understudy/cli sync
+npx @wiluszdamian/cue-cli sync
 ```
 
 It shows a diff before changing anything.
@@ -140,4 +140,4 @@ It shows a diff before changing anything.
 
 - [Every rule, explained](../reference/constitution.md)
 - [Common questions](./faq.md)
-- [Report an issue](https://github.com/understudy-dev/understudy/issues)
+- [Report an issue](https://github.com/wiluszdamian/project-cue/issues)

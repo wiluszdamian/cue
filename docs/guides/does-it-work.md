@@ -1,9 +1,9 @@
 # Does it actually work?
 
-_How to measure whether Understudy changes what an assistant writes — and what has not been measured yet._
+_How to measure whether Cue changes what an assistant writes — and what has not been measured yet._
 
 <Callout type="warn">
-  **No benchmark has been run yet.** Understudy does not claim that assistants write better tests
+  **No benchmark has been run yet.** Cue does not claim that assistants write better tests
   with it. The tool to measure that exists; the measurement does not.
 </Callout>
 
@@ -13,7 +13,7 @@ cost of being wrong for a year.
 
 ## The two questions worth asking
 
-Both are comparisons — the same prompts, the same model, once with Understudy and
+Both are comparisons — the same prompts, the same model, once with Cue and
 once without. An absolute number would mean nothing: models differ, prompts
 differ, and today's score is not comparable with anybody else's.
 
@@ -63,7 +63,7 @@ understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execut
 
 That adds what reading the code cannot tell you: whether it **compiles**, whether it
 **passes the first time**, and which of its locators name the right element on the
-right page (the same judgement `understudy check` makes). A locator the checker cannot
+right page (the same judgement `cue check` makes). A locator the checker cannot
 decide, such as one built from a variable, is counted as not judged, never as
 invented. The checker also does not follow a click to a new page, so a real element
 asserted after navigating is reported as being on the wrong route, apart from the
@@ -99,7 +99,7 @@ sampled); what was not measured; and what the numbers cannot show. Browser explo
 count, knowledge reuse, repair iterations and flaky reruns are listed as not measured, never
 as zero, because the answers are single completions with no tools and no second attempt.
 If any answer carries no `recordedAt`, it was written by hand and the report opens by
-saying that it tests the instrument, not Understudy.
+saying that it tests the instrument, not Cue.
 
 Narrow it deliberately while you work:
 
@@ -115,16 +115,16 @@ being mentioned is worse than no sample.
 
 ```
 Constitution violations per generated file
-  without Understudy   3.40
-  with Understudy      0.60
+  without Cue   3.40
+  with Cue      0.60
 
 Selectors naming something that actually exists
-  without Understudy   35%
-  with Understudy      92%
+  without Cue   35%
+  with Cue      92%
 ```
 
 It always prints the sample size alongside, and it says plainly when the result
-does **not** favour Understudy. A benchmark that only ever confirms its author is
+does **not** favour Cue. A benchmark that only ever confirms its author is
 not a benchmark.
 
 ## How the scoring avoids flattering itself

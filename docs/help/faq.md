@@ -1,6 +1,6 @@
 # Common questions
 
-_Why Understudy works the way it does._
+_Why Cue works the way it does._
 
 ## Do I need an AI assistant to use this?
 
@@ -25,7 +25,7 @@ guarantee.
 Playwright's own documentation is good, current, and maintained by the people who
 build it. Copying it here would produce a second version that slowly goes wrong.
 
-Understudy covers the two things nobody else can: your team's conventions, and
+Cue covers the two things nobody else can: your team's conventions, and
 your app.
 
 ## Why won't it guess a selector?
@@ -51,7 +51,7 @@ the code.
 
 Where there is an `.agent-kb`, the linter checks `getByRole`, `getByTestId` and
 `getByLabel` against it. Where there is none, the rule stays silent — and
-`understudy check` says so, rather than reporting a clean run. Locators the code
+`cue check` says so, rather than reporting a clean run. Locators the code
 cannot settle (a variable, a regular expression, `getByText`, CSS) are never
 judged. A rule that cannot be checked at all would be written down and marked as not
 enforced; being honest about which half has teeth is what makes the enforced half
@@ -67,7 +67,7 @@ and removing those is usually the single biggest speed-up available.
 ## What if I already have a test suite?
 
 ```bash
-npx @understudy/cli init --bare
+npx @wiluszdamian/cue-cli init --bare
 ```
 
 That gives you the rules without imposing a folder layout. Expect the first run
@@ -92,8 +92,8 @@ before the file is written.
 No. The main file, `AGENTS.md`, is read automatically by most assistants. Claude
 Code reads it through a one-line import. Nothing is locked to a vendor.
 
-## Why "Understudy"?
+## Why "Cue"?
 
-An understudy learns the whole production — every line, every cue — so they can
-step in and get it right. That is the job: know the show well enough to perform
-it properly.
+In a theatre, a cue is the signal that tells a performer exactly when to come
+in and what to do. That is the job: give your assistant the right signal at the
+right moment, from your team's rules and from what is really on the page.

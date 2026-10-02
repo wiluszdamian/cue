@@ -18,6 +18,9 @@ export default defineConfig([
     // A separate Next.js app with its own project and typecheck. Linting it here
     // would mean adding every Next type to a project with no opinion about React.
     'docs/',
+    // The landing page and docs site: a separate Astro app with its own install,
+    // build and `astro check`, kept out of the monorepo's type-aware lint.
+    'site/',
     'coverage/',
     // Scratch workspaces the benchmark writes generated tests into, removed afterwards.
     '**/.benchmark/',

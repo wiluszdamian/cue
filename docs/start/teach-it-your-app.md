@@ -1,6 +1,6 @@
 # Teach it about your app
 
-_Let Understudy visit your app and write down what is actually there._
+_Let Cue visit your app and write down what is actually there._
 
 This is the step that stops the guessing.
 
@@ -14,10 +14,10 @@ the afternoon on it before realising the app was fine all along.
 
 ## The fix
 
-Let Understudy look at the real thing:
+Let Cue look at the real thing:
 
 ```bash
-npx @understudy/cli survey http://localhost:3000/login
+npx @wiluszdamian/cue-cli survey http://localhost:3000/login
 ```
 
 It opens the page, notes everything you can interact with, and saves it:
@@ -54,9 +54,9 @@ links:
 ```
 
 Every element says **what it rests on** (`evidence`), **where it stands** (`status`) and
-**when it was last confirmed**. Files written by earlier versions of Understudy
+**when it was last confirmed**. Files written by earlier versions of Cue
 (`schemaVersion: 1`, with a `confidence` instead) are still read, and become version 2
-the next time something saves them. A file from a newer Understudy is refused with a
+the next time something saves them. A file from a newer Cue is refused with a
 message to upgrade, rather than read as far as it goes.
 
 Now anyone — you or an assistant — can look up a real answer instead of
@@ -68,9 +68,9 @@ inventing one.
 to go next. Work through the pages your tests actually touch:
 
 ```bash
-npx @understudy/cli survey http://localhost:3000/login
-npx @understudy/cli survey http://localhost:3000/forgot
-npx @understudy/cli survey http://localhost:3000/dashboard
+npx @wiluszdamian/cue-cli survey http://localhost:3000/login
+npx @wiluszdamian/cue-cli survey http://localhost:3000/forgot
+npx @wiluszdamian/cue-cli survey http://localhost:3000/dashboard
 ```
 
 <Callout>
@@ -81,7 +81,7 @@ npx @understudy/cli survey http://localhost:3000/dashboard
 ## Looking things up
 
 ```bash
-npx @understudy/cli locator "log in button"
+npx @wiluszdamian/cue-cli locator "log in button"
 ```
 
 ```
@@ -99,7 +99,7 @@ No entry for "delete account button".
 Do not guess a selector. A plausible one that does not exist fails at runtime
 in a way that reads like an application bug.
 
-Run: understudy survey <url>
+Run: cue survey <url>
 ```
 
 **That refusal is the feature.** A tool that guesses here is worse than no tool.

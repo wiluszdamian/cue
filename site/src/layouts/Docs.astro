@@ -1,0 +1,110 @@
+---
+import Base from './Base.astro';
+import { getDocs, groupsOf } from '../lib/docs';
+import { url } from '../lib/url';
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+const DOCS = await getDocs();
+const GROUPS = groupsOf(DOCS);
+const index = DOCS.findIndex((d) => d.slug === slug);
+const page = DOCS[index];
+if (!page) throw new Error(`No docs entry for "${slug}"`);
+const prev = DOCS[index - 1];
+const next = DOCS[index + 1];
+const href = (s: string) => url(s === '' ? 'docs/' : `docs/${s}/`);
+---
+
+<Base title={`${page.title} · Cue docs`} description={page.description} inDocs>
+  <div class="docs">
+    <aside class="docs-side" aria-label="Documentation">
+      <label class="search" for="docs-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="docs-search" type="search" placeholder="Search docs" autocomplete="off" />
+        <kbd>/</kbd>
+      </label>
+      <nav class="docs-nav" id="docs-nav">
+        {
+          GROUPS.map((group) => (
+            <div class="group">
+              <span class="group-title">{group}</span>
+              {DOCS.filter((d) => d.group === group).map((d) => (
+                <a
+                  href={href(d.slug)}
+                  class={d.slug === slug ? 'active' : undefined}
+                  aria-current={d.slug === slug ? 'page' : undefined}
+                  data-search={`${d.title} ${d.description} ${d.group}`.toLowerCase()}
+                >
+                  {d.title}
+                </a>
+              ))}
+            </div>
+          ))
+        }
+        <p class="no-hits" id="no-hits" hidden>No page matches.</p>
+      </nav>
+    </aside>
+
+    <div class="docs-main">
+      <article>
+        <span class="crumb">{page.group}</span>
+        <h1>{page.title}</h1>
+        {page.description && <p class="desc">{page.description}</p>}
+        <div class="prose">
+          <slot />
+        </div>
+      </article>
+
+      <footer class="docs-foot">
+        <div class="helpful">
+          <span>Was this page helpful?</span>
+          <button type="button" data-helpful>Yes</button>
+          <button type="button" data-helpful>No</button>
+          <span id="helpful-thanks" hidden>Thanks.</span>
+        </div>
+        <div class="pager">
+          {
+            prev && (
+              <a id="pg-prev" href={href(prev.slug)}>
+                <small>Previous</small>
+                <span>{prev.title}</span>
+              </a>
+            )
+          }
+          {
+            next && (
+              <a id="pg-next" href={href(next.slug)}>
+                <small>Next</small>
+                <span>{next.title}</span>
+              </a>
+            )
+          }
+        </div>
+        <a
+          class="docs-edit"
+          href={`https://github.com/wiluszdamian/project-cue/blob/main/docs/${page.slug || 'index'}.md`}
+          target="_blank"
+          rel="noopener noreferrer">Edit this page on GitHub ↗</a
+        >
+        <p class="docs-credit">
+          Authored by <a href="https://github.com/wiluszdamian" target="_blank" rel="noopener noreferrer">Damian Wilusz</a>
+        </p>
+      </footer>
+    </div>
+
+    <aside class="docs-toc" aria-label="On this page">
+      <span class="group-title">On this page</span>
+      <nav id="toc"></nav>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import { initCopyButtons } from '../lib/copy';
+  import { initDocs } from '../lib/docs-client';
+
+  initCopyButtons();
+  initDocs();
+</script>

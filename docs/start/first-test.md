@@ -2,7 +2,7 @@
 
 _The shape of a test here, and the two files it lives in._
 
-Understudy set up a working example when you ran `init`. Let's walk through it,
+Cue set up a working example when you ran `init`. Let's walk through it,
 because everything else follows the same shape.
 
 ## Two files, two jobs
@@ -103,7 +103,7 @@ You'll see a message explaining what's wrong, why, and what to write instead. Wa
 the longer version?
 
 ```bash
-npx @understudy/cli explain no-hard-waits
+npx @wiluszdamian/cue-cli explain no-hard-waits
 ```
 
 <Callout>
