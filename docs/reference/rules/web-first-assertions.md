@@ -13,7 +13,7 @@ _Assert on locators, not on awaited values_
 | Skill       | `canon`      |
 | Applies to  | `**/*.ts`    |
 | Exempt      | —            |
-| Since       | 0.8.0        |
+| Since       | 1.0.0        |
 
 ## Why
 

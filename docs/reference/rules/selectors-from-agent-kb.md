@@ -13,7 +13,7 @@ _Selectors come from .agent-kb or from fresh exploration_
 | Skill       | `locator-policy`                                                              |
 | Applies to  | `**/*.ts`                                                                     |
 | Exempt      | —                                                                             |
-| Since       | 0.8.0                                                                         |
+| Since       | 1.0.0                                                                         |
 
 ## Why
 

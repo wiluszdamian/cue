@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue-demo-app",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "private": true,
   "description": "A small, deterministic web app for end-to-end checks and the benchmark. Not published.",
   "license": "MIT",

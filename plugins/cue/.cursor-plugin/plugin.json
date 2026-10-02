@@ -1,6 +1,6 @@
 {
   "name": "cue",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
   "author": { "name": "Cue" },
   "homepage": "https://github.com/wiluszdamian/project-cue",

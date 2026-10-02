@@ -13,7 +13,7 @@ _Locators live in page objects, not in tests_
 | Skill       | `stage-map`           |
 | Applies to  | `tests/**/*.ts`       |
 | Exempt      | `tests/**/*.setup.ts` |
-| Since       | 0.8.0                 |
+| Since       | 1.0.0                 |
 
 ## Why
 

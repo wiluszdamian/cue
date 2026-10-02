@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Cue is pre-1.0. Only the latest published version receives fixes.
+Only the latest published version receives fixes.
 
 ## Reporting a vulnerability
 
@@ -16,7 +16,7 @@ within a week.
 Two areas of this project touch things worth being careful about, and both are
 worth reporting on:
 
-- **`describe` reads a repository the user may not own.** It must never write to
+- **`extract` reads a repository the user may not own.** It must never write to
   the product repo, and only structure, names, and `file:line` references — never
   code contents — may reach `.agent-kb`. A path that leaks source, secrets from
   config files, tokens from URLs, or personal data from seed files is a security

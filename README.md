@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@wiluszdamian/cue"><img src="https://img.shields.io/badge/npm-@wiluszdamian%2Fcue--cli-121b24" alt="npm package"></a>
+  <a href="https://www.npmjs.com/package/@wiluszdamian/cue"><img src="https://img.shields.io/badge/npm-@wiluszdamian%2Fcue-121b24" alt="npm package"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-121b24" alt="MIT licence"></a>
   <img src="https://img.shields.io/badge/node-%5E22.13%20%7C%7C%20%3E%3D24-121b24" alt="Node ^22.13 || >=24">
 </p>

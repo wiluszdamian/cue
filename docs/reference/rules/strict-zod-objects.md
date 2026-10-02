@@ -13,7 +13,7 @@ _API schemas must be strict_
 | Skill       | `wire-contract`      |
 | Applies to  | `**/*.ts`            |
 | Exempt      | —                    |
-| Since       | 0.8.0                |
+| Since       | 1.0.0                |
 
 ## Why
 
