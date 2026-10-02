@@ -129,14 +129,16 @@ npx @understudy/cli verify --json
 The verdict is one of `PASS`, `PARTIAL`, `NOT VERIFIED`, `FAIL` or `EMPTY`. Only
 `PASS` says the notes match the app, and only when every page was checked.
 
-| Option             | Does                                                                   |
-| ------------------ | ---------------------------------------------------------------------- |
-| `--base-url <url>` | The environment to look at. Without it nothing is checked.             |
-| `--route <a,b>`    | Check only these pages; the others count as not checked (`PARTIAL`).   |
-| `--ci[=advisory]`  | Exit 1 on `FAIL` only: drift, an unreachable page, an unreadable file. |
-| `--ci=strict`      | Exit 1 unless `PASS`, so "nobody looked" is not a green build.         |
-| `--refresh`        | Record today as the confirmation date for pages found unchanged.       |
-| `--json`           | Print the report as JSON.                                              |
+| Option                  | Does                                                                   |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `--base-url <url>`      | The environment to look at. Without it nothing is checked.             |
+| `--route <a,b>`         | Check only these pages; the others count as not checked (`PARTIAL`).   |
+| `--ci[=advisory]`       | Exit 1 on `FAIL` only: drift, an unreachable page, an unreadable file. |
+| `--ci=strict`           | Exit 1 unless `PASS`, so "nobody looked" is not a green build.         |
+| `--refresh`             | Record today as the confirmation date for pages found unchanged.       |
+| `--source <path>`       | The product's code, to see whether what a note was read from changed.  |
+| `--affected-by <range>` | Check only the pages read from files changed over this git range.      |
+| `--json`                | Print the report as JSON.                                              |
 
 Without `--ci` the exit code is always 0.
 

@@ -67,6 +67,7 @@ describe('computeOverall', () => {
     fresh: 0,
     ageing: 0,
     stale: 0,
+    possiblyStale: 0,
     invalid: 0,
   };
   const cases: [string, Partial<VerifyCounts>, Overall][] = [

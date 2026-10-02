@@ -1,7 +1,9 @@
 import type { Confidence, Freshness, KbElement } from '../schema/agent-kb.js';
 import {
+  dependencyChanges,
   indexKnowledge,
   nameSimilarity,
+  type FileStateProvider,
   type KnowledgeIndex,
   type LocatorFact,
 } from '../knowledge/index.js';
@@ -24,6 +26,11 @@ export interface LocatorFound {
   readonly confidence: Confidence;
   readonly advice: string;
   readonly alternatives: readonly KbElement[];
+  /**
+   * Files this was read from that have changed or gone since it was confirmed, one
+   * sentence each. Empty when nothing changed, or when there was nothing to compare.
+   */
+  readonly changes: readonly string[];
 }
 
 export interface LocatorUnknown {
@@ -47,6 +54,8 @@ export interface ResolveOptions {
   readonly route?: string | undefined;
   readonly query: string;
   readonly now?: Date;
+  /** The product's files as they are now, to notice that what an element was read from changed. */
+  readonly files?: FileStateProvider | undefined;
 }
 
 /** The older element shape, for the answer's callers; what it says is read off the fact. */
@@ -67,7 +76,7 @@ function samePath(a: string, b: string): boolean {
 }
 
 export function resolveLocator(options: ResolveOptions): LocatorAnswer {
-  const { projectRoot, route, query, now } = options;
+  const { projectRoot, route, query, now, files } = options;
   const index = indexKnowledge(loadKnowledge(projectRoot, now).kb);
 
   // Routes somebody actually looked at; a route only the source declares is not "surveyed".
@@ -84,6 +93,7 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
   const candidates = inScope.map((fact) => {
     const element = toElement(index, fact);
     return {
+      fact,
       element,
       route: routeOf(fact),
       freshness: index.freshness(fact, now) satisfies Freshness,
@@ -108,14 +118,23 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
     };
   }
 
+  // Only for the answer given: looking at every candidate's files would cost for nothing.
+  const changes = dependencyChanges(best.fact, files);
+  const advice =
+    changes.length === 0
+      ? freshnessAdvice(best.freshness, best.route)
+      : `${freshnessAdvice(best.freshness, best.route)} A file it was read from has changed, so it may no longer be right: ` +
+        `run \`understudy survey\` on ${best.route} before relying on it.`;
+
   return {
     kind: 'found',
     route: best.route,
     element: best.element,
     freshness: best.freshness,
     confidence: best.element.confidence,
-    advice: freshnessAdvice(best.freshness, best.route),
+    advice,
     alternatives: matches.slice(1, 4).map((m) => m.element),
+    changes,
   };
 }
 
@@ -147,13 +166,19 @@ export function formatLocatorAnswer(answer: LocatorAnswer): string {
     return lines.join('\n');
   }
 
-  const { element, route, freshness, confidence, advice, alternatives } = answer;
+  const { element, route, freshness, confidence, advice, alternatives, changes } = answer;
   const lines = [
     `Route:      ${route}`,
     `Locator:    ${element.locator}`,
     ...(element.testId === undefined ? [] : [`Test id:    ${element.testId}`]),
     `Confidence: ${confidence} — ${CONFIDENCE_NOTE[confidence]}`,
     `Freshness:  ${freshness} — ${advice}`,
+    // The first reason only: an answer is paid for out of the context the task needs.
+    ...(changes.length === 0
+      ? []
+      : [
+          `Changed:    ${changes[0] ?? ''}${changes.length > 1 ? ` (and ${String(changes.length - 1)} more)` : ''}`,
+        ]),
   ];
 
   if (alternatives.length > 0) {

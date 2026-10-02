@@ -5,7 +5,9 @@ import {
 } from '../agent-kb/extract-locators.js';
 import { routeToFilename } from '../agent-kb/snapshot/index.js';
 import {
+  dependencyChanges,
   nameSimilarity,
+  type FileStateProvider,
   type KnowledgeIndex,
   type LocatorFact,
   type TestIdFact,
@@ -76,6 +78,12 @@ export interface AnalyzeLocatorsInput {
   readonly source: string;
   readonly index: KnowledgeIndex;
   readonly now?: Date;
+  /**
+   * The product's files as they are now. When given, a match read from a file that
+   * has since changed is reported as stale, with the file named. Without it only age
+   * and failed checks count, as they always did.
+   */
+  readonly files?: FileStateProvider;
 }
 
 /** Roles `getByLabel` can reach: form controls, which are what a label belongs to. */
@@ -261,13 +269,14 @@ export function analyzeLocators(input: AnalyzeLocatorsInput): LocatorFinding[] {
     }
 
     const found = best(inScope, judged.query);
-    const state = standing(found, index, now);
+    const changed = dependencyChanges(found, input.files);
+    const state = standing(found, index, now, changed.length > 0);
     return {
       ...position,
       verdict: state,
       match: describe(found),
       nearest: state === 'known' ? [] : near(),
-      suggestion: adviceFor(state, found, index, use.locator),
+      suggestion: adviceFor(state, found, index, use.locator, changed[0]),
     };
   });
 }
@@ -351,8 +360,11 @@ function standing(
   fact: LocatorFact,
   index: KnowledgeIndex,
   now: Date | undefined,
+  codeChanged: boolean,
 ): 'known' | 'stale' | 'unverified' {
-  if (fact.status === 'stale' || index.freshness(fact, now) === 'stale') return 'stale';
+  if (fact.status === 'stale' || index.freshness(fact, now) === 'stale' || codeChanged) {
+    return 'stale';
+  }
   if (fact.status === 'inferred') return 'unverified';
   return 'known';
 }
@@ -419,14 +431,20 @@ function adviceFor(
   fact: LocatorFact,
   index: KnowledgeIndex,
   expression: string,
+  codeChange: string | undefined,
 ): string {
   switch (state) {
     case 'known':
       return `${expression} matches ${fact.expression} on ${pathOf(fact)}.`;
-    case 'stale':
-      return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but ${
-        fact.status === 'stale' ? 'it failed its last check' : 'it has not been confirmed recently'
-      }. Run \`understudy survey <url>${pathOf(fact)}\` before relying on it.`;
+    case 'stale': {
+      const why =
+        fact.status === 'stale'
+          ? 'it failed its last check'
+          : index.freshness(fact) === 'stale'
+            ? 'it has not been confirmed recently'
+            : `the code it was read from may have changed (${codeChange ?? 'a file it depends on'})`;
+      return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but ${why}. Run \`understudy survey <url>${pathOf(fact)}\` before relying on it.`;
+    }
     case 'unverified':
       return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but that is only inferred (${index.coverage(fact)}), never seen running. Survey ${pathOf(fact)} to confirm it.`;
   }

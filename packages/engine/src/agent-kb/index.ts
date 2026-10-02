@@ -80,6 +80,14 @@ export * from './extract/index.js';
 
 export { cachedKnowledgeIndex, clearKnowledgeCache, findKnowledgeRoot } from './knowledge-cache.js';
 
+export {
+  changedFiles,
+  findProductRoot,
+  hashContent,
+  workingTreeFiles,
+  type ChangedFiles,
+} from './working-tree.js';
+
 export { loadKnowledge, type LoadedKnowledge, type LoadIssue } from './load-knowledge.js';
 
 export {

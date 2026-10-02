@@ -1,10 +1,12 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  findProductRoot,
   formatLocatorAnswer,
   loadRules,
   resolveLocator,
   whoOwns,
+  workingTreeFiles,
   type Rule,
   type Rules,
 } from '@understudy/engine';
@@ -143,7 +145,13 @@ export function resolveOwner(context: ToolContext, topic: string): string {
 // ---------------------------------------------------------- resolve_locator
 
 export function resolveLocatorTool(context: ToolContext, element: string, route?: string): string {
+  const productRoot = findProductRoot(context.projectRoot);
   return formatLocatorAnswer(
-    resolveLocator({ projectRoot: context.projectRoot, query: element, route }),
+    resolveLocator({
+      projectRoot: context.projectRoot,
+      query: element,
+      route,
+      files: productRoot === undefined ? undefined : workingTreeFiles(productRoot),
+    }),
   );
 }
