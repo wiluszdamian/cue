@@ -57,6 +57,17 @@ export {
   type WriteResult,
 } from './store.js';
 
+export {
+  parseRouteMapFile,
+  readSourceIndex,
+  recordLiveCheck,
+  serializeRouteMap,
+  UnsupportedSchemaVersionError,
+  type LiveCheck,
+  type ParsedRouteMap,
+  type SourceIndex,
+} from './route-map-file.js';
+
 export { extractLocators, type LocatorUse } from './extract-locators.js';
 
 export * from './extract/index.js';

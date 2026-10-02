@@ -243,6 +243,47 @@ describe('--refresh', () => {
   });
 });
 
+describe('--refresh writes what the check learned', () => {
+  it('marks an element the page lost as stale, and keeps it', () => {
+    surveyed('login', '/login');
+    const report = verify({
+      projectRoot: root,
+      baseUrl: BASE,
+      driver: app({ '/login': page('signup') }),
+      refresh: true,
+      environment: 'staging',
+    });
+    expect(report.overall).toBe('FAIL');
+
+    const map = readRouteMap(root, '/login')?.map;
+    const logIn = map?.elements.find((e) => e.name === 'Log in');
+    expect(logIn?.status).toBe('stale');
+    expect(map?.elements.length).toBeGreaterThan(1);
+  });
+
+  it('does not touch the files without --refresh', () => {
+    surveyed('login', '/login');
+    const before = readFileSync(join(root, '.agent-kb', 'app-map', 'login.yaml'), 'utf8');
+    verify({ projectRoot: root, baseUrl: BASE, driver: app({ '/login': page('signup') }) });
+    expect(readFileSync(join(root, '.agent-kb', 'app-map', 'login.yaml'), 'utf8')).toBe(before);
+  });
+
+  it('records the environment name with the new observation, never an address', () => {
+    surveyed('login', '/login', 60);
+    verify({
+      projectRoot: root,
+      baseUrl: BASE,
+      driver: app({ '/login': { ok: true, output: real('login'), cliVersion: '0.1.22' } }),
+      refresh: true,
+      environment: 'staging',
+    });
+    const written = readFileSync(join(root, '.agent-kb', 'app-map', 'login.yaml'), 'utf8');
+    expect(written).toContain('environment: staging');
+    expect(written).toContain('version: 0.1.22');
+    expect(written).not.toContain('app.test');
+  });
+});
+
 describe('CI exit codes', () => {
   function reportFor(overall: Overall) {
     surveyed('login', '/login');

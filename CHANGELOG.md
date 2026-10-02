@@ -12,6 +12,22 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Changed
 
+- **Route maps are written as `schemaVersion: 2`.** Every element now carries an
+  `id`, a `status` (`inferred`, `observed`, `verified`, `stale`), the `evidence` it
+  rests on and when it was last confirmed; the product source reference and the
+  files it depends on are recorded for elements a test id confirms. Evidence names
+  the tool and version that read the page. Version 1 files are still read (migrated
+  in memory, left untouched until something saves them), and a version this
+  Understudy does not know is refused with an instruction to upgrade. The product
+  files (`testids`, `surface`, `vocabulary`) are unchanged: they already carry
+  `file:line` and a commit.
+- `survey --env <name>` and `verify --env <name>` record the environment's name in
+  the evidence. The address is never written to `.agent-kb`.
+- `verify --refresh` now records what the check found: an unchanged page is
+  confirmed now (the new observation replaces the one before it, so evidence does
+  not accumulate), and an element the page no longer shows is kept and marked
+  `stale`.
+
 - **`init`, `add`, `sync` and `uninstall` no longer assume yes without a terminal.**
   With no TTY and no `--yes` they print the plan, write nothing and exit 1 with
   `Re-run with --yes to apply this plan.` Scripts that relied on the old silent

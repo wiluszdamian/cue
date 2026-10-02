@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DependenciesSchema, EvidenceSchema, FactStatusSchema } from '../knowledge/model.js';
 
 /**
  * Schemas for `.agent-kb`. A selector reported confidently after it stopped
@@ -7,6 +8,17 @@ import { z } from 'zod';
  */
 
 export const AGENT_KB_SCHEMA_VERSION = 1;
+
+/**
+ * Route maps are written as version 2: every element says what it rests on
+ * (evidence), where it stands (status) and when it was confirmed. Version 1 is
+ * still read — migrated in memory, never rewritten until something saves it — and
+ * a version this Understudy does not know is refused rather than half-read.
+ * The product files (`testids`, `surface`, `vocabulary`) stay at version 1: each of
+ * their entries already carries its `file:line` and each file its `commit`, which
+ * is exactly their evidence.
+ */
+export const ROUTE_MAP_VERSION = 2;
 
 /** How much to trust a selector. Only `confirmed` earns an unqualified answer. */
 export const ConfidenceSchema = z.enum([
@@ -22,8 +34,7 @@ export const ConfidenceSchema = z.enum([
 
 export const FreshnessSchema = z.enum(['fresh', 'ageing', 'stale']);
 
-/** One addressable thing on a page. Storing CSS here would launder a violation. */
-export const KbElementSchema = z.strictObject({
+const elementCore = {
   role: z.string().min(1),
   name: z.string().optional(),
   level: z.number().int().positive().optional(),
@@ -31,7 +42,36 @@ export const KbElementSchema = z.strictObject({
   locator: z.string().min(1),
   /** `data-testid` from the product source, when correlation found one. */
   testId: z.string().optional(),
+};
+
+/** An element as version 1 stored it. Only used to read old files. */
+export const KbElementV1Schema = z.strictObject({ ...elementCore, confidence: ConfidenceSchema });
+
+/**
+ * One addressable thing on a page, as the code works with it. `confidence` is the
+ * short answer to "who has seen this" and is derived from `status` and `evidence`
+ * when those are present; a freshly surveyed element has only `confidence`, and the
+ * rest is worked out when it is written. Storing CSS here would launder a violation.
+ */
+export const KbElementSchema = z.strictObject({
+  ...elementCore,
   confidence: ConfidenceSchema,
+  id: z.string().min(1).optional(),
+  status: FactStatusSchema.optional(),
+  /** Ids into the map's `evidence`. */
+  evidence: z.array(z.string().min(1)).optional(),
+  verifiedAt: z.string().min(1).optional(),
+  dependencies: DependenciesSchema.optional(),
+});
+
+/** An element as version 2 stores it: what it is, where it stands, what it rests on. */
+export const KbElementFileV2Schema = z.strictObject({
+  id: z.string().min(1),
+  ...elementCore,
+  status: FactStatusSchema,
+  evidence: z.array(z.string().min(1)).min(1),
+  verifiedAt: z.string().min(1).optional(),
+  dependencies: DependenciesSchema.optional(),
 });
 
 export const KbLinkSchema = z.strictObject({
@@ -39,20 +79,56 @@ export const KbLinkSchema = z.strictObject({
   href: z.string().min(1),
 });
 
-export const RouteMapSchema = z.strictObject({
-  schemaVersion: z.literal(AGENT_KB_SCHEMA_VERSION),
+const routeMapCore = {
   /** Path only — the host belongs to the environment, never to the map. */
   route: z.string().min(1),
   title: z.string(),
+  /** A name such as `staging`. Never a URL: the address is configuration, not knowledge. */
+  environment: z.string().min(1).optional(),
   exploredAt: z.string().min(1),
   /** Equal to `exploredAt` on a fresh survey; moved forward by `verify --refresh`. */
   verifiedAt: z.string().min(1),
   /** Hash of the accessibility snapshot, so drift is detectable without a diff. */
   snapshotHash: z.string().min(1),
-  elements: z.array(KbElementSchema),
   links: z.array(KbLinkSchema).default([]),
   /** Anything the survey could not establish, stated rather than omitted. */
   gaps: z.array(z.string()).default([]),
+};
+
+/** A route map as version 1 stored it. Only used to read old files. */
+export const RouteMapV1Schema = z.strictObject({
+  schemaVersion: z.literal(1),
+  ...routeMapCore,
+  elements: z.array(KbElementV1Schema),
+});
+
+/** A route map as it is written to disk. */
+export const RouteMapFileV2Schema = z.strictObject({
+  schemaVersion: z.literal(ROUTE_MAP_VERSION),
+  ...routeMapCore,
+  /** Every piece of evidence any element below cites. */
+  evidence: z.array(EvidenceSchema),
+  elements: z.array(KbElementFileV2Schema),
+});
+
+/**
+ * A route map as the code works with it, whichever version it was read from. Reading
+ * a version 1 file yields `schemaVersion: 2` here, since it has been migrated; the
+ * value is ignored on the way out, because writing always produces version 2.
+ */
+export const RouteMapSchema = z.strictObject({
+  schemaVersion: z.union([z.literal(1), z.literal(ROUTE_MAP_VERSION)]),
+  ...routeMapCore,
+  /** The tool that made the observation. Used once, to describe it in evidence. */
+  tool: z
+    .strictObject({
+      name: z.string().min(1),
+      version: z.string().min(1).optional(),
+      format: z.string().min(1).optional(),
+    })
+    .optional(),
+  evidence: z.array(EvidenceSchema).optional(),
+  elements: z.array(KbElementSchema),
 });
 
 export const FlowStepSchema = z.strictObject({
@@ -134,6 +210,7 @@ export type Freshness = z.infer<typeof FreshnessSchema>;
 export type KbElement = z.infer<typeof KbElementSchema>;
 export type KbLink = z.infer<typeof KbLinkSchema>;
 export type RouteMap = z.infer<typeof RouteMapSchema>;
+export type RouteMapFileV2 = z.infer<typeof RouteMapFileV2Schema>;
 export type Flow = z.infer<typeof FlowSchema>;
 export type TestIdEntry = z.infer<typeof TestIdEntrySchema>;
 export type TestIds = z.infer<typeof TestIdsSchema>;

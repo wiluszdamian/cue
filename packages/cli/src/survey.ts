@@ -109,6 +109,8 @@ export interface SurveyOptions {
   readonly url: string;
   readonly driver: SnapshotDriver;
   readonly now?: Date;
+  /** A name such as `staging`, recorded with the observation. Never the URL: that is configuration. */
+  readonly environment?: string | undefined;
 }
 
 export interface SurveyResult {
@@ -177,9 +179,16 @@ export function survey(options: SurveyOptions): SurveyResult {
   }
 
   const map: RouteMap = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     route,
     title: parsed.title,
+    ...(options.environment === undefined ? {} : { environment: options.environment }),
+    // So the evidence can say which tool, at which version, read the page this way.
+    tool: {
+      name: 'playwright-cli',
+      ...(captured.cliVersion === undefined ? {} : { version: captured.cliVersion }),
+      format: parsed.format,
+    },
     exploredAt: timestamp,
     verifiedAt: timestamp,
     snapshotHash: hashSnapshot(parsed.tree),
