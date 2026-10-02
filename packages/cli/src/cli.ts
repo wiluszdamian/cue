@@ -22,6 +22,8 @@ import {
   survey,
   SurveyError,
 } from './survey.js';
+import { changedFiles, findProductRoot, workingTreeFiles } from '@understudy/engine';
+import { productFiles } from './product-files.js';
 import {
   CHECK_FORMATS,
   check,
@@ -77,6 +79,8 @@ Options
   --adapter <a,b>      restrict extract to named adapters
   --base-url <url>     environment to verify the map against
   --env <name>         name this environment (staging) in what survey and verify record
+  --source <path>      the product source, to see whether code behind the map changed (verify)
+  --affected-by <range> check only the routes read from files changed over this git range (verify)
   --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked)
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
@@ -340,7 +344,11 @@ async function main(): Promise<number> {
         err(`--format takes one of: ${CHECK_FORMATS.join(', ')}`);
         return 2;
       }
-      const report = check({ projectRoot, targets: positional });
+      const report = check({
+        projectRoot,
+        targets: positional,
+        files: productFiles(projectRoot, asString(flags['source'])),
+      });
       out(
         formatCheck(
           report,
@@ -367,9 +375,30 @@ async function main(): Promise<number> {
       }
       const baseUrl = asString(flags['base-url']);
       const from = asString(flags['from']);
+
+      // Where the code behind the map is, to see whether it has changed since.
+      const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+      const files = productRoot === undefined ? undefined : workingTreeFiles(productRoot);
+      let changedPaths: string[] | undefined;
+      const range = asString(flags['affected-by']);
+      if (range !== undefined) {
+        if (productRoot === undefined) {
+          err('--affected-by reads git history in the product: pass --source <path> to it.');
+          return 2;
+        }
+        const changed = changedFiles(range, productRoot);
+        if (!changed.ok) {
+          err(changed.reason);
+          return 2;
+        }
+        changedPaths = changed.files;
+      }
+
       const report = verify({
         projectRoot,
         baseUrl,
+        files,
+        changedPaths,
         environment: asString(flags['env']),
         driver:
           from !== undefined
@@ -395,7 +424,12 @@ async function main(): Promise<number> {
       }
       out(
         formatLocatorAnswer(
-          resolveLocator({ projectRoot, query, route: asString(flags['route']) }),
+          resolveLocator({
+            projectRoot,
+            query,
+            route: asString(flags['route']),
+            files: productFiles(projectRoot, asString(flags['source'])),
+          }),
         ),
       );
       // An unknown element is a finding, not a crash: the output says which

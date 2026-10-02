@@ -452,6 +452,8 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
     confidence: best.element.confidence,
     advice: freshnessAdvice(best.freshness, best.route),
     alternatives: matches.slice(1, 4).map((m) => m.element),
+    // The old algorithm knew nothing of the code behind an element.
+    changes: [],
   };
 }
 

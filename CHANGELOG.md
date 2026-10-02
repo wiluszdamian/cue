@@ -67,6 +67,16 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Notes go stale when the code behind them changes, not only with age.** A route whose
+  elements were confirmed by a `data-testid` records the product file it came from; `verify`
+  now compares that file with the one on disk (found where `extract` read it, or with
+  `--source`) and reports the route as *possibly stale*, naming the file, unless a live check
+  just found it unchanged. `verify --affected-by <git-range>` checks only the routes read from
+  files changed over that range. `locator`, the `resolve_locator` MCP tool and `check` say when
+  the code behind an answer has changed (`check` calls it stale). Nothing is claimed when the
+  product cannot be found: `verify` says it did not compare. Unrelated changes invalidate
+  nothing.
+
 - `scripts/prepare-benchmark-project.mjs` builds the project a benchmark is run against
   (Understudy installed, and a knowledge base of the demo application made with `extract`
   and `survey`), and `benchmarks/RUNBOOK.md` is the procedure for the first real,

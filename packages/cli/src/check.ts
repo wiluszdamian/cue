@@ -12,6 +12,7 @@ import {
   sortDiagnostics,
   type Constitution,
   type Diagnostic,
+  type FileStateProvider,
   type LoadIssue,
   type LocatorFinding,
   type LocatorVerdict,
@@ -108,6 +109,8 @@ export interface CheckOptions {
   readonly projectRoot: string;
   readonly targets: readonly string[];
   readonly now?: Date;
+  /** The product's files as they are now, to notice a match read from code that changed. */
+  readonly files?: FileStateProvider | undefined;
 }
 
 const VERDICTS: readonly LocatorVerdict[] = [
@@ -133,6 +136,7 @@ export function check(options: CheckOptions): CheckReport {
       source: readFileSync(join(options.projectRoot, path), 'utf8'),
       index,
       ...(options.now === undefined ? {} : { now: options.now }),
+      ...(options.files === undefined ? {} : { files: options.files }),
     }),
   }));
 

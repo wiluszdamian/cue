@@ -62,3 +62,17 @@ export {
 } from './query.js';
 
 export { nameSimilarity, words } from './similarity.js';
+
+export {
+  affectedBy,
+  AGEING_AFTER_DAYS,
+  ageInDays,
+  computeFreshness,
+  dependencyChanges,
+  freshnessOf,
+  STALE_AFTER_DAYS,
+  type FileStateProvider,
+  type FreshnessLevel,
+  type FreshnessVerdict,
+  type FreshnessWithChanges,
+} from './freshness.js';
