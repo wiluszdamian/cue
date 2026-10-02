@@ -33,7 +33,7 @@ export const CONSTITUTION = {
         bad: "await page.click('#submit');\nawait page.waitForTimeout(5000);\n",
         good: "await page.getByRole('button', { name: 'Submit' }).click();\nawait expect(page.getByRole('status')).toHaveText('Saved');\n",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -58,7 +58,7 @@ export const CONSTITUTION = {
         bad: "expect(await page.locator('.total').textContent()).toBe('42');",
         good: "await expect(page.getByTestId('total')).toHaveText('42');",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -85,7 +85,7 @@ export const CONSTITUTION = {
         bad: "page.locator('div.card > button.primary')",
         good: "page.getByRole('button', { name: 'Continue' })",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -111,7 +111,7 @@ export const CONSTITUTION = {
         bad: "await page.getByRole('button', { name: 'Log in' }).click();",
         good: 'await loginPage.logInButton.click();',
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -136,7 +136,7 @@ export const CONSTITUTION = {
         bad: 'const User = z.object({ id: z.string() });',
         good: 'const User = z.strictObject({ id: z.string() });',
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -162,7 +162,7 @@ export const CONSTITUTION = {
         bad: "test.only('checkout succeeds', async () => {});",
         good: "test('checkout succeeds', async () => {});",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -189,7 +189,7 @@ export const CONSTITUTION = {
         bad: "test.skip('refund flow', async () => {});",
         good: "// TODO(PROJ-1234) un-skip once the refund webhook is stubbed\ntest.skip('refund flow', async () => {});\n",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -215,7 +215,7 @@ export const CONSTITUTION = {
         bad: "test('user can log in', async ({ page }) => {});",
         good: "test('user can log in', { tag: ['@smoke', '@auth'] }, async ({ page }) => {});",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -240,7 +240,7 @@ export const CONSTITUTION = {
         bad: 'const body: any = await response.json();',
         good: 'const body = UserSchema.parse(await response.json());',
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -266,7 +266,7 @@ export const CONSTITUTION = {
         bad: "await page.goto('https://staging.internal.acme.com/login');",
         good: "await page.goto('/login');",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
     {
@@ -291,7 +291,7 @@ export const CONSTITUTION = {
         bad: "page.getByTestId('submit-order-btn') // invented, not in .agent-kb",
         good: "page.getByTestId('checkout-submit') // .agent-kb/app-map/checkout.yaml:31",
       },
-      since: '0.8.0',
+      since: '1.0.0',
       deprecated: null,
     },
   ],

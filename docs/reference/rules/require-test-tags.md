@@ -13,7 +13,7 @@ _Every test carries a canonical tag_
 | Skill       | `canon`               |
 | Applies to  | `tests/**/*.ts`       |
 | Exempt      | `tests/**/*.setup.ts` |
-| Since       | 0.8.0                 |
+| Since       | 1.0.0                 |
 
 ## Why
 
