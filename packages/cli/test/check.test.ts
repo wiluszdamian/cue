@@ -333,3 +333,41 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
     expect(result.stdout).toContain('1 known');
   });
 });
+
+describe('one analyzer for the command and the lint rule', () => {
+  it('finds the same places as the engine does for the rule’s own fixture', async () => {
+    const { analyze, indexKnowledge, loadKnowledge, loadRules } =
+      await import('@understudy/engine');
+    const fixture = join(
+      import.meta.dirname,
+      '..',
+      '..',
+      'engine',
+      'test',
+      'fixtures',
+      'selectors-from-agent-kb',
+    );
+    const rules = loadRules(join(import.meta.dirname, '..', '..', '..', 'rules'));
+    const source = (await import('node:fs')).readFileSync(join(fixture, 'bad.ts'), 'utf8');
+    const now = new Date('2026-10-01T12:00:00Z');
+
+    const viaRule = analyze({
+      files: [{ path: 'bad.ts', text: source }],
+      constitution: rules.constitution,
+      tags: rules.tags,
+      disabled: rules.constitution.rules
+        .filter((r) => r.id !== 'selectors-from-agent-kb')
+        .map((r) => r.id),
+      knowledge: indexKnowledge(loadKnowledge(fixture, now).kb),
+      now,
+    }).diagnostics.map((d) => [d.line, d.column, d.endLine, d.endColumn]);
+
+    const viaCheck = check({ projectRoot: fixture, targets: ['bad.ts'], now })
+      .files.flatMap((file) => file.findings)
+      .filter((finding) => finding.verdict !== 'known' && finding.verdict !== 'undecidable')
+      .map((f) => [f.line, f.column, f.endLine, f.endColumn]);
+
+    expect(viaCheck).toEqual(viaRule);
+    expect(viaRule.length).toBeGreaterThan(0);
+  });
+});

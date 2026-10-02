@@ -58,6 +58,7 @@ const prose = (text) => oneLine(text).replace(/(<)/g, String.raw`\$1`);
 const ENFORCEMENT = {
   ast: 'ESLint (AST)',
   regex: 'ESLint (text)',
+  knowledge: 'ESLint, against `.agent-kb` (silent where there is none; `understudy check` says so)',
   manual: '**not enforced** — review only',
 };
 

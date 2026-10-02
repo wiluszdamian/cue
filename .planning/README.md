@@ -47,7 +47,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 09 | [`.agent-kb` v2 na dysku: evidence, status, migracja](tickets/09-agent-kb-v2-on-disk.md) | P0.5 | 08 | done |
 | 10 | [Wspólny analizator locatorów vs KB](tickets/10-locator-analyzer.md) | P0.6 | 08 | done |
 | 11 | [`understudy check <files>`](tickets/11-check-command.md) | P0.6 | 10 | done |
-| 12 | [Reguła ESLint oparta o KB (`selectors-from-agent-kb` egzekwowana)](tickets/12-eslint-kb-rule.md) | P0.6 | 10 | todo |
+| 12 | [Reguła ESLint oparta o KB (`selectors-from-agent-kb` egzekwowana)](tickets/12-eslint-kb-rule.md) | P0.6 | 10 | done |
 | 13 | [Prawdziwe E2E w CI: extract → survey → locator → check → test → verify](tickets/13-e2e-ci.md) | P0.2 | 02, 03, 04, 06, 11 | todo |
 | 14 | [Benchmark: kompilacja i uruchamianie wygenerowanych testów](tickets/14-benchmark-execution.md) | P0.7 | 03, 10 | todo |
 | 15 | [Benchmark: mutacje, metadane, raport](tickets/15-benchmark-mutation-report.md) | P0.7 | 14 | todo |

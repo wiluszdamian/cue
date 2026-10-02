@@ -49,7 +49,7 @@ data, or addresses its UI is ours.
   rationale: >
     What goes wrong in practice if this is ignored. Concrete, not moral.
   detector:
-    kind: ast # ast | regex | manual
+    kind: ast # ast | regex | knowledge | manual
     selector: "CallExpression[callee.property.name='waitForTimeout']"
     refine: optional-registered-refinement
   scope: ['**/*.ts']
@@ -76,6 +76,10 @@ Notes that save a review round-trip:
   agent to work around it. Name the replacement.
 - **Scope is anchored.** `tests/**/*.ts` is matched as `**/tests/**/*.ts`, so it
   works against both repo-relative paths (the engine) and absolute ones (ESLint).
+- **`kind: knowledge`** checks against `.agent-kb` rather than the code alone, and
+  needs an index passed to `analyze`; without one the result lists the rule under
+  `notChecked` instead of passing. A fixture for it carries its own `.agent-kb/`
+  next to `good.ts` and `bad.ts`.
 - **`kind: manual`** is the honest choice for a rule no linter can check. It gets
   documented and never reported. Do not invent a weak detector to make a manual
   rule look enforced.

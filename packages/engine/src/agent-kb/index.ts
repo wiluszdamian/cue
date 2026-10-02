@@ -78,6 +78,8 @@ export {
 
 export * from './extract/index.js';
 
+export { cachedKnowledgeIndex, clearKnowledgeCache, findKnowledgeRoot } from './knowledge-cache.js';
+
 export { loadKnowledge, type LoadedKnowledge, type LoadIssue } from './load-knowledge.js';
 
 export {

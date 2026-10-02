@@ -8,6 +8,7 @@ export {
 
 export {
   findingToDiagnostic,
+  type DiagnosticOptions,
   KNOWLEDGE_RULE_ID,
   REPORTED_VERDICTS,
   severityOf,

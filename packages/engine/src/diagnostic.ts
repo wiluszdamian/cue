@@ -33,10 +33,21 @@ export interface AnalysisSkip {
   readonly reason: string;
 }
 
+export interface NotChecked {
+  readonly ruleId: string;
+  readonly reason: string;
+}
+
 export interface AnalysisResult {
   readonly diagnostics: readonly Diagnostic[];
   /** Files that could not be parsed. Never silently dropped. */
   readonly skipped: readonly AnalysisSkip[];
+  /**
+   * Rules that could not run at all, and why: a rule that checks against the
+   * knowledge base, given none. Reported so that "no findings" is never mistaken
+   * for "checked and clean".
+   */
+  readonly notChecked: readonly NotChecked[];
   readonly filesAnalyzed: number;
   readonly durationMs: number;
 }

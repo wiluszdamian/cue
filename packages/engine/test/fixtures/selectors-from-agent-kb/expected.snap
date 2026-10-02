@@ -1,0 +1,4 @@
+[
+  "5:14-5:45  getByTestId('submit-order-btn')",
+  "6:14-6:58  getByRole('button', { name: 'Sign in now' })",
+]

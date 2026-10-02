@@ -27,10 +27,18 @@ export function severityOf(verdict: LocatorVerdict): Severity {
   return verdict === 'unknown' || verdict === 'wrong-route' ? 'error' : 'warn';
 }
 
+export interface DiagnosticOptions {
+  /** The rule's configured severity, when the caller has one; otherwise the verdict decides. */
+  readonly severity?: Severity;
+  /** Said before the finding's own sentence, e.g. the constitution's message. */
+  readonly lead?: string;
+}
+
 export function findingToDiagnostic(
   finding: LocatorFinding,
   file: string,
   docsUrl: string,
+  options: DiagnosticOptions = {},
 ): Diagnostic | undefined {
   if (!REPORTED_VERDICTS.has(finding.verdict)) return undefined;
   return {
@@ -40,8 +48,9 @@ export function findingToDiagnostic(
     column: finding.column,
     endLine: finding.endLine,
     endColumn: finding.endColumn,
-    severity: severityOf(finding.verdict),
-    message: finding.suggestion,
+    severity: options.severity ?? severityOf(finding.verdict),
+    message:
+      options.lead === undefined ? finding.suggestion : `${options.lead} ${finding.suggestion}`,
     docsUrl,
     snippet: finding.expression,
   };

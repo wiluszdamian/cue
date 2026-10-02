@@ -316,6 +316,7 @@ export function formatCheck(
         result: {
           diagnostics: toDiagnostics(report, constitution),
           skipped: [],
+          notChecked: [],
           filesAnalyzed: report.files.length,
           durationMs: 0,
         },
