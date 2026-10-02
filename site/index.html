@@ -554,14 +554,31 @@
       .prompt-btn:hover .agents-stack span:nth-child(3) {
         transform: translateX(3px);
       }
-      .prompt-btn .done-text {
-        display: none;
+      .btn-labels {
+        display: grid;
       }
+      .btn-labels > span {
+        grid-area: 1 / 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .btn-labels svg {
+        width: 15px;
+        height: 15px;
+      }
+      .prompt-btn .done-text,
       .prompt-btn.done .idle-text {
-        display: none;
+        opacity: 0;
+        transform: translateY(4px);
       }
       .prompt-btn.done .done-text {
-        display: inline;
+        opacity: 1;
+        transform: none;
       }
       .prompt-peek {
         position: absolute;
@@ -590,6 +607,10 @@
       .prompt-btn:focus-visible .prompt-peek {
         opacity: 1;
         transform: none;
+      }
+      .prompt-btn.done .prompt-peek {
+        opacity: 0;
+        transform: translateY(-4px);
       }
       .meta-row {
         display: flex;
@@ -1948,8 +1969,12 @@
                     ><svg><use href="#i-cursor" /></svg
                   ></span>
                 </span>
-                <span class="idle-text">Copy prompt</span
-                ><span class="done-text">Copied, paste it in</span>
+                <span class="btn-labels"
+                  ><span class="idle-text">Copy prompt</span
+                  ><span class="done-text" aria-live="polite"
+                    ><svg><use href="#i-check" /></svg>Copied</span
+                  ></span
+                >
                 <span class="prompt-peek" id="agent-line" role="tooltip"
                   >Set up Cue in this Playwright project: run npx @wiluszdamian/cue-cli init, show
                   me the plan before writing anything, then run npx @wiluszdamian/cue-cli doctor and
