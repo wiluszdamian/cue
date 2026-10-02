@@ -71,11 +71,13 @@ read it from there.
 routes to the rest of the catalog: `/compose` to write a test, `/resolve-locator`
 for a selector, `/bind` if the repo is not wired up yet.
 
-The plugin starts two MCP servers. `understudy` answers three read-only point
+The plugin starts two MCP servers. `understudy` answers read-only point
 lookups — `explain_rule` for why a rule blocked a change and what to write
-instead, `resolve_owner` for which source of guidance governs a topic, and
+instead, `resolve_owner` for which source of guidance governs a topic,
 `resolve_locator` for a real selector from the knowledge base rather than a
-guessed one. Playwright MCP handles point-in-time browser calls.
+guessed one, and `resolve_route`, `resolve_api`, `get_evidence`, `get_freshness`
+and `find_knowledge` for what is known about a page, an endpoint, and how far to
+trust it. Playwright MCP handles point-in-time browser calls.
 
 Mapping the live app still goes through `playwright-cli` and `/survey`: an
 accessibility tree costs more context than the question it answers, which is why

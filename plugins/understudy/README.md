@@ -6,8 +6,9 @@ The skill catalog, packaged so coding agents can install it as a plugin rather
 than copying markdown by hand. Procedures are the same files as `skills/`; this
 directory is the installable unit around them.
 
-Two MCP servers are bundled. `understudy` answers three point lookups —
-`explain_rule`, `resolve_owner` and `resolve_locator` — against this
+Two MCP servers are bundled. `understudy` answers point lookups —
+`explain_rule`, `resolve_owner`, `resolve_locator`, `resolve_route`,
+`resolve_api`, `get_evidence`, `get_freshness` and `find_knowledge` — against this
 project's rules and knowledge base, and writes nothing. Playwright MCP handles
 point-in-time browser calls. Exploration still goes through `playwright-cli`:
 an accessibility tree costs more context than the question it answers. See the

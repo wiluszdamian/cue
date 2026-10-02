@@ -1,9 +1,19 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { explainRule, resolveLocatorTool, resolveOwner, type ToolContext } from './tools.js';
+import {
+  explainRule,
+  findKnowledge,
+  getEvidence,
+  getFreshness,
+  resolveApi,
+  resolveLocatorTool,
+  resolveOwner,
+  resolveRoute,
+  type ToolContext,
+} from './tools.js';
 
 /**
- * The Understudy MCP server: three tools, all read-only point lookups.
+ * The Understudy MCP server: eight tools, all read-only point lookups.
  *
  * What is not here matters as much — browser exploration goes through
  * `playwright-cli`, never through MCP. This server answers questions cheaply
@@ -71,6 +81,82 @@ export function createServer(context: ToolContext): McpServer {
       annotations: READ_ONLY,
     },
     ({ element, route }) => text(resolveLocatorTool(context, element, route)),
+  );
+
+  server.registerTool(
+    'resolve_route',
+    {
+      title: 'Find a page',
+      description:
+        'What is known about one page of the application: its title, how far to trust it, how many elements it has and where that came from. Use before relying on a page; unknown comes with the command that finds out.',
+      inputSchema: {
+        route: z.string().describe('A path such as /login, or a few words such as "sign up".'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ route }) => text(resolveRoute(context, route)),
+  );
+
+  server.registerTool(
+    'resolve_api',
+    {
+      title: 'Find an endpoint',
+      description:
+        'The API endpoints the project is known to have, with the file each came from. Use before writing a request against an endpoint.',
+      inputSchema: {
+        path: z.string().describe('A path such as /api/login, or a few words from one.'),
+        method: z.string().optional().describe('GET, POST, … Omit to match any method.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ path, method }) => text(resolveApi(context, path, method)),
+  );
+
+  server.registerTool(
+    'get_evidence',
+    {
+      title: 'Why is this believed',
+      description:
+        'The reasons behind one known fact: source lines, surveyed pages, tests. Use when a fact surprises you, before trusting or discarding it.',
+      inputSchema: {
+        fact_id: z.string().describe('A fact id, e.g. route:/login. find_knowledge lists them.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ fact_id }) => text(getEvidence(context, fact_id)),
+  );
+
+  server.registerTool(
+    'get_freshness',
+    {
+      title: 'How recent is this',
+      description:
+        'When a fact was last confirmed and whether the code it was read from has changed since. Use before trusting an old fact; give a fact id or a route.',
+      inputSchema: {
+        fact_id: z.string().optional().describe('A fact id.'),
+        route: z.string().optional().describe('A route path, e.g. /login.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ fact_id, route }) => text(getFreshness(context, { factId: fact_id, route })),
+  );
+
+  server.registerTool(
+    'find_knowledge',
+    {
+      title: 'Search what is known',
+      description:
+        'Up to five known facts matching a few words: routes, locators, endpoints, vocabulary. Use to find an id for get_evidence, or to see whether something is known at all.',
+      inputSchema: {
+        query: z.string().describe('A few words, e.g. "checkout total".'),
+        kind: z
+          .string()
+          .optional()
+          .describe('Restrict to route, locator, api or term. Omit to search all.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ query, kind }) => text(findKnowledge(context, query, kind)),
   );
 
   return server;

@@ -198,13 +198,22 @@ describe('resolve_locator', () => {
 });
 
 describe('the server', () => {
-  it('registers exactly the three tools v1 promises', () => {
+  it('registers exactly the tools it documents', () => {
     const server = createServer(context);
     // The only way to see what a client sees without standing up a transport.
     const registered = Object.keys(
       (server as unknown as { _registeredTools: Record<string, unknown> })._registeredTools,
     ).sort();
-    expect(registered).toEqual(['explain_rule', 'resolve_locator', 'resolve_owner']);
+    expect(registered).toEqual([
+      'explain_rule',
+      'find_knowledge',
+      'get_evidence',
+      'get_freshness',
+      'resolve_api',
+      'resolve_locator',
+      'resolve_owner',
+      'resolve_route',
+    ]);
   });
 
   it('declares every tool read-only', () => {

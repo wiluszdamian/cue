@@ -48,8 +48,9 @@ function mcpToml(manager: PackageManager): string {
     ].join('\n');
 
   return `
-# Understudy MCP — explain_rule, resolve_owner and resolve_locator. Read-only
-# point lookups against this project's rules and knowledge base.
+# Understudy MCP — explain_rule, resolve_owner, resolve_locator and the knowledge
+# lookups (resolve_route, resolve_api, get_evidence, get_freshness, find_knowledge).
+# Read-only point lookups against this project's rules and knowledge base.
 ${block('understudy')}
 
 # Playwright MCP — point-in-time browser calls with small results.
