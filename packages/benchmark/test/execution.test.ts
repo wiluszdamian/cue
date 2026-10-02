@@ -410,7 +410,9 @@ describe('a run with an executor', () => {
     durationMs: 10,
   });
 
-  const prompts = PROMPTS_V2.slice(0, 2);
+  // Without a defect attached: those are run a second time, and have tests of their own.
+  const prompts = PROMPTS_V2.filter((prompt) => prompt.mutation === undefined).slice(0, 2);
+  const withDefects = PROMPTS_V2.filter((prompt) => prompt.mutation !== undefined);
 
   it('executes every answer of both conditions and summarises them per condition', async () => {
     const executor = new FakeExecutor((input) => ok(input.condition === 'understudy'));
@@ -425,10 +427,10 @@ describe('a run with an executor', () => {
 
     expect(executor.inputs).toHaveLength(4);
     expect(executor.inputs.map((i) => `${i.condition}/${i.promptId}`)).toEqual([
-      'bare/demo-login',
-      'bare/demo-login-failure',
-      'understudy/demo-login',
-      'understudy/demo-login-failure',
+      'bare/demo-navigation',
+      'bare/demo-items-crud',
+      'understudy/demo-navigation',
+      'understudy/demo-items-crud',
     ]);
     expect(result.promptSetVersion).toBe(2);
     expect(result.conditions.map((c) => c.execution)).toEqual([
@@ -452,8 +454,8 @@ describe('a run with an executor', () => {
     const executor = new FakeExecutor(() => ok(false));
     const result = await runBenchmark({ projectRoot: dir, agent, rules, prompts, executor });
     const sample = result.conditions[0]?.samples[0];
-    expect(sample).toMatchObject({ promptId: 'demo-login', condition: 'bare' });
-    expect(sample?.files).toEqual(['tests/app/functional/demo-login.spec.ts']);
+    expect(sample).toMatchObject({ promptId: 'demo-navigation', condition: 'bare' });
+    expect(sample?.files).toEqual(['tests/app/functional/demo-navigation.spec.ts']);
     expect(sample?.execution?.run.failures).toEqual(['t: Timeout 2000ms exceeded.']);
     expect(sample?.locators).toBeDefined();
   });
@@ -473,6 +475,91 @@ describe('a run with an executor', () => {
     expect(result.conditions.every((c) => c.locators === undefined)).toBe(true);
   });
 
+  describe('breaking the application on purpose', () => {
+    /** Passes on the correct application, fails once the named defect is switched on. */
+    const catching = (input: ExecutionInput): ExecutionResult => ok(input.mutation === undefined);
+    const ignoring = (): ExecutionResult => ok(true);
+
+    it('runs a passing answer a second time with the defect, and calls a failure detection', async () => {
+      const executor = new FakeExecutor(catching);
+      const result = await runBenchmark({
+        projectRoot: dir,
+        agent,
+        rules,
+        prompts: withDefects.slice(0, 1),
+        executor,
+      });
+      const first = withDefects[0];
+
+      expect(executor.inputs.map((i) => i.mutation)).toEqual([
+        undefined,
+        first?.mutation,
+        undefined,
+        first?.mutation,
+      ]);
+      const sample = result.conditions[0]?.samples[0];
+      expect(sample?.mutation).toEqual({ id: first?.mutation, outcome: 'detected' });
+      expect(result.conditions[0]?.mutations).toEqual({
+        eligible: 1,
+        detected: 1,
+        missed: 0,
+        notApplicable: 0,
+      });
+    });
+
+    it('calls a test that still passes with the defect a miss', async () => {
+      const result = await runBenchmark({
+        projectRoot: dir,
+        agent,
+        rules,
+        prompts: withDefects.slice(0, 1),
+        executor: new FakeExecutor(ignoring),
+      });
+      expect(result.conditions[0]?.mutations).toMatchObject({ detected: 0, missed: 1 });
+      expect(result.conditions[0]?.samples[0]?.mutation?.outcome).toBe('missed');
+    });
+
+    it('does not break an application for a test that did not pass on the correct one', async () => {
+      const executor = new FakeExecutor(() => ok(false));
+      const result = await runBenchmark({
+        projectRoot: dir,
+        agent,
+        rules,
+        prompts: withDefects.slice(0, 1),
+        executor,
+      });
+      // Once per condition, never with a defect: there was nothing to break.
+      expect(executor.inputs.map((i) => i.mutation)).toEqual([undefined, undefined]);
+      expect(result.conditions[0]?.samples[0]?.mutation?.outcome).toBe('not-applicable');
+      expect(result.conditions[0]?.mutations).toMatchObject({ eligible: 1, notApplicable: 1 });
+    });
+
+    it('says in the report how many were caught, and what that does not show', async () => {
+      const result = await runBenchmark({
+        projectRoot: dir,
+        agent,
+        rules,
+        prompts: withDefects.slice(0, 2),
+        executor: new FakeExecutor(catching),
+      });
+      const text = formatReport(result);
+      expect(text).toContain('Caught the defect put into the application');
+      expect(text).toContain('bare       2/2');
+      expect(text).toContain('not whether it failed for the intended reason');
+    });
+
+    it('has no mutation numbers for prompts that name no defect', async () => {
+      const result = await runBenchmark({
+        projectRoot: dir,
+        agent,
+        rules,
+        prompts,
+        executor: new FakeExecutor(ignoring),
+      });
+      expect(result.conditions[0]?.mutations).toBeUndefined();
+    });
+  });
+
   it('does not call every locator invented when the knowledge base is empty', async () => {
     const executor = new FakeExecutor(() => ok(true));
     const result = await runBenchmark({ projectRoot: dir, agent, rules, prompts, executor });
@@ -483,7 +570,7 @@ describe('a run with an executor', () => {
 
   it('reports compile and first-run numbers, and says what failed', async () => {
     const executor = new FakeExecutor((input) =>
-      input.promptId === 'demo-login'
+      input.promptId === 'demo-navigation'
         ? {
             compile: {
               ok: false,
@@ -500,7 +587,7 @@ describe('a run with an executor', () => {
 
     expect(text).toContain('Compiled and run against the demo application (first run, no retries)');
     expect(text).toContain('compiled 1/2 · passed first run 1/2 · 1 failed');
-    expect(text).toContain('demo-login: does not compile; failed');
+    expect(text).toContain('demo-navigation: does not compile; failed');
     expect(text).toContain("TS2339 Property 'x' does not exist");
     expect(text).toContain('Timeout 2000ms exceeded.');
   });
