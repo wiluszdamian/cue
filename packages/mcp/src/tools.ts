@@ -13,10 +13,10 @@ import {
 import { CONSTITUTION, OWNERSHIP, TAGS } from './generated/rules.js';
 
 /**
- * The three tools as plain functions, so behaviour is testable without a transport
+ * The tools as plain functions, so behaviour is testable without a transport
  * and the budgets below can be asserted against every reachable output.
  *
- * All three are point lookups: a tool that returns a wall of text competes with
+ * All of them are point lookups: a tool that returns a wall of text competes with
  * the work. Browser exploration goes through `playwright-cli` instead.
  */
 
@@ -25,6 +25,11 @@ export const TOKEN_BUDGET = {
   explain_rule: 400,
   resolve_owner: 300,
   resolve_locator: 350,
+  resolve_route: 350,
+  resolve_api: 350,
+  get_evidence: 300,
+  get_freshness: 250,
+  find_knowledge: 350,
 } as const;
 
 /** Four characters per token over-estimates here, which is the safe direction. */
@@ -155,3 +160,11 @@ export function resolveLocatorTool(context: ToolContext, element: string, route?
     }),
   );
 }
+
+export {
+  findKnowledge,
+  getEvidence,
+  getFreshness,
+  resolveApi,
+  resolveRoute,
+} from './knowledge-tools.js';

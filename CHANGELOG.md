@@ -10,6 +10,13 @@ rather than deletion, and stay documented for one major cycle.
 
 ## [Unreleased]
 
+### Added
+
+- **Five MCP lookups over the knowledge base**: `resolve_route`, `resolve_api`, `get_evidence`,
+  `get_freshness` and `find_knowledge`. Each answers from the same engine functions the CLI uses,
+  has a token ceiling asserted over hits, misses and oversized input, and answers a miss with
+  `status: unknown` and the command that would find out, never a value that was made up.
+
 ### Changed
 
 - Where a message tells you to look at a page again, it now gives the narrowest command that
