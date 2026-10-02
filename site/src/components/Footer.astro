@@ -1,0 +1,36 @@
+---
+import { url } from '../lib/url';
+---
+
+<footer class="site-foot">
+  <div class="page foot-grid">
+    <div class="foot-brand">
+      <svg viewBox="0 0 94 32" role="img" aria-label="Cue"><use href="#cue-logo" /></svg>
+      <p>Playwright rules and an app map for AI agents. Open source, MIT licensed.</p>
+      <p class="author">Authored by <a href="https://github.com/wiluszdamian" target="_blank" rel="noopener noreferrer">Damian Wilusz</a></p>
+    </div>
+    <nav aria-label="Product">
+      <span class="foot-h">Product</span>
+      <a href={url('#running-order')}>How it works</a>
+      <a href={url('#rules')}>Rules</a>
+      <a href={url('#map')}>App map</a>
+      <a href={url('#faq')}>FAQ</a>
+    </nav>
+    <nav aria-label="Docs">
+      <span class="foot-h">Docs</span>
+      <a href={url('docs/quickstart/')}>Quickstart</a>
+      <a href={url('docs/commands/')}>Commands</a>
+      <a href={url('docs/rules/')}>Rules reference</a>
+    </nav>
+    <nav aria-label="Project">
+      <span class="foot-h">Project</span>
+      <a href="https://github.com/wiluszdamian/project-cue" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli" target="_blank" rel="noopener noreferrer">npm ↗</a>
+      <a href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog ↗</a>
+    </nav>
+  </div>
+  <div class="page foot-bottom">
+    <span>© 2026 Cue</span>
+    <span>Built on Playwright. Not affiliated with Microsoft, Anthropic, OpenAI or Anysphere.</span>
+  </div>
+</footer>

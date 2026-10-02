@@ -21,6 +21,8 @@ plugins/understudy/
 gemini-extension.json
 docs/.next/
 docs/.source/
+site/.astro/
+site/pnpm-lock.yaml
 
 # Working notes, not product source
 .planning/

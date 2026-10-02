@@ -1,0 +1,28 @@
+---
+import Docs from '../../layouts/Docs.astro';
+import { url } from '../../lib/url';
+---
+
+<Docs slug="commands">
+      <h2 id="cmd-init"><code>init</code></h2>
+      <p>Sets up a project. Shows the plan first and waits for a yes. Without a terminal it applies nothing unless you pass <code>--yes</code>.</p>
+      <div class="params">
+        <div class="param"><code>--target &lt;a,b&gt;</code><span class="type">string</span><p>Set up for specific agents.</p></div>
+        <div class="param"><code>--bare</code><span class="type">flag</span><p>Skip the Playwright folder layout.</p></div>
+        <div class="param"><code>--yes</code><span class="type">flag</span><p>Do not ask. Required without a terminal.</p></div>
+        <div class="param"><code>--force</code><span class="type">flag</span><p>Overwrite files you edited. Use with care.</p></div>
+      </div>
+      <h2 id="cmd-doctor"><code>doctor</code></h2>
+      <p>Checks everything is wired up. <code>--ci</code> fails on errors; <code>--offline</code> skips network checks.</p>
+      <h2 id="cmd-survey"><code>survey &lt;url&gt;</code></h2>
+      <p>Visits a page and records what is on it. <code>--from &lt;file&gt;</code> reads a snapshot captured elsewhere.</p>
+      <h2 id="cmd-locator"><code>locator &lt;element&gt;</code></h2>
+      <p>Looks up a selector with its confidence and freshness. <code>--route</code> narrows it to one page.</p>
+      <h2 id="cmd-verify"><code>verify</code></h2>
+      <p>Checks the map against the app. See <a href={url('docs/verify/')}>Keep the map current</a>.</p>
+      <h2 id="cmd-explain"><code>explain &lt;rule-id&gt;</code></h2>
+      <p>Why a rule exists, and what to write instead.</p>
+      <h2 id="cmd-uninstall"><code>uninstall</code></h2>
+      <p>Removes exactly what <code>init</code> installed, from the recorded manifest.</p>
+    
+</Docs>

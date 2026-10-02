@@ -1,0 +1,103 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  inDocs?: boolean;
+}
+const { inDocs = false } = Astro.props;
+---
+
+<header class="bar" id="bar">
+  <div class="page bar-inner">
+    <a class="brand" href={url()} aria-label="Cue home"><svg viewBox="0 0 94 32" role="img" aria-label="Cue"><use href="#cue-logo" /></svg></a>
+    <nav class="links" id="links" aria-label="Sections">
+      <a href={url('#running-order')}>How it works</a>
+      <a href={url('#rules')}>Rules</a>
+      <a href={url('#map')}>App map</a>
+      <a href={url('#who')}>Who decides</a>
+      <a href={url('#faq')}>FAQ</a>
+      <a href={url('docs/')} class={inDocs ? 'current' : undefined} data-docs-link>Docs</a>
+    </nav>
+    <div class="bar-tools">
+      <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+        <button type="button" role="radio" data-theme-set="system" aria-checked="true" aria-label="Match system" title="Match system"><svg><use href="#i-auto" /></svg></button>
+        <button type="button" role="radio" data-theme-set="light" aria-checked="false" aria-label="Light" title="Light"><svg><use href="#i-sun" /></svg></button>
+        <button type="button" role="radio" data-theme-set="dark" aria-checked="false" aria-label="Dark" title="Dark"><svg><use href="#i-moon" /></svg></button>
+      </div>
+      <a class="icon-link" href="https://github.com/wiluszdamian/project-cue" target="_blank" rel="noopener noreferrer" aria-label="Cue on GitHub (opens in a new tab)" title="GitHub"><svg class="gh"><use href="#i-github" /></svg><svg class="ext"><use href="#i-ext" /></svg></a>
+      <a class="btn-start" href={url('docs/quickstart/')}>Get started</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="links"><svg><use href="#i-menu" /></svg></button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Theme switch: Auto follows the system, Light and Dark pin a choice. The
+  // stored choice is applied before paint by the inline script in Base.astro.
+  const root = document.documentElement;
+  const themeButtons = document.querySelectorAll<HTMLButtonElement>('[data-theme-set]');
+  function applyTheme(choice: string) {
+    if (choice === 'light' || choice === 'dark') root.setAttribute('data-theme', choice);
+    else root.removeAttribute('data-theme');
+    themeButtons.forEach((b) => {
+      b.setAttribute('aria-checked', String(b.dataset.themeSet === choice));
+    });
+  }
+  let saved = 'system';
+  try {
+    saved = localStorage.getItem('cue-theme') ?? 'system';
+  } catch {
+    // Storage can be blocked; the page still follows the system theme.
+  }
+  applyTheme(saved);
+  themeButtons.forEach((b) => {
+    b.addEventListener('click', () => {
+      const choice = b.dataset.themeSet ?? 'system';
+      applyTheme(choice);
+      try {
+        localStorage.setItem('cue-theme', choice);
+      } catch {
+        // Not remembered, but applied for this visit.
+      }
+    });
+  });
+
+  // Hairline once scrolled, a menu on small screens, and the current section
+  // underlined while reading the landing page.
+  const bar = document.getElementById('bar')!;
+  const onScroll = () => bar.classList.toggle('scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const menuBtn = document.getElementById('menu-btn')!;
+  const links = document.getElementById('links')!;
+  menuBtn.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  links.addEventListener('click', (ev) => {
+    if ((ev.target as HTMLElement).closest('a')) {
+      links.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  const sectionLinks = [...links.querySelectorAll<HTMLAnchorElement>('a:not([data-docs-link])')];
+  const sections = sectionLinks
+    .map((a) => document.getElementById(new URL(a.href).hash.slice(1)))
+    .filter((el): el is HTMLElement => el !== null);
+  if (sections.length > 0) {
+    const spy = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          for (const a of sectionLinks) {
+            a.classList.toggle('current', new URL(a.href).hash === `#${entry.target.id}`);
+          }
+        }
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    sections.forEach((s) => spy.observe(s));
+  }
+</script>
