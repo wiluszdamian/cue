@@ -115,10 +115,18 @@ describe('generated reference', () => {
   });
 
   it('says plainly when a rule is not mechanically enforced', () => {
+    // There may be none: every rule can become mechanical. Then there is nothing to label.
     const manual = rules.constitution.rules.filter((r) => r.detector.kind === 'manual');
-    expect(manual.length).toBeGreaterThan(0);
     for (const rule of manual) {
       expect(referenceFor(rule.skill)).toContain('**not enforced**');
+    }
+  });
+
+  it('says when a rule is enforced only where a knowledge base exists', () => {
+    const knowledge = rules.constitution.rules.filter((r) => r.detector.kind === 'knowledge');
+    expect(knowledge.map((r) => r.id)).toContain('selectors-from-agent-kb');
+    for (const rule of knowledge) {
+      expect(referenceFor(rule.skill)).toContain('enforced by ESLint, against `.agent-kb`');
     }
   });
 

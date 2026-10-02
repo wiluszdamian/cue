@@ -73,7 +73,9 @@ table, so a rule added later lands on decided ownership instead of a gap.`
 \`${rule.tier}\` · \`${rule.severity}\` · ${
               rule.detector.kind === 'manual'
                 ? '**not enforced** — checked in review'
-                : 'enforced by ESLint'
+                : rule.detector.kind === 'knowledge'
+                  ? 'enforced by ESLint, against `.agent-kb`'
+                  : 'enforced by ESLint'
             }${rule.autofix ? ' · autofixable' : ''}
 
 ${oneLine(rule.rationale)}

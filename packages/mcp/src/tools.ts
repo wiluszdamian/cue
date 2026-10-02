@@ -79,6 +79,15 @@ function renderRule(rule: Rule): string {
     // linter can check this one.
     lines.push('', 'Not mechanically enforced — checked in review, binding all the same.');
   }
+  if (rule.detector.kind === 'knowledge') {
+    // The linter is silent where there is no .agent-kb, and silent about what the code
+    // cannot decide; an agent should not read that silence as a clean bill.
+    lines.push(
+      '',
+      'Checked against .agent-kb only, and only getByRole/getByTestId/getByLabel with literal',
+      'arguments. Silence means nothing was found, not that everything was checked: run `understudy check`.',
+    );
+  }
   return lines.join('\n');
 }
 

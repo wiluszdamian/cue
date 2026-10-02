@@ -91,12 +91,13 @@ Three promises about your files:
 
 ## ⚖️ The rules
 
-Eleven rules, ten enforced automatically:
+Eleven rules, all enforced automatically — ten from the code alone, and one against
+your app's notes:
 
 `no-hard-waits` · `web-first-assertions` · `no-raw-selectors` ·
 `no-locators-in-tests` · `strict-zod-objects` · `no-focused-tests` ·
 `skips-need-a-reason` · `require-test-tags` · `no-explicit-any` ·
-`no-hardcoded-urls` · `selectors-from-agent-kb` _(review only)_
+`no-hardcoded-urls` · `selectors-from-agent-kb` _(needs `.agent-kb`)_
 
 They live in one file, `rules/constitution.yaml`. Change it, run `pnpm generate`,
 and the ESLint rules, the docs and the agent instructions all update together.

@@ -12,6 +12,16 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Changed
 
+- **`selectors-from-agent-kb` is now enforced.** It was a manual rule: stated, never
+  checked. It now runs in the linter and in the engine's `analyze` (a new `knowledge`
+  detector) using the same analyzer as `understudy check`, against the `.agent-kb`
+  found above the file. It reports invented, wrong-route, ambiguous, stale and
+  inferred-only locators, as a **warning** (the `strict` preset makes it an error)
+  until the false-positive rate on real suites is known. Without an `.agent-kb` the
+  linter stays silent; `analyze` lists the rule under the new `notChecked` instead
+  of passing. A locator the code cannot decide — a variable, a regular expression,
+  `getByText`, CSS — is never judged.
+
 - `extractLocators` also reports where each locator is (column and end position),
   whether `{ exact: true }` was passed, whether it is built from something only known
   at runtime, whether it narrows another locator, and which functions it sits in.

@@ -15,6 +15,7 @@ export {
   sortDiagnostics,
   type AnalysisResult,
   type AnalysisSkip,
+  type NotChecked,
   type Diagnostic,
   type Fix,
 } from './diagnostic.js';
@@ -51,6 +52,7 @@ export {
   type AstDetector,
   type Constitution,
   type Detector,
+  type KnowledgeDetector,
   type EnforceableRule,
   type RegexDetector,
   type Rule,

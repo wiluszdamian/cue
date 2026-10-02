@@ -8,31 +8,31 @@ These are the rules Understudy owns outright. Everything else — how to drive t
 browser, how to debug a test, how to handle Electron or i18n — belongs to another
 source; see [Who decides what](ownership.md) for who owns what.
 
-10 of 11 rules are mechanically
+11 of 11 rules are mechanically
 enforced by `@understudy/eslint-plugin`. The rest are stated here and checked in
 review. That split is deliberate and published, because a standard that overstates
 its own teeth stops being believed.
 
 ## Enforced
 
-| Rule                                                    | Tier     | Severity | Checked by | Fix |                                                    |
-| ------------------------------------------------------- | -------- | -------- | ---------- | --- | -------------------------------------------------- |
-| [`no-hard-waits`](rules/no-hard-waits.md)               | MUST_NOT | error    | lint       |     | No hard waits                                      |
-| [`web-first-assertions`](rules/web-first-assertions.md) | MUST     | error    | lint       |     | Assert on locators, not on awaited values          |
-| [`no-raw-selectors`](rules/no-raw-selectors.md)         | MUST_NOT | error    | lint       |     | No CSS or XPath selector strings                   |
-| [`no-locators-in-tests`](rules/no-locators-in-tests.md) | MUST_NOT | error    | lint       |     | Locators live in page objects, not in tests        |
-| [`strict-zod-objects`](rules/strict-zod-objects.md)     | MUST     | error    | lint       | ✓   | API schemas must be strict                         |
-| [`no-focused-tests`](rules/no-focused-tests.md)         | MUST_NOT | error    | lint       |     | No focused tests                                   |
-| [`skips-need-a-reason`](rules/skips-need-a-reason.md)   | MUST     | warn     | lint       |     | A skipped test must say why and when it comes back |
-| [`require-test-tags`](rules/require-test-tags.md)       | MUST     | error    | lint       |     | Every test carries a canonical tag                 |
-| [`no-explicit-any`](rules/no-explicit-any.md)           | MUST_NOT | error    | lint       |     | No explicit any                                    |
-| [`no-hardcoded-urls`](rules/no-hardcoded-urls.md)       | MUST_NOT | warn     | lint       |     | No hardcoded environment URLs                      |
+| Rule                                                          | Tier     | Severity | Checked by | Fix |                                                         |
+| ------------------------------------------------------------- | -------- | -------- | ---------- | --- | ------------------------------------------------------- |
+| [`no-hard-waits`](rules/no-hard-waits.md)                     | MUST_NOT | error    | lint       |     | No hard waits                                           |
+| [`web-first-assertions`](rules/web-first-assertions.md)       | MUST     | error    | lint       |     | Assert on locators, not on awaited values               |
+| [`no-raw-selectors`](rules/no-raw-selectors.md)               | MUST_NOT | error    | lint       |     | No CSS or XPath selector strings                        |
+| [`no-locators-in-tests`](rules/no-locators-in-tests.md)       | MUST_NOT | error    | lint       |     | Locators live in page objects, not in tests             |
+| [`strict-zod-objects`](rules/strict-zod-objects.md)           | MUST     | error    | lint       | ✓   | API schemas must be strict                              |
+| [`no-focused-tests`](rules/no-focused-tests.md)               | MUST_NOT | error    | lint       |     | No focused tests                                        |
+| [`skips-need-a-reason`](rules/skips-need-a-reason.md)         | MUST     | warn     | lint       |     | A skipped test must say why and when it comes back      |
+| [`require-test-tags`](rules/require-test-tags.md)             | MUST     | error    | lint       |     | Every test carries a canonical tag                      |
+| [`no-explicit-any`](rules/no-explicit-any.md)                 | MUST_NOT | error    | lint       |     | No explicit any                                         |
+| [`no-hardcoded-urls`](rules/no-hardcoded-urls.md)             | MUST_NOT | warn     | lint       |     | No hardcoded environment URLs                           |
+| [`selectors-from-agent-kb`](rules/selectors-from-agent-kb.md) | MUST     | warn     | lint       |     | Selectors come from .agent-kb or from fresh exploration |
 
 ## Documented, not enforced
 
-| Rule                                                          | Tier | Severity | Checked by | Fix |                                                         |
-| ------------------------------------------------------------- | ---- | -------- | ---------- | --- | ------------------------------------------------------- |
-| [`selectors-from-agent-kb`](rules/selectors-from-agent-kb.md) | MUST | error    | review     |     | Selectors come from .agent-kb or from fresh exploration |
+| Rule | Tier | Severity | Checked by | Fix |     |
+| ---- | ---- | -------- | ---------- | --- | --- |
 
 ## Canonical tags
 
@@ -133,6 +133,6 @@ Use a relative path and let baseURL resolve it: await page.goto('/login'). Set b
 
 **Selectors come from .agent-kb or from fresh exploration** · `MUST` · [full page](rules/selectors-from-agent-kb.md)
 
-This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. Not mechanically detectable — a linter cannot tell an invented test-id from a real one — so this rule documents the obligation and leaves enforcement to understudy verify and review.
+This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; understudy check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.
 
-Every selector must trace to .agent-kb/app-map/ or .agent-kb/product/testids.yaml, or to an exploration run in this session. If it is not there, run understudy survey \<url> and record it — do not guess. An entry marked stale is a lead to verify, not a fact to use.
+This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run understudy survey \<url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.
