@@ -1379,74 +1379,26 @@
               <span class="spacer"></span>
               <button type="button" id="replay">Replay</button>
             </div>
+            <!-- prettier-ignore -->
             <div class="script" id="script">
-              <div class="ln call standby" data-cue="standby">
-                <span class="who">SM</span><span class="txt">Standby cue 1.</span>
-              </div>
-              <div class="ln">
-                <span class="who">$</span><span>npx @wiluszdamian/cue-cli init</span>
-              </div>
-              <div class="ln call go" data-cue="go">
-                <span class="who">SM</span><span class="txt">Cue 1, go.</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span><span><span class="ok">create</span> AGENTS.md</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span><span class="ok">create</span> eslint.config.mjs</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span><span><span class="ok">create</span> .agent-kb/</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span
-                  ><span class="d">SKIP</span> playwright.config.ts
-                  <span class="d">yours, left alone</span></span
-                >
-              </div>
-              <div class="ln call standby" data-cue="standby">
-                <span class="who">SM</span><span class="txt">Standby cue 2.</span>
-              </div>
-              <div class="ln">
-                <span class="who">$</span><span>cue survey http://localhost:3000/login</span>
-              </div>
-              <div class="ln call go" data-cue="go">
-                <span class="who">SM</span><span class="txt">Cue 2, go.</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span
-                  ><span class="d">/login button</span>
-                  <span class="hl">getByRole('button', { name: 'Log in' })</span></span
-                >
-              </div>
-              <div class="ln call standby" data-cue="standby">
-                <span class="who">SM</span><span class="txt">Standby cue 3.</span>
-              </div>
-              <div class="ln">
-                <span class="who">you</span><span>write a test for a locked-out login</span>
-              </div>
-              <div class="ln call go" data-cue="go">
-                <span class="who">SM</span><span class="txt">Cue 3, go.</span>
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span
-                  ><span class="bad">✗ no-hard-waits</span>
-                  <span class="d">waitForTimeout waits on the clock,</span></span
-                >
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span><span class="d"> not on the app. Use await expect(locator)…</span></span>
-              </div>
-              <div class="ln">
-                <span class="who"></span
-                ><span><span class="ok">✓ rewritten · eslint: 0 problems</span></span>
-              </div>
-            </div>
+        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 1.</span></div>
+        <div class="ln"><span class="who">$</span><span>npx @wiluszdamian/cue-cli init</span></div>
+        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 1, go.</span></div>
+        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  AGENTS.md</span></div>
+        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  eslint.config.mjs</span></div>
+        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  .agent-kb/</span></div>
+        <div class="ln"><span class="who"></span><span><span class="d">SKIP</span>    playwright.config.ts <span class="d">yours, left alone</span></span></div>
+        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 2.</span></div>
+        <div class="ln"><span class="who">$</span><span>cue survey http://localhost:3000/login</span></div>
+        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 2, go.</span></div>
+        <div class="ln"><span class="who"></span><span><span class="d">/login  button</span> <span class="hl">getByRole('button', { name: 'Log in' })</span></span></div>
+        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 3.</span></div>
+        <div class="ln"><span class="who">you</span><span>write a test for a locked-out login</span></div>
+        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 3, go.</span></div>
+        <div class="ln"><span class="who"></span><span><span class="bad">✗ no-hard-waits</span> <span class="d">waitForTimeout waits on the clock,</span></span></div>
+        <div class="ln"><span class="who"></span><span><span class="d">  not on the app. Use await expect(locator)…</span></span></div>
+        <div class="ln"><span class="who"></span><span><span class="ok">✓ rewritten · eslint: 0 problems</span></span></div>
+      </div>
           </div>
         </section>
 
