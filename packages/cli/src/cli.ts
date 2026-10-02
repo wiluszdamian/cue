@@ -22,6 +22,13 @@ import {
   survey,
   SurveyError,
 } from './survey.js';
+import {
+  CHECK_FORMATS,
+  check,
+  formatCheck,
+  locatorCheckExitCode,
+  type CheckFormat,
+} from './check.js';
 import { decideConfirmation, REFUSED_MESSAGE } from './confirm.js';
 import { formatVerifyReport, verify, verifyExitCode, type CiMode } from './verify.js';
 import {
@@ -46,6 +53,7 @@ const USAGE = `understudy <command> [options]
   explain <rule-id>    why a rule exists, and what to do instead
   survey <url>         map a live route into .agent-kb
   extract              read the product source into .agent-kb
+  check [files...]     check the locators in tests against the knowledge base
   verify               check the map against the application (and say what was not checked)
   verify-map           old name for verify
   locator <element>    look up a selector, with freshness and confidence
@@ -60,6 +68,7 @@ Options
   --force              overwrite files that were edited by hand
   --ci[=advisory|strict] non-zero exit: doctor errors; verify drift (strict: also unverified)
   --json               print the verify report as JSON
+  --format <name>      check output: human | agent | json | sarif | github
   --check              report drift without writing (sync)
   --offline            skip checks that need the network
   --from <file>        survey from a captured snapshot instead of a browser
@@ -318,6 +327,32 @@ async function main(): Promise<number> {
         ),
       );
       return 0;
+    }
+
+    case 'check': {
+      const ci = flags['ci'];
+      if (ci !== undefined && ci !== true && ci !== 'advisory' && ci !== 'strict') {
+        err('--ci takes advisory or strict, e.g. --ci=strict');
+        return 2;
+      }
+      const format = asString(flags['format']) ?? 'human';
+      if (!(CHECK_FORMATS as readonly string[]).includes(format)) {
+        err(`--format takes one of: ${CHECK_FORMATS.join(', ')}`);
+        return 2;
+      }
+      const report = check({ projectRoot, targets: positional });
+      out(
+        formatCheck(
+          report,
+          format as CheckFormat,
+          resolveRules(projectRoot).constitution,
+          projectRoot,
+        ),
+      );
+      // Without --ci a check informs; with it, it can fail the build.
+      return ci === undefined
+        ? 0
+        : locatorCheckExitCode(report, ci === 'strict' ? 'strict' : 'advisory');
     }
 
     case 'verify-map':

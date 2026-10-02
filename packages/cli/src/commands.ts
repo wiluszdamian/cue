@@ -17,6 +17,7 @@ export const COMMANDS = [
   'explain',
   'survey',
   'extract',
+  'check',
   'verify',
   'verify-map',
   'locator',

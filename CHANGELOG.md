@@ -57,6 +57,13 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **`understudy check [files…]`** reports which locators in your tests the knowledge base
+  does not know, with the nearest real locator and the command to run, using the same
+  analyzer the lint rule will. Output is `human`, `agent`, `json`, `sarif` or `github`.
+  `--ci` fails on what breaks at runtime (an invented locator, or a real one on the wrong
+  page); `--ci=strict` fails on any finding and when nothing could be checked. Locators the
+  code alone cannot decide are always counted and listed as not judged.
+
 - **`analyzeLocators`** (`@understudy/engine`): for each locator in a test file, says
   whether the knowledge base knows it — `known`, `ambiguous` (several elements match,
   which Playwright's strict mode refuses), `unknown`, `wrong-route`, `stale`,
