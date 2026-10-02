@@ -12,6 +12,13 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **`compatibility.yaml`**: the range and the tested version of each tool Understudy composes
+  (`@playwright/cli`, `@playwright/mcp`, `@playwright/test`, typescript-eslint). The MCP
+  configuration `init` writes and the plugin manifests now pin exact versions instead of
+  `@latest`; `doctor` warns, with the command to install the tested version, when an installed
+  tool is outside its range; and the weekly `upstream` workflow fails, saying which tool and what
+  to do, when a new release has moved outside it.
+
 - **`doctor` looks at the knowledge, not only the setup.** Unreadable or unsupported files,
   pages in the older format, facts that are old or whose code changed, sources that disagree,
   locators in your tests that the notes do not know, test ids that left the source, one element

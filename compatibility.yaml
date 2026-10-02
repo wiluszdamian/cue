@@ -1,0 +1,43 @@
+# What Understudy has been checked against.
+#
+# Understudy composes tools it does not own, and their movement is its main risk.
+# This file says which versions were actually run, so that a version outside the
+# range gives a signal (`understudy doctor`, the weekly `upstream` workflow) rather
+# than a failure nobody can explain.
+#
+#   range     the versions the project claims to work with
+#   tested    the version it was last run against: pinned in the config it writes,
+#             and what `doctor` tells you to install
+#   role      what the tool is for here
+#
+# A range is a lower bound that has been tested and an upper bound that has not.
+# Moving the upper bound is a decision, made after a run, not a default.
+#
+# Generated from this file: packages/cli/src/generated/compatibility.ts, the MCP
+# configuration `init` writes, and the plugin manifests. `pnpm generate` rewrites them.
+schemaVersion: 1
+
+node: '^22.13 || >=24'
+
+tools:
+  '@playwright/cli':
+    range: '>=0.1.22 <0.2.0'
+    tested: '0.1.22'
+    role: the browser, for survey and verify
+    snapshotFormats:
+      - 'playwright-cli/markdown-yaml@1'
+
+  '@playwright/mcp':
+    range: '>=0.0.83 <0.1.0'
+    tested: '0.0.83'
+    role: browser calls from an agent, next to the Understudy server
+
+  '@playwright/test':
+    range: '>=1.63.0 <2.0.0'
+    tested: '1.63.0'
+    role: the test runner the suite is written for
+
+  typescript-eslint:
+    range: '>=8.70.0 <9.0.0'
+    tested: '8.70.0'
+    role: the linter the rules run in

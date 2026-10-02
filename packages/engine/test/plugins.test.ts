@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { V1_SKILLS } from '../src/schema/skill.js';
+import { loadCompatibility } from '../src/compatibility.js';
 import { loadSkills } from '../src/skills.js';
 
 /**
@@ -20,6 +21,7 @@ function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
 }
 
+const compatibility = loadCompatibility(join(REPO_ROOT, 'compatibility.yaml'));
 const catalog = loadSkills(SKILLS);
 const bundled = loadSkills(join(PLUGIN, 'skills'));
 
@@ -103,9 +105,19 @@ describe('manifests', () => {
     expect(pluginJson.license).toBe('MIT');
   });
 
+  it('pins both MCP servers instead of running whatever was published last', () => {
+    const everything = [mcp, mcpDot, gemini, geminiRoot]
+      .map((manifest) => JSON.stringify(manifest))
+      .join('\n');
+    expect(everything).not.toContain('@latest');
+  });
+
   it('bundles both MCP servers without guessing a package manager', () => {
-    const npx = { command: 'npx', args: ['-y', '@playwright/mcp@latest'] };
-    const ours = { command: 'npx', args: ['-y', '@understudy/mcp@latest'] };
+    const npx = {
+      command: 'npx',
+      args: ['-y', `@playwright/mcp@${compatibility.tools['@playwright/mcp']?.tested ?? ''}`],
+    };
+    const ours = { command: 'npx', args: ['-y', `@understudy/mcp@${VERSION}`] };
 
     const servers = mcp.mcpServers as Record<string, { command: string; args: string[] }>;
     expect(servers.playwright?.command).toBe(npx.command);
