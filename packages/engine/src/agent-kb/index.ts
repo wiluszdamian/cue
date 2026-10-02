@@ -68,7 +68,13 @@ export {
   type SourceIndex,
 } from './route-map-file.js';
 
-export { extractLocators, type LocatorUse } from './extract-locators.js';
+export {
+  extractLocators,
+  scanTestSource,
+  type LocatorUse,
+  type Navigation,
+  type TestSourceScan,
+} from './extract-locators.js';
 
 export * from './extract/index.js';
 

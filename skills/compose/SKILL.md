@@ -23,6 +23,9 @@ the repository.
    change one fixture, and it is always the one somebody forgets.
 4. Locators come from the page object, following `stage-map` and
    `locator-policy`. Any new selector comes from `resolve-locator`.
+   A page object that belongs to one route says so in a comment at the top of
+   the file — `// understudy-route: /login` — so a checker knows which page its
+   locators are on. Without it they are matched against every route.
 5. Tag every test from `tags.yaml`. Build data per `seed-policy`.
 6. Run the linter on the new file before calling it done.
 7. **If a rule blocks you, read `understudy explain <rule-id>` and satisfy it.**

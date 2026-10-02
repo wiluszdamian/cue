@@ -60,3 +60,5 @@ export {
   type TermFact,
   type TestIdFact,
 } from './query.js';
+
+export { nameSimilarity, words } from './similarity.js';
