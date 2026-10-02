@@ -2,83 +2,66 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cue — Playwright tests for you and your agent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta
       name="description"
-      content="Cue teaches your AI agent what is actually true about your application and how your team tests it: real ESLint rules it cannot skip, and a map of your real routes and selectors."
+      content="Cue gives your AI agent your team's Playwright rules as ESLint rules, and a map of your app's real routes and selectors."
     />
-    <meta property="og:title" content="Cue — Playwright tests for you and your agent" />
-    <meta
-      property="og:description"
-      content="Rules your agent cannot ignore, and a map of the app it is testing. Install with npx @wiluszdamian/cue-cli init."
-    />
+    <title>Cue: Playwright rules and an app map for AI agents</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,300..800&display=swap"
       rel="stylesheet"
     />
     <style>
+      /* Layout: a stage manager's prompt book. A narrow margin column carries cue
+     numbers and pencil notes; the wide column carries the script. One face,
+     Martian Mono, does everything through its width and weight axes. */
       :root {
-        --bg: #fbfaf8;
-        --bg-alt: #f3f1ed;
-        --surface: #ffffff;
-        --text: #17161a;
-        --muted: #5d5a63;
-        --faint: #8d8a93;
-        --border: #e4e1db;
-        --accent: #e63329;
-        --accent-soft: #fde9e7;
-        --accent-text: #c4261d;
-        --ok: #1f8a4c;
-        --warn: #b7791f;
-        --code-bg: #16151a;
-        --code-text: #e9e6ef;
-        --code-dim: #8a8696;
-        --code-key: #ff8a7a;
-        --code-str: #9fd8a8;
-        --code-fn: #8fc1ff;
-        --shadow: 0 1px 2px rgba(20, 18, 24, 0.04), 0 8px 24px rgba(20, 18, 24, 0.06);
-        --radius: 14px;
-        --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-        color-scheme: light;
+        --paper: #f3f5f7;
+        --sheet: #fbfcfd;
+        --ink: #121b24;
+        --pencil: #5b6875;
+        --rule: #d3dae1;
+        --blue: #2547c9;
+        --standby: #d23a2c;
+        --go: #17894f;
+        --console: #0e1620;
+        --console-ink: #dbe3ec;
+        --console-dim: #6f8193;
+        --font: 'Martian Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+        --step--1: 0.78rem;
+        --step-0: 0.9rem;
+        --step-1: 1.05rem;
+        --step-2: 1.5rem;
+        --step-3: clamp(1.9rem, 4.2vw, 2.9rem);
+        --step-4: clamp(2.1rem, 5.4vw, 4.2rem);
       }
       @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
-          --bg: #0f0e12;
-          --bg-alt: #16151a;
-          --surface: #1b1a20;
-          --text: #f2f0f5;
-          --muted: #aaa6b2;
-          --faint: #77737f;
-          --border: #2b2932;
-          --accent: #ff4d42;
-          --accent-soft: #3a1a18;
-          --accent-text: #ff7a70;
-          --ok: #4cc47e;
-          --warn: #e0a84a;
-          --code-bg: #0b0a0d;
-          --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+          --paper: #0b1219;
+          --sheet: #101a24;
+          --ink: #e3e9ef;
+          --pencil: #8b9aaa;
+          --rule: #213040;
+          --blue: #86a2ff;
+          --standby: #ff5d50;
+          --go: #3fd68a;
+          --console: #070c11;
           color-scheme: dark;
         }
       }
       :root[data-theme='dark'] {
-        --bg: #0f0e12;
-        --bg-alt: #16151a;
-        --surface: #1b1a20;
-        --text: #f2f0f5;
-        --muted: #aaa6b2;
-        --faint: #77737f;
-        --border: #2b2932;
-        --accent: #ff4d42;
-        --accent-soft: #3a1a18;
-        --accent-text: #ff7a70;
-        --ok: #4cc47e;
-        --warn: #e0a84a;
-        --code-bg: #0b0a0d;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+        --paper: #0b1219;
+        --sheet: #101a24;
+        --ink: #e3e9ef;
+        --pencil: #8b9aaa;
+        --rule: #213040;
+        --blue: #86a2ff;
+        --standby: #ff5d50;
+        --go: #3fd68a;
+        --console: #070c11;
         color-scheme: dark;
       }
 
@@ -89,716 +72,653 @@
         scroll-behavior: smooth;
       }
       body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: var(--sans);
-        font-size: 16px;
-        line-height: 1.6;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font);
+        font-size: var(--step-0);
+        font-stretch: 87.5%;
+        font-weight: 400;
+        line-height: 1.7;
         -webkit-font-smoothing: antialiased;
       }
       a {
-        color: inherit;
+        color: var(--blue);
+        text-underline-offset: 3px;
       }
-      code,
-      pre,
-      kbd {
-        font-family: var(--mono);
+      :focus-visible {
+        outline: 2px solid var(--blue);
+        outline-offset: 3px;
       }
-      .wrap {
-        max-width: 1120px;
+      code {
+        font-family: inherit;
+        font-stretch: 87.5%;
+      }
+      .page {
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 0 24px;
+        padding-inline: 24px;
       }
       @media (max-width: 600px) {
-        .wrap {
-          padding: 0 16px;
+        .page {
+          padding-inline: 16px;
         }
       }
 
-      /* ---------- Announcement + nav ---------- */
-      .announce {
-        background: var(--text);
-        color: var(--bg);
-        font-size: 14px;
-        text-align: center;
-        padding: 8px 16px;
-      }
-      .announce strong {
-        color: var(--accent);
-        margin-right: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-size: 12px;
-      }
-      .announce a {
-        text-underline-offset: 3px;
-      }
-      header.nav {
+      /* ---------- Top bar ---------- */
+      .bar {
         position: sticky;
-        top: 0;
-        z-index: 20;
-        background: color-mix(in srgb, var(--bg) 85%, transparent);
-        backdrop-filter: saturate(1.4) blur(10px);
-        border-bottom: 1px solid var(--border);
+        top: env(safe-area-inset-top, 0px);
+        z-index: 10;
+        background: color-mix(in srgb, var(--paper) 88%, transparent);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--rule);
       }
-      .nav-inner {
+      .bar .page {
         display: flex;
         align-items: center;
-        gap: 28px;
-        height: 64px;
+        gap: 24px;
+        height: 58px;
       }
-      .logo {
+      .wordmark {
         display: flex;
         align-items: center;
         gap: 10px;
         font-weight: 800;
-        font-size: 20px;
+        font-stretch: 75%;
+        font-size: 1.25rem;
         letter-spacing: -0.02em;
+        color: var(--ink);
         text-decoration: none;
       }
-      .logo-mark {
-        width: 28px;
-        height: 28px;
-        border-radius: 8px;
-        background: var(--accent);
-        display: grid;
-        place-items: center;
-        color: #fff;
-        font-size: 15px;
-        font-weight: 800;
+      .lamp {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--standby);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--standby) 22%, transparent);
+        transition:
+          background 0.25s ease,
+          box-shadow 0.25s ease;
       }
-      .nav-links {
+      .lamp.go {
+        background: var(--go);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--go) 22%, transparent);
+      }
+      .bar nav {
         display: flex;
         gap: 22px;
-        font-size: 15px;
-        color: var(--muted);
+        font-size: var(--step--1);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
-      .nav-links a {
+      .bar nav a {
+        color: var(--pencil);
         text-decoration: none;
       }
-      .nav-links a:hover {
-        color: var(--text);
+      .bar nav a:hover {
+        color: var(--ink);
       }
-      .nav-spacer {
+      .spacer {
         flex: 1;
       }
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border-radius: 999px;
-        padding: 10px 18px;
-        font-weight: 600;
-        font-size: 15px;
+      .ghost {
+        font: inherit;
+        font-size: var(--step--1);
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        padding: 6px 12px;
+        cursor: pointer;
         text-decoration: none;
-        border: 1px solid transparent;
-        cursor: pointer;
-        font-family: inherit;
-        transition:
-          transform 0.15s ease,
-          background 0.15s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
-      .btn:hover {
-        transform: translateY(-1px);
+      .ghost:hover {
+        border-color: var(--ink);
       }
-      .btn-primary {
-        background: var(--accent);
-        color: #fff;
+      @media (max-width: 820px) {
+        .bar nav {
+          display: none;
+        }
       }
-      .btn-ghost {
-        border-color: var(--border);
-        background: var(--surface);
-        color: var(--text);
-      }
-      .icon-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--text);
+
+      /* ---------- Prompt-book grid ---------- */
+      .leaf {
         display: grid;
-        place-items: center;
-        cursor: pointer;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 40px;
+        padding-block: 88px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .margin {
+        font-size: var(--step--1);
+        color: var(--pencil);
+        line-height: 1.55;
+        border-right: 1px solid var(--rule);
+        padding-right: 18px;
+      }
+      .margin .cue-no {
+        display: block;
+        font-weight: 800;
+        font-stretch: 75%;
+        font-size: var(--step-2);
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .margin .note {
+        font-style: italic;
+      }
+      .body {
+        min-width: 0;
       }
       @media (max-width: 760px) {
-        .nav-links {
-          display: none;
+        .leaf {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 18px;
+          padding-block: 64px;
         }
-        .nav-inner .btn-ghost {
-          display: none;
+        .margin {
+          border-right: 0;
+          border-bottom: 1px solid var(--rule);
+          padding: 0 0 12px;
+          display: flex;
+          gap: 14px;
+          align-items: baseline;
         }
+        .margin .cue-no {
+          margin: 0;
+        }
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-weight: 800;
+        font-stretch: 75%;
+        letter-spacing: -0.03em;
+        line-height: 1.02;
+        text-wrap: balance;
+        margin: 0;
+      }
+      h1 {
+        font-size: var(--step-4);
+      }
+      h2 {
+        font-size: var(--step-3);
+        margin-bottom: 18px;
+      }
+      h3 {
+        font-size: var(--step-1);
+        letter-spacing: -0.01em;
+        margin-bottom: 6px;
+      }
+      .label {
+        font-size: var(--step--1);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--pencil);
+      }
+      p {
+        margin: 0;
+        max-width: 62ch;
+      }
+      .lede {
+        font-size: var(--step-1);
+        color: var(--pencil);
+        max-width: 56ch;
+      }
+      .stack {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
       }
 
       /* ---------- Hero ---------- */
       .hero {
-        padding: 88px 0 56px;
-        text-align: center;
+        padding-block: 72px 80px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+        gap: 56px;
+        align-items: start;
+        border-bottom: 1px solid var(--rule);
       }
-      .eyebrow {
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--accent-text);
-        margin-bottom: 14px;
+      .hero h1 .soft {
+        color: var(--pencil);
+        font-weight: 300;
       }
-      h1 {
-        font-size: clamp(40px, 7vw, 76px);
-        line-height: 1.02;
-        letter-spacing: -0.045em;
-        margin: 0 auto 22px;
-        max-width: 900px;
-        font-weight: 800;
+      .hero .stack {
+        gap: 26px;
       }
-      h1 em {
-        font-style: normal;
-        color: var(--accent);
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 40px;
+          padding-block: 48px 64px;
+        }
       }
-      .lead {
-        font-size: clamp(18px, 2.2vw, 21px);
-        color: var(--muted);
-        max-width: 700px;
-        margin: 0 auto 36px;
-      }
+
       .install {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-      }
-      .cmd {
-        display: inline-flex;
-        align-items: center;
-        gap: 14px;
-        background: var(--code-bg);
-        color: var(--code-text);
-        border-radius: 12px;
-        padding: 14px 14px 14px 20px;
-        font-family: var(--mono);
-        font-size: 16px;
-        box-shadow: var(--shadow);
+        align-items: stretch;
+        border: 1.5px solid var(--ink);
+        background: var(--sheet);
         max-width: 100%;
+        width: fit-content;
       }
-      .cmd .prompt {
-        color: var(--accent);
-        user-select: none;
-      }
-      .cmd code {
+      .install code {
+        padding: 14px 18px;
+        font-size: var(--step-0);
+        font-weight: 500;
         white-space: nowrap;
         overflow-x: auto;
-      }
-      .copy {
-        border: 1px solid #34313b;
-        background: #24222a;
-        color: var(--code-text);
-        border-radius: 8px;
-        font-size: 13px;
-        padding: 6px 10px;
-        cursor: pointer;
-        font-family: var(--sans);
-        white-space: nowrap;
-      }
-      .copy:hover {
-        background: #2f2c36;
-      }
-      .copy.done {
-        color: #9fd8a8;
-      }
-      .hero-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-      .agent-prompt {
-        margin: 34px auto 0;
-        max-width: 720px;
-        text-align: left;
-        border: 1px dashed var(--border);
-        border-radius: var(--radius);
-        padding: 16px 18px;
-        background: var(--surface);
-        display: flex;
-        gap: 16px;
-        align-items: flex-start;
-      }
-      .agent-prompt .label {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--faint);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        margin-bottom: 4px;
-      }
-      .agent-prompt p {
-        margin: 0;
-        font-size: 15px;
-        color: var(--muted);
-      }
-      .agent-prompt .copy {
-        background: var(--bg-alt);
-        border-color: var(--border);
-        color: var(--text);
-        flex-shrink: 0;
-      }
-      @media (max-width: 600px) {
-        .cmd {
-          font-size: 13px;
-          padding-left: 14px;
-        }
-        .agent-prompt {
-          flex-direction: column;
-        }
-      }
-
-      /* ---------- Terminal mockup ---------- */
-      .terminal {
-        margin: 56px auto 0;
-        max-width: 920px;
-        border-radius: 16px;
-        background: var(--code-bg);
-        color: var(--code-text);
-        text-align: left;
-        box-shadow:
-          0 30px 80px -20px rgba(230, 51, 41, 0.25),
-          var(--shadow);
-        overflow: hidden;
-        border: 1px solid #2a2830;
-      }
-      .terminal-bar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 16px;
-        border-bottom: 1px solid #26242c;
-        font-size: 13px;
-        color: var(--code-dim);
-      }
-      .dot {
-        width: 11px;
-        height: 11px;
-        border-radius: 50%;
-        background: #3a3742;
-      }
-      .terminal-bar span:last-child {
-        margin-left: 10px;
-      }
-      .terminal pre {
-        margin: 0;
-        padding: 22px 24px 26px;
-        font-size: 14px;
-        line-height: 1.7;
-        overflow-x: auto;
-      }
-      .t-dim {
-        color: var(--code-dim);
-      }
-      .t-acc {
-        color: var(--code-key);
-      }
-      .t-ok {
-        color: var(--code-str);
-      }
-      .t-fn {
-        color: var(--code-fn);
-      }
-      .t-warn {
-        color: #f0c674;
-      }
-
-      /* ---------- Sections ---------- */
-      section {
-        padding: 96px 0;
-      }
-      section.alt {
-        background: var(--bg-alt);
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-      }
-      .section-head {
-        max-width: 720px;
-        margin-bottom: 48px;
-      }
-      .section-head.center {
-        margin-left: auto;
-        margin-right: auto;
-        text-align: center;
-      }
-      h2 {
-        font-size: clamp(30px, 4.4vw, 46px);
-        line-height: 1.08;
-        letter-spacing: -0.035em;
-        margin: 0 0 16px;
-        font-weight: 800;
-      }
-      h3 {
-        font-size: 20px;
-        letter-spacing: -0.015em;
-        margin: 0 0 8px;
-      }
-      .section-head p {
-        font-size: 18px;
-        color: var(--muted);
-        margin: 0;
-      }
-
-      /* Logos row */
-      .agents {
-        padding: 28px 0 0;
-        text-align: center;
-        color: var(--faint);
-        font-size: 14px;
-      }
-      .agents ul {
-        list-style: none;
-        padding: 0;
-        margin: 14px 0 0;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px 30px;
-        font-weight: 600;
-        font-size: 17px;
-        color: var(--muted);
-      }
-
-      /* Steps */
-      .steps {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 18px;
-        counter-reset: step;
-      }
-      .step {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 24px 22px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        box-shadow: var(--shadow);
-      }
-      .step-num {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: var(--accent-soft);
-        color: var(--accent-text);
-        font-weight: 700;
-        font-size: 14px;
-        display: grid;
-        place-items: center;
-      }
-      .step p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 15px;
-      }
-      .step code.inline {
-        margin-top: auto;
-      }
-      code.inline {
-        display: block;
-        background: var(--bg-alt);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 10px;
-        font-size: 12.5px;
-        color: var(--text);
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-      @media (max-width: 960px) {
-        .steps {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-      @media (max-width: 560px) {
-        .steps {
-          grid-template-columns: minmax(0, 1fr);
-        }
-      }
-
-      /* Feature split */
-      .split {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-        gap: 56px;
-        align-items: center;
-      }
-      .split.reverse > :first-child {
-        order: 2;
-      }
-      .split ul.points {
-        list-style: none;
-        padding: 0;
-        margin: 24px 0 0;
-        display: grid;
-        gap: 14px;
-      }
-      .points li {
-        display: flex;
-        gap: 12px;
-        color: var(--muted);
-      }
-      .points li::before {
-        content: '';
-        flex-shrink: 0;
-        width: 8px;
-        height: 8px;
-        margin-top: 9px;
-        border-radius: 2px;
-        background: var(--accent);
-      }
-      .points strong {
-        color: var(--text);
-      }
-      @media (max-width: 880px) {
-        .split {
-          grid-template-columns: minmax(0, 1fr);
-          gap: 36px;
-        }
-        .split.reverse > :first-child {
-          order: 0;
-        }
-      }
-
-      /* Code card */
-      .code-card {
-        background: var(--code-bg);
-        color: var(--code-text);
-        border-radius: var(--radius);
-        overflow: hidden;
-        box-shadow: var(--shadow);
-        border: 1px solid #2a2830;
         min-width: 0;
       }
-      .code-card .tab {
-        font-size: 13px;
-        color: var(--code-dim);
-        padding: 12px 18px;
-        border-bottom: 1px solid #26242c;
+      .install code::before {
+        content: '$ ';
+        color: var(--pencil);
+      }
+      .copy {
+        font: inherit;
+        font-size: var(--step--1);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border: 0;
+        border-left: 1.5px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        padding: 0 16px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .copy:hover {
+        background: var(--blue);
+      }
+      .copy.done {
+        background: var(--go);
+      }
+      .handoff {
+        border-left: 2px solid var(--rule);
+        padding-left: 16px;
+        display: grid;
+        gap: 6px;
+        max-width: 60ch;
+      }
+      .handoff p {
+        color: var(--pencil);
+        font-size: var(--step--1);
+      }
+      .linkish {
+        font: inherit;
+        font-size: var(--step--1);
+        background: none;
+        border: 0;
+        padding: 0;
+        color: var(--blue);
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        justify-self: start;
+      }
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+        font-size: var(--step--1);
+        color: var(--pencil);
+      }
+
+      /* ---------- Show-calling console ---------- */
+      .console {
+        background: var(--console);
+        color: var(--console-ink);
+        font-size: 0.76rem;
+        line-height: 1.75;
+        min-width: 0;
+        position: relative;
+      }
+      .console-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid #1d2a37;
+        font-size: var(--step--1);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--console-dim);
+      }
+      .console-head .lamp {
+        width: 14px;
+        height: 14px;
+      }
+      .console-head .state {
+        color: var(--console-ink);
+        font-weight: 700;
+        min-width: 7ch;
+      }
+      .console-head .spacer {
+        flex: 1;
+      }
+      .console-head button {
+        font: inherit;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: transparent;
+        color: var(--console-dim);
+        border: 1px solid #253546;
+        padding: 3px 9px;
+        cursor: pointer;
+      }
+      .console-head button:hover {
+        color: var(--console-ink);
+      }
+      .script {
+        padding: 14px 0 18px;
+        overflow-x: auto;
+      }
+      .ln {
+        display: grid;
+        grid-template-columns: 4.5ch minmax(0, 1fr);
+        gap: 10px;
+        padding: 0 16px;
+        white-space: pre;
+        transition:
+          opacity 0.35s ease,
+          background 0.35s ease;
+      }
+      .ln .who {
+        color: var(--console-dim);
+        font-weight: 700;
+      }
+      .ln.call .txt {
+        font-weight: 700;
+      }
+      .ln.call.standby .txt {
+        color: #ff8a80;
+      }
+      .ln.call.go .txt {
+        color: #6be3a2;
+      }
+      .ln .d {
+        color: var(--console-dim);
+      }
+      .ln .ok {
+        color: #6be3a2;
+      }
+      .ln .bad {
+        color: #ff8a80;
+      }
+      .ln .hl {
+        color: #a9bcff;
+      }
+      .console.running .ln {
+        opacity: 0.28;
+      }
+      .console.running .ln.on {
+        opacity: 1;
+      }
+      .console.running .ln.now {
+        background: rgba(134, 162, 255, 0.08);
+      }
+
+      /* ---------- Correction (pencil strike) ---------- */
+      .correction {
+        display: grid;
+        gap: 2px;
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        padding: 22px 22px 20px;
+        font-size: var(--step-0);
+        overflow-x: auto;
+      }
+      .correction .wrong {
+        position: relative;
+        width: fit-content;
+        color: var(--pencil);
+        white-space: nowrap;
+      }
+      .correction .wrong::after {
+        content: '';
+        position: absolute;
+        left: -4px;
+        right: -4px;
+        top: 52%;
+        height: 2px;
+        background: var(--standby);
+        transform-origin: left;
+        transform: scaleX(1) rotate(-1deg);
+        transition: transform 0.6s cubic-bezier(0.6, 0, 0.2, 1);
+      }
+      .correction .right {
+        color: var(--ink);
+        font-weight: 600;
+        white-space: nowrap;
+        transition:
+          opacity 0.4s ease 0.55s,
+          transform 0.4s ease 0.55s;
+      }
+      .correction .why {
+        margin-top: 12px;
+        font-size: var(--step--1);
+        color: var(--pencil);
+        font-style: italic;
+        white-space: normal;
+      }
+      .correction.pending .wrong::after {
+        transform: scaleX(0) rotate(-1deg);
+      }
+      .correction.pending .right {
+        opacity: 0.25;
+        transform: translateY(4px);
+      }
+      .two {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px;
+      }
+      @media (max-width: 860px) {
+        .two {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      /* ---------- Cue sheet table ---------- */
+      .sheet-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--rule);
+        background: var(--sheet);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: var(--step--1);
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+      }
+      th {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--pencil);
+        font-size: 0.7rem;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      tbody tr {
+        transition: background 0.2s ease;
+      }
+      tbody tr:hover {
+        background: color-mix(in srgb, var(--blue) 6%, transparent);
+      }
+      td.no {
+        font-weight: 800;
+        font-stretch: 75%;
+        font-size: var(--step-1);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      td code {
+        white-space: nowrap;
+        color: var(--blue);
+      }
+      .wins {
+        color: var(--standby);
+        font-weight: 700;
+      }
+
+      /* ---------- Rules ---------- */
+      .lint {
+        background: var(--console);
+        color: var(--console-ink);
+        font-size: 0.76rem;
+        line-height: 1.75;
+        padding: 18px 20px;
+        overflow-x: auto;
+        white-space: pre;
+        margin: 0;
+        font-family: inherit;
+      }
+      .lint .d {
+        color: var(--console-dim);
+      }
+      .lint .bad {
+        color: #ff8a80;
+        font-weight: 700;
+      }
+      .lint .ok {
+        color: #6be3a2;
+      }
+      .lint .hl {
+        color: #a9bcff;
+      }
+      .lint .strike {
+        background: rgba(255, 93, 80, 0.14);
+      }
+      .rule-list {
+        columns: 2;
+        column-gap: 28px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: var(--step--1);
+      }
+      .rule-list li {
+        padding: 7px 0;
+        border-bottom: 1px dotted var(--rule);
+        break-inside: avoid;
         display: flex;
         justify-content: space-between;
         gap: 12px;
       }
-      .code-card pre {
-        margin: 0;
-        padding: 18px 20px 22px;
-        font-size: 13.5px;
-        line-height: 1.7;
-        overflow-x: auto;
+      .rule-list li span:last-child {
+        color: var(--pencil);
       }
-      .code-card + .code-card {
-        margin-top: 16px;
-      }
-      .err-line {
-        display: block;
-        background: rgba(255, 77, 66, 0.12);
-        border-left: 2px solid var(--accent);
-        margin: 0 -20px;
-        padding: 0 18px;
+      @media (max-width: 520px) {
+        .rule-list {
+          columns: 1;
+        }
       }
 
-      /* Verdict chips */
+      /* ---------- Verdicts ---------- */
       .verdicts {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-top: 22px;
       }
-      .chip {
-        font-family: var(--mono);
-        font-size: 12.5px;
-        font-weight: 500;
-        padding: 5px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--muted);
+      .verdict {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 4px 9px;
+        border: 1.5px solid currentColor;
       }
-      .chip.pass {
-        color: var(--ok);
-        border-color: color-mix(in srgb, var(--ok) 40%, var(--border));
+      .v-pass {
+        color: var(--go);
       }
-      .chip.fail {
-        color: var(--accent-text);
-        border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+      .v-fail {
+        color: var(--standby);
       }
-      .chip.partial {
-        color: var(--warn);
-        border-color: color-mix(in srgb, var(--warn) 40%, var(--border));
+      .v-other {
+        color: var(--pencil);
       }
 
-      /* Rules grid */
-      .rules {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        max-width: 900px;
-        margin: 0 auto;
-      }
-      .rules .chip {
-        font-size: 14px;
-        padding: 8px 14px;
-      }
-      .rules .chip.review {
-        border-style: dashed;
-      }
-
-      /* Promise cards */
-      .cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-      }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 26px 24px;
-      }
-      .card .ico {
-        font-size: 24px;
-        margin-bottom: 12px;
-      }
-      .card p {
+      /* ---------- Plain lists ---------- */
+      .house {
+        list-style: none;
         margin: 0;
-        color: var(--muted);
-        font-size: 15px;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
       }
-      @media (max-width: 880px) {
-        .cards {
-          grid-template-columns: 1fr;
+      .house li {
+        border-top: 1.5px solid var(--ink);
+        padding-top: 14px;
+        display: grid;
+        gap: 6px;
+        align-content: start;
+      }
+      .house p {
+        color: var(--pencil);
+        font-size: var(--step--1);
+      }
+      @media (max-width: 820px) {
+        .house {
+          grid-template-columns: minmax(0, 1fr);
         }
       }
 
-      /* Chat mock */
-      .chat {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        padding: 20px;
+      .tools {
+        list-style: none;
+        margin: 0;
+        padding: 0;
         display: grid;
-        gap: 12px;
-        font-size: 14.5px;
-        min-width: 0;
+        gap: 0;
+        border-top: 1px solid var(--rule);
       }
-      .msg {
-        padding: 12px 14px;
-        border-radius: 12px;
-        max-width: 92%;
+      .tools li {
+        display: grid;
+        grid-template-columns: 17ch minmax(0, 1fr);
+        gap: 18px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--rule);
+        font-size: var(--step--1);
       }
-      .msg.user {
-        background: var(--accent);
-        color: #fff;
-        justify-self: end;
+      .tools code {
+        font-weight: 700;
+        color: var(--blue);
       }
-      .msg.agent {
-        background: var(--bg-alt);
-        color: var(--text);
+      .tools .ans {
+        color: var(--pencil);
+        display: block;
+        margin-top: 4px;
       }
-      .tool {
-        font-family: var(--mono);
-        font-size: 12.5px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 12px;
-        color: var(--muted);
-        background: var(--bg);
-        overflow-x: auto;
-        white-space: pre;
-      }
-      .tool b {
-        color: var(--accent-text);
-        font-weight: 500;
+      @media (max-width: 560px) {
+        .tools li {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 4px;
+        }
       }
 
-      /* Ownership table */
-      .owners {
-        width: 100%;
-        border-collapse: collapse;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        overflow: hidden;
-        font-size: 15px;
-      }
-      .owners th,
-      .owners td {
-        text-align: left;
-        padding: 14px 18px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: top;
-      }
-      .owners th {
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--faint);
-        background: var(--bg-alt);
-      }
-      .owners tr:last-child td {
-        border-bottom: 0;
-      }
-      .owners td:last-child {
-        font-family: var(--mono);
-        font-size: 13.5px;
-        white-space: nowrap;
-      }
-      .wins {
-        color: var(--accent-text);
-        font-weight: 600;
-      }
-      .table-scroll {
-        overflow-x: auto;
-        border-radius: var(--radius);
-      }
-
-      /* Honesty callout */
-      .honest {
-        border: 1px solid var(--border);
-        border-left: 4px solid var(--accent);
-        background: var(--surface);
-        border-radius: var(--radius);
-        padding: 32px 34px;
-        max-width: 860px;
-        margin: 0 auto;
-      }
-      .honest h2 {
-        font-size: clamp(26px, 3.4vw, 34px);
-      }
-      .honest p {
-        color: var(--muted);
-        margin: 0 0 12px;
-        font-size: 17px;
-      }
-      .honest p:last-child {
-        margin-bottom: 0;
-      }
-
-      /* FAQ */
-      .faq {
-        max-width: 800px;
-        margin: 0 auto;
-      }
+      /* ---------- FAQ ---------- */
       details {
-        border-bottom: 1px solid var(--border);
-        padding: 20px 0;
+        border-bottom: 1px solid var(--rule);
+        padding-block: 16px;
       }
       details:first-of-type {
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--rule);
       }
       summary {
         cursor: pointer;
-        font-weight: 600;
-        font-size: 18px;
+        font-weight: 700;
         list-style: none;
         display: flex;
         justify-content: space-between;
@@ -809,461 +729,1605 @@
       }
       summary::after {
         content: '+';
-        color: var(--faint);
-        font-weight: 400;
-        font-size: 22px;
-        line-height: 1;
-        transition: transform 0.2s ease;
+        color: var(--pencil);
+        transition: transform 0.25s ease;
       }
       details[open] summary::after {
         transform: rotate(45deg);
       }
       details p {
-        color: var(--muted);
-        margin: 12px 0 0;
+        margin-top: 10px;
+        color: var(--pencil);
       }
       details code,
-      .card code,
-      .step code:not(.inline),
-      .points code,
-      .section-head code {
-        font-size: 0.88em;
-        background: var(--bg-alt);
-        border: 1px solid var(--border);
-        border-radius: 5px;
-        padding: 1px 5px;
+      p code,
+      li code {
+        color: var(--blue);
+        white-space: nowrap;
       }
 
-      /* CTA */
-      .cta {
-        text-align: center;
-        padding: 110px 0;
-      }
-      .cta h2 {
-        font-size: clamp(34px, 5vw, 56px);
-      }
-      .cta p {
-        color: var(--muted);
-        font-size: 18px;
-        margin: 0 0 32px;
-      }
-
-      /* Footer */
-      footer {
-        border-top: 1px solid var(--border);
-        padding: 56px 0 40px;
-        font-size: 15px;
-        color: var(--muted);
-      }
-      .foot-grid {
+      /* ---------- Finale ---------- */
+      .finale {
+        padding-block: 110px;
         display: grid;
-        grid-template-columns: 2fr repeat(3, 1fr);
-        gap: 32px;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: start;
+        gap: 22px;
       }
-      .foot-grid h4 {
-        margin: 0 0 12px;
-        color: var(--text);
-        font-size: 14px;
-      }
-      .foot-grid ul {
-        list-style: none;
-        padding: 0;
+      .finale h2 {
+        font-size: var(--step-4);
         margin: 0;
+      }
+      footer {
+        border-top: 1px solid var(--rule);
+        padding-block: 28px 40px;
+        font-size: var(--step--1);
+        color: var(--pencil);
+      }
+      footer .page {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 26px;
+        justify-content: space-between;
+      }
+      footer nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+      }
+      footer a {
+        color: var(--pencil);
+      }
+
+      /* ---------- Theme switch ---------- */
+      .theme-switch {
+        display: inline-flex;
+        border: 1px solid var(--rule);
+        padding: 2px;
+        gap: 2px;
+      }
+      .theme-switch button {
+        font: inherit;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        background: transparent;
+        color: var(--pencil);
+        border: 0;
+        padding: 4px 9px;
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+      .theme-switch button:hover {
+        color: var(--ink);
+      }
+      .theme-switch button[aria-checked='true'] {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .bar nav a.nav-docs {
+        color: var(--blue);
+      }
+      @media (max-width: 560px) {
+        .hide-sm {
+          display: none;
+        }
+      }
+
+      /* ---------- Docs (Mintlify-style three columns) ---------- */
+      .docs {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding-inline: 24px;
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr) 200px;
+        gap: 48px;
+      }
+      .docs[hidden] {
+        display: none;
+      }
+      .docs-side,
+      .docs-toc {
+        position: sticky;
+        top: calc(58px + env(safe-area-inset-top, 0px));
+        align-self: start;
+        max-height: calc(100vh - 58px);
+        overflow-y: auto;
+        padding-block: 28px;
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--rule);
+        background: var(--sheet);
+        padding: 7px 10px;
+        color: var(--pencil);
+        margin-bottom: 22px;
+      }
+      .search input {
+        font: inherit;
+        font-size: var(--step--1);
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+        width: 100%;
+        min-width: 0;
+        outline: none;
+      }
+      .search:focus-within {
+        border-color: var(--blue);
+      }
+      .search kbd {
+        font: inherit;
+        font-size: 0.66rem;
+        border: 1px solid var(--rule);
+        padding: 0 5px;
+      }
+      .docs-nav {
+        display: grid;
+        gap: 22px;
+      }
+      .group {
+        display: grid;
+        gap: 2px;
+      }
+      .group-title {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+      .docs-nav a {
+        font-size: var(--step--1);
+        color: var(--pencil);
+        text-decoration: none;
+        padding: 5px 10px;
+        border-left: 2px solid var(--rule);
+        transition:
+          color 0.15s ease,
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .docs-nav a:hover {
+        color: var(--ink);
+        border-left-color: var(--pencil);
+      }
+      .docs-nav a.active {
+        color: var(--blue);
+        border-left-color: var(--blue);
+        background: color-mix(in srgb, var(--blue) 8%, transparent);
+        font-weight: 600;
+      }
+      .no-hits {
+        font-size: var(--step--1);
+        color: var(--pencil);
+      }
+      .docs-main {
+        min-width: 0;
+        padding-block: 40px 64px;
+        max-width: 760px;
+      }
+      .docs-main article {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        animation: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .docs-main article[hidden] {
+        display: none;
+      }
+      .crumb {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--blue);
+        font-weight: 700;
+      }
+      .docs-main h1 {
+        font-size: var(--step-3);
+      }
+      .docs-main h2 {
+        font-size: var(--step-2);
+        margin: 22px 0 0;
+        scroll-margin-top: 80px;
+      }
+      .docs-main h2 code {
+        color: inherit;
+      }
+      .docs-main .desc {
+        font-size: var(--step-1);
+        color: var(--pencil);
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .docs-main ul {
+        margin: 0;
+        padding-left: 1.2em;
         display: grid;
         gap: 8px;
       }
-      .foot-grid a {
-        text-decoration: none;
+      .docs-main pre {
+        margin: 0;
+        font-family: inherit;
       }
-      .foot-grid a:hover {
-        color: var(--text);
+      .docs-main pre.code,
+      .codegroup {
+        background: var(--console);
+        color: var(--console-ink);
+        font-size: 0.76rem;
+        line-height: 1.75;
       }
-      .foot-bottom {
-        margin-top: 48px;
+      .docs-main pre.code,
+      .codegroup pre {
+        padding: 14px 18px;
+        overflow-x: auto;
+      }
+      .docs-main pre code {
+        color: inherit;
+      }
+      .codegroup .tabs {
         display: flex;
-        justify-content: space-between;
+        gap: 2px;
+        border-bottom: 1px solid #1d2a37;
+        padding: 0 8px;
+        overflow-x: auto;
+      }
+      .codegroup .tabs button,
+      .codegroup .filename {
+        font: inherit;
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+        background: transparent;
+        color: var(--console-dim);
+        border: 0;
+        border-bottom: 2px solid transparent;
+        padding: 9px 10px 7px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .codegroup .filename {
+        cursor: default;
+        color: var(--console-ink);
+      }
+      .codegroup .tabs button[aria-selected='true'] {
+        color: var(--console-ink);
+        border-bottom-color: #86a2ff;
+      }
+      .steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        counter-reset: s;
+        display: grid;
+        gap: 0;
+      }
+      .steps li {
+        counter-increment: s;
+        grid-template-columns: minmax(0, 1fr);
+        position: relative;
+        padding: 0 0 28px 48px;
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+      }
+      .steps li::before {
+        content: counter(s);
+        position: absolute;
+        left: 0;
+        top: -2px;
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: var(--step--1);
+        border: 1.5px solid var(--ink);
+        background: var(--paper);
+        z-index: 1;
+      }
+      .steps li::after {
+        content: '';
+        position: absolute;
+        left: 14px;
+        top: 26px;
+        bottom: 0;
+        width: 1px;
+        background: var(--rule);
+      }
+      .steps li:last-child::after {
+        display: none;
+      }
+      .steps h3 {
+        font-size: var(--step-1);
+        margin: 0;
+      }
+      .callout {
+        border: 1px solid var(--rule);
+        border-left: 3px solid var(--blue);
+        background: color-mix(in srgb, var(--blue) 5%, var(--sheet));
+        padding: 12px 16px;
+        display: grid;
+        gap: 4px;
+        font-size: var(--step--1);
+      }
+      .callout strong {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--blue);
+      }
+      .callout.warn {
+        border-left-color: var(--standby);
+        background: color-mix(in srgb, var(--standby) 5%, var(--sheet));
+      }
+      .callout.warn strong {
+        color: var(--standby);
+      }
+      .callout.tip {
+        border-left-color: var(--go);
+        background: color-mix(in srgb, var(--go) 5%, var(--sheet));
+      }
+      .callout.tip strong {
+        color: var(--go);
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .dcard {
+        display: grid;
+        gap: 6px;
+        border: 1px solid var(--rule);
+        background: var(--sheet);
+        padding: 16px 18px;
+        color: var(--ink);
+        text-decoration: none;
+        font-size: var(--step--1);
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+      .dcard span {
+        color: var(--pencil);
+      }
+      .dcard:hover {
+        border-color: var(--blue);
+        transform: translateY(-2px);
+      }
+      .chips {
+        display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-        color: var(--faint);
+        gap: 8px;
+      }
+      .chips span {
+        border: 1px solid var(--rule);
+        padding: 3px 10px;
+        font-size: var(--step--1);
+      }
+      .table {
+        overflow-x: auto;
+        border: 1px solid var(--rule);
+        background: var(--sheet);
+      }
+      .params {
+        display: grid;
+        border-top: 1px solid var(--rule);
+      }
+      .param {
+        display: grid;
+        grid-template-columns: auto auto minmax(0, 1fr);
+        gap: 4px 12px;
+        align-items: baseline;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--rule);
+        font-size: var(--step--1);
+      }
+      .param code {
+        font-weight: 700;
+      }
+      .param .type {
+        font-size: 0.68rem;
+        color: var(--pencil);
+        border: 1px solid var(--rule);
+        padding: 0 6px;
+      }
+      .param p {
+        grid-column: 1 / -1;
+        color: var(--pencil);
+      }
+      .docs-foot {
+        margin-top: 48px;
+        padding: 24px 0 0;
+        border-top: 1px solid var(--rule);
+        display: grid;
+        gap: 24px;
+      }
+      .helpful {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        font-size: var(--step--1);
+        color: var(--pencil);
+      }
+      .helpful button {
+        font: inherit;
+        font-size: var(--step--1);
+        border: 1px solid var(--rule);
+        background: transparent;
+        color: var(--ink);
+        padding: 2px 12px;
+        cursor: pointer;
+      }
+      .pager {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 14px;
+      }
+      .pager a {
+        border: 1px solid var(--rule);
+        padding: 12px 16px;
+        text-decoration: none;
+        color: var(--ink);
+        display: grid;
+        gap: 2px;
+        font-weight: 600;
+        transition: border-color 0.2s ease;
+      }
+      .pager a:hover {
+        border-color: var(--blue);
+      }
+      .pager a small {
+        font-weight: 400;
+        color: var(--pencil);
+        font-size: 0.7rem;
+      }
+      #pg-next {
+        text-align: right;
+        grid-column: 2;
+      }
+      .pager a[hidden] {
+        display: none;
+      }
+      #toc {
+        display: grid;
+        gap: 2px;
+        margin-top: 6px;
+      }
+      #toc a {
+        font-size: 0.74rem;
+        color: var(--pencil);
+        text-decoration: none;
+        padding: 4px 0 4px 10px;
+        border-left: 1px solid var(--rule);
+      }
+      #toc a.active {
+        color: var(--ink);
+        border-left: 2px solid var(--blue);
+      }
+      @media (max-width: 1100px) {
+        .docs {
+          grid-template-columns: 220px minmax(0, 1fr);
+        }
+        .docs-toc {
+          display: none;
+        }
       }
       @media (max-width: 760px) {
-        .foot-grid {
-          grid-template-columns: 1fr 1fr;
+        .docs {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0;
+          padding-inline: 16px;
         }
-        .foot-grid > :first-child {
-          grid-column: 1 / -1;
+        .docs-side {
+          position: static;
+          max-height: none;
+          padding-block: 20px 0;
+          border-bottom: 1px solid var(--rule);
+        }
+        .docs-nav {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 14px;
+          padding-bottom: 16px;
+        }
+        .cards {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      /* ---------- Load sequence ---------- */
+      @keyframes rise {
+        from {
+          opacity: 0.001;
+          transform: translateY(14px);
+        }
+      }
+      .js .hero .stack > * {
+        animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .js .hero .stack > *:nth-child(2) {
+        animation-delay: 0.08s;
+      }
+      .js .hero .stack > *:nth-child(3) {
+        animation-delay: 0.16s;
+      }
+      .js .hero .stack > *:nth-child(4) {
+        animation-delay: 0.24s;
+      }
+      .js .hero .stack > *:nth-child(5) {
+        animation-delay: 0.32s;
+      }
+      .js .hero .console {
+        animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
         }
       }
     </style>
   </head>
   <body>
-    <div class="announce">
-      <strong>New name</strong>Understudy is now <b>Cue</b>, published as
-      <code>@wiluszdamian/cue-cli</code>.
-      <a href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md"
-        >What changed →</a
-      >
-    </div>
-
-    <header class="nav">
-      <div class="wrap nav-inner">
-        <a class="logo" href="#top" aria-label="Cue home"
-          ><span class="logo-mark" aria-hidden="true">C</span>Cue</a
+    <header class="bar">
+      <div class="page">
+        <a class="wordmark" href="#top"
+          ><span class="lamp" id="bar-lamp" aria-hidden="true"></span>Cue</a
         >
-        <nav class="nav-links" aria-label="Primary">
-          <a href="#how">How it works</a>
+        <nav aria-label="Sections">
+          <a href="#running-order">Running order</a>
           <a href="#rules">Rules</a>
-          <a href="#map">App map</a>
-          <a href="#mcp">MCP</a>
+          <a href="#map">Map</a>
+          <a href="#who">Who decides</a>
           <a href="#faq">FAQ</a>
+          <a href="#docs" class="nav-docs">Docs</a>
         </nav>
-        <span class="nav-spacer"></span>
-        <button class="icon-btn" id="theme" type="button" aria-label="Toggle colour theme">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            aria-hidden="true"
+        <span class="spacer"></span>
+        <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+          <button
+            type="button"
+            role="radio"
+            data-theme-set="system"
+            aria-checked="true"
+            title="Follow system"
           >
-            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-          </svg>
-        </button>
-        <a class="btn btn-ghost" href="https://github.com/wiluszdamian/project-cue">GitHub</a>
-        <a class="btn btn-primary" href="#get-started">Get started</a>
+            Auto
+          </button>
+          <button
+            type="button"
+            role="radio"
+            data-theme-set="light"
+            aria-checked="false"
+            title="Light"
+          >
+            Light
+          </button>
+          <button
+            type="button"
+            role="radio"
+            data-theme-set="dark"
+            aria-checked="false"
+            title="Dark"
+          >
+            Dark
+          </button>
+        </div>
+        <a class="ghost hide-sm" href="https://github.com/wiluszdamian/project-cue">GitHub</a>
       </div>
     </header>
 
-    <main id="top">
-      <!-- ---------- Hero ---------- -->
-      <div class="hero">
-        <div class="wrap">
-          <span class="eyebrow">For Playwright teams using AI agents</span>
-          <h1>Playwright tests for you <em>and your agent</em></h1>
-          <p class="lead">
-            Cue teaches your AI agent the two things it can't know on its own: the rules your team
-            tests by, and what your application actually looks like. Rules it can't skip, selectors
-            that really exist.
-          </p>
-
-          <div class="install" id="get-started">
-            <div class="cmd">
-              <span class="prompt">$</span>
-              <code id="install-cmd">npx @wiluszdamian/cue-cli init</code>
-              <button class="copy" type="button" data-copy="install-cmd">Copy</button>
+    <div id="view-landing">
+      <main class="page" id="top">
+        <!-- ======== Hero ======== -->
+        <section class="hero">
+          <div class="stack">
+            <span class="label">Cue · for Playwright teams with AI agents</span>
+            <h1>
+              Your agent knows Playwright. <span class="soft">It doesn't know your app.</span>
+            </h1>
+            <p class="lede">
+              Cue gives it its cues: your team's testing rules as ESLint rules it can't talk past,
+              and a map of the routes and selectors your application really has.
+            </p>
+            <div class="stack" style="gap: 14px">
+              <div class="install">
+                <code id="cmd-install">npx @wiluszdamian/cue-cli init</code>
+                <button class="copy" type="button" data-copy="cmd-install">Copy</button>
+              </div>
+              <div class="meta-row">
+                <span>Node 22.13+</span><span>MIT</span><span>Runs locally</span
+                ><a href="#docs-quickstart">Quickstart →</a
+                ><a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli">npm ↗</a>
+              </div>
             </div>
-            <div class="hero-actions">
-              <a class="btn btn-ghost" href="https://github.com/wiluszdamian/project-cue#readme"
-                >Read the docs</a
-              >
-              <a class="btn btn-ghost" href="https://www.npmjs.com/package/@wiluszdamian/cue-cli"
-                >View on npm</a
-              >
-            </div>
-          </div>
-
-          <div class="agent-prompt">
-            <div>
-              <div class="label">Or hand it to your agent</div>
-              <p id="agent-prompt">
+            <div class="handoff">
+              <span class="label">Or hand your agent this line</span>
+              <p id="agent-line">
                 Set up Cue in this Playwright project: run npx @wiluszdamian/cue-cli init, show me
                 the plan before writing anything, then run npx @wiluszdamian/cue-cli doctor and fix
-                whatever it reports.
+                what it reports.
+              </p>
+              <button class="linkish" type="button" data-copy="agent-line">Copy the line</button>
+            </div>
+          </div>
+
+          <div
+            class="console"
+            id="console"
+            aria-label="Example session: Cue being installed, surveying a page, and blocking a bad test"
+          >
+            <div class="console-head">
+              <span class="lamp" id="console-lamp" aria-hidden="true"></span>
+              <span class="state" id="console-state">Standby</span>
+              <span>Calling the show</span>
+              <span class="spacer"></span>
+              <button type="button" id="replay">Replay</button>
+            </div>
+            <div class="script" id="script">
+              <div class="ln call standby" data-cue="standby">
+                <span class="who">SM</span><span class="txt">Standby cue 1.</span>
+              </div>
+              <div class="ln">
+                <span class="who">$</span><span>npx @wiluszdamian/cue-cli init</span>
+              </div>
+              <div class="ln call go" data-cue="go">
+                <span class="who">SM</span><span class="txt">Cue 1, go.</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span><span><span class="ok">create</span> AGENTS.md</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span><span class="ok">create</span> eslint.config.mjs</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span><span><span class="ok">create</span> .agent-kb/</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span
+                  ><span class="d">SKIP</span> playwright.config.ts
+                  <span class="d">yours, left alone</span></span
+                >
+              </div>
+              <div class="ln call standby" data-cue="standby">
+                <span class="who">SM</span><span class="txt">Standby cue 2.</span>
+              </div>
+              <div class="ln">
+                <span class="who">$</span><span>cue survey http://localhost:3000/login</span>
+              </div>
+              <div class="ln call go" data-cue="go">
+                <span class="who">SM</span><span class="txt">Cue 2, go.</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span
+                  ><span class="d">/login button</span>
+                  <span class="hl">getByRole('button', { name: 'Log in' })</span></span
+                >
+              </div>
+              <div class="ln call standby" data-cue="standby">
+                <span class="who">SM</span><span class="txt">Standby cue 3.</span>
+              </div>
+              <div class="ln">
+                <span class="who">you</span><span>write a test for a locked-out login</span>
+              </div>
+              <div class="ln call go" data-cue="go">
+                <span class="who">SM</span><span class="txt">Cue 3, go.</span>
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span
+                  ><span class="bad">✗ no-hard-waits</span>
+                  <span class="d">waitForTimeout waits on the clock,</span></span
+                >
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span><span class="d"> not on the app. Use await expect(locator)…</span></span>
+              </div>
+              <div class="ln">
+                <span class="who"></span
+                ><span><span class="ok">✓ rewritten · eslint: 0 problems</span></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======== The gap ======== -->
+        <section class="leaf" id="gap">
+          <aside class="margin">
+            <span class="note">Pencil note, rehearsal 1: the agent improvised.</span>
+          </aside>
+          <div class="body stack">
+            <h2>A reasonable test, for some other project.</h2>
+            <p class="lede">
+              Ask an agent for a Playwright test and it writes what it has seen a thousand times. It
+              invents selectors your app doesn't have and skips the conventions your team agreed on,
+              because it has never seen your repo or your application.
+            </p>
+            <div class="two">
+              <div class="correction pending" data-reveal>
+                <span class="label">Selector</span>
+                <code class="wrong">page.locator('#btn-submit-2')</code>
+                <code class="right">getByRole('button', { name: 'Log in' })</code>
+                <p class="why">From .agent-kb/, recorded on /login after actually looking.</p>
+              </div>
+              <div class="correction pending" data-reveal>
+                <span class="label">Waiting</span>
+                <code class="wrong">await page.waitForTimeout(3000)</code>
+                <code class="right">await expect(alert).toBeVisible()</code>
+                <p class="why">From no-hard-waits, enforced by ESLint on every save and push.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======== Running order ======== -->
+        <section class="leaf" id="running-order">
+          <aside class="margin">
+            <span class="cue-no">1–4</span>
+            <span>The running order. Cues are called in this sequence.</span>
+          </aside>
+          <div class="body stack">
+            <h2>The running order</h2>
+            <p class="lede">
+              Four cues from an untouched repo to a test your team would sign off. The last one runs
+              in CI with no agent in the room.
+            </p>
+            <div class="sheet-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cue</th>
+                    <th>Called when</th>
+                    <th>Command</th>
+                    <th>What happens</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="no">1</td>
+                    <td>Once per repo</td>
+                    <td><code>npx @wiluszdamian/cue-cli init</code></td>
+                    <td>
+                      Detects your agents, prints a plan and writes nothing until you say yes.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="no">2</td>
+                    <td>Per route, when it changes</td>
+                    <td><code>cue survey &lt;url&gt;</code></td>
+                    <td>
+                      Records what is really on the page into <code>.agent-kb/</code>, with a date.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="no">3</td>
+                    <td>Whenever you want a test</td>
+                    <td>Ask your agent</td>
+                    <td>
+                      It reads the rules and the map on its own and looks selectors up instead of
+                      guessing.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="no">4</td>
+                    <td>Every push</td>
+                    <td><code>eslint . &amp;&amp; cue verify --ci</code></td>
+                    <td>A broken rule fails the build. Map drift fails the check.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======== Rules ======== -->
+        <section class="leaf" id="rules">
+          <aside class="margin">
+            <span class="note"
+              >The book is law. A document is a suggestion; a red build is not.</span
+            >
+          </aside>
+          <div class="body stack">
+            <h2>Rules your agent can't talk past</h2>
+            <p class="lede">
+              Your conventions ship as real ESLint rules. Every message says what is wrong, why, and
+              what to write instead, because "violates rule" teaches an agent to route around it and
+              naming the replacement teaches it to fix the test.
+            </p>
+            <pre class="lint"><span class="d">tests/checkout.spec.ts</span>
+  <span class="d">14:3</span>  <span class="bad">error</span>  <span class="hl">no-hard-waits</span>
+
+  waitForTimeout waits on the clock, not on the app. Wait on the
+  state you actually care about with a web-first assertion, which
+  retries until the condition holds: <span class="ok">await expect(locator).toBeVisible()</span>,
+  <span class="ok">.toHaveText()</span>, <span class="ok">.toBeEnabled()</span>. For a network round-trip, use
+  <span class="ok">await page.waitForResponse(...)</span>.
+
+<span class="bad">✗ 1 problem</span></pre>
+            <div class="stack" style="gap: 10px">
+              <span class="label">Eleven rules, ten enforced automatically</span>
+              <ul class="rule-list">
+                <li><span>no-hard-waits</span><span>enforced</span></li>
+                <li><span>web-first-assertions</span><span>enforced</span></li>
+                <li><span>no-raw-selectors</span><span>enforced</span></li>
+                <li><span>no-locators-in-tests</span><span>enforced</span></li>
+                <li><span>strict-zod-objects</span><span>enforced</span></li>
+                <li><span>no-focused-tests</span><span>enforced</span></li>
+                <li><span>skips-need-a-reason</span><span>enforced</span></li>
+                <li><span>require-test-tags</span><span>enforced</span></li>
+                <li><span>no-explicit-any</span><span>enforced</span></li>
+                <li><span>no-hardcoded-urls</span><span>enforced</span></li>
+                <li><span>selectors-from-agent-kb</span><span>review only</span></li>
+              </ul>
+              <p style="color: var(--pencil); font-size: var(--step--1)">
+                They live in one YAML file. Change it and the ESLint rules, the docs and the agent
+                instructions update together. <code>cue explain no-hard-waits</code> prints the
+                reasoning for any rule.
               </p>
             </div>
-            <button class="copy" type="button" data-copy="agent-prompt">Copy prompt</button>
           </div>
+        </section>
 
-          <div class="terminal" role="img" aria-label="Terminal output of cue-cli init">
-            <div class="terminal-bar">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-              <span>~/shop-e2e</span>
+        <!-- ======== Map ======== -->
+        <section class="leaf" id="map">
+          <aside class="margin">
+            <span class="note">Blocking notes: where everything actually stands on stage.</span>
+          </aside>
+          <div class="body stack">
+            <h2>A map of the app, with a date on every entry</h2>
+            <p class="lede">
+              Cue writes down what is on each page after actually looking, and cross-checks it
+              against your source. Every entry can answer one question: why does Cue believe this?
+            </p>
+            <div class="two">
+              <pre class="lint"><span class="d">$ cue locator "Log in" --route /login</span>
+
+Route:      /login
+Locator:    <span class="hl">getByRole('button', { name: 'Log in' })</span>
+Test id:    login-submit
+Confidence: <span class="ok">confirmed</span>
+            Present in the product source
+            and seen running.
+Freshness:  <span class="ok">fresh</span></pre>
+              <div class="stack" style="gap: 14px; align-content: start">
+                <p>
+                  <strong>Confidence</strong> says whether a locator was confirmed in source and at
+                  runtime, seen only at runtime, or found only in code. The agent knows which ones
+                  may move.
+                </p>
+                <p>
+                  <strong>Unknown means unknown.</strong> With no entry, Cue says so and names the
+                  command that fills the gap. It never hands back a plausible guess.
+                </p>
+                <p>
+                  <strong>Verify</strong> reports exactly what it checked against the running app:
+                </p>
+                <div class="verdicts">
+                  <span class="verdict v-pass">PASS</span>
+                  <span class="verdict v-other">PARTIAL</span>
+                  <span class="verdict v-other">NOT VERIFIED</span>
+                  <span class="verdict v-fail">FAIL</span>
+                  <span class="verdict v-other">EMPTY</span>
+                </div>
+              </div>
             </div>
-            <pre><span class="t-acc">$</span> npx @wiluszdamian/cue-cli init
-<span class="t-dim">Targets: claude-code, cursor</span>
-<span class="t-dim">Detected in this project: claude-code, cursor</span>
-
-  <span class="t-ok">create  </span> AGENTS.md
-            <span class="t-dim">the conventions, in the file every agent reads on its own</span>
-  <span class="t-ok">create  </span> eslint.config.mjs
-            <span class="t-dim">the same conventions as ESLint rules, so CI enforces them</span>
-  <span class="t-ok">create  </span> .agent-kb/
-            <span class="t-dim">what your application actually looks like</span>
-  <span class="t-warn">SKIP    </span> playwright.config.ts
-            <span class="t-dim">this file already exists and is not ours — left alone</span>
-
-<span class="t-fn">?</span> Apply this plan? <span class="t-dim">(y/N)</span> <span class="t-ok">y</span></pre>
           </div>
+        </section>
 
-          <div class="agents">
-            Works with the agent you already use
-            <ul>
-              <li>Claude Code</li>
-              <li>Cursor</li>
-              <li>Codex</li>
-              <li>Grok</li>
-              <li>Gemini CLI</li>
-              <li>OpenCode</li>
+        <!-- ======== Who decides ======== -->
+        <section class="leaf" id="who">
+          <aside class="margin">
+            <span class="note">One voice calls the show. Everyone else takes the cue.</span>
+          </aside>
+          <div class="body stack">
+            <h2>Cue doesn't teach Playwright. It decides who does.</h2>
+            <p class="lede">
+              Your agent may load Microsoft's Playwright skills, Playwright MCP and a community
+              reference skill. None of them knows the others exist. Cue installs them and adds one
+              table that says which source wins on each topic.
+            </p>
+            <div class="sheet-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Topic</th>
+                    <th>Decided by</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Page objects, locator strategy, test structure, tagging</td>
+                    <td><code>cue</code> <span class="wins">wins</span></td>
+                  </tr>
+                  <tr>
+                    <td>Your app's selectors, routes and vocabulary</td>
+                    <td><code>agent-kb</code> <span class="wins">wins</span></td>
+                  </tr>
+                  <tr>
+                    <td>Running, debugging, tracing, reports</td>
+                    <td><code>playwright-official</code></td>
+                  </tr>
+                  <tr>
+                    <td>Single scripted browser actions</td>
+                    <td><code>playwright-mcp</code></td>
+                  </tr>
+                  <tr>
+                    <td>Accessibility, visual regression, Electron</td>
+                    <td><code>reference-skill</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <span class="label" style="margin-top: 14px">Three lookups over MCP, read-only</span>
+            <ul class="tools">
+              <li>
+                <code>explain_rule</code>
+                <span
+                  >Why a rule exists and what to write instead.<span class="ans"
+                    >explain_rule("no-hard-waits")</span
+                  ></span
+                >
+              </li>
+              <li>
+                <code>resolve_owner</code>
+                <span
+                  >Which source wins on a topic.<span class="ans"
+                    >resolve_owner("test data strategy") → cue</span
+                  ></span
+                >
+              </li>
+              <li>
+                <code>resolve_locator</code>
+                <span
+                  >A real selector, with confidence and freshness.<span class="ans"
+                    >resolve_locator("Log in", "/login")</span
+                  ></span
+                >
+              </li>
             </ul>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <!-- ---------- How it works ---------- -->
-      <section class="alt" id="how">
-        <div class="wrap">
-          <div class="section-head">
-            <span class="eyebrow">How it works</span>
-            <h2>From an empty repo to a test your team would write</h2>
-            <p>
-              Ask an agent for a Playwright test and you get a reasonable test for some other
-              project. Cue closes that gap in four steps, and the last one doesn't need an agent at
-              all.
-            </p>
-          </div>
-          <div class="steps">
-            <div class="step">
-              <span class="step-num">1</span>
-              <h3>Install once</h3>
-              <p>
-                Cue detects your agents, shows a plan, and writes nothing until you say yes. Running
-                it twice changes nothing.
-              </p>
-              <code class="inline">npx @wiluszdamian/cue-cli init</code>
-            </div>
-            <div class="step">
-              <span class="step-num">2</span>
-              <h3>Map your app</h3>
-              <p>
-                Survey a live route and Cue records what is really on the page: the button is called
-                "Log in", not <code>#btn-submit-2</code>.
-              </p>
-              <code class="inline">cue survey http://localhost:3000/login</code>
-            </div>
-            <div class="step">
-              <span class="step-num">3</span>
-              <h3>Ask for a test</h3>
-              <p>
-                Your agent reads the rules and the map on its own, and looks selectors up instead of
-                guessing them.
-              </p>
-              <code class="inline">cue locator "Log in" --route /login</code>
-            </div>
-            <div class="step">
-              <span class="step-num">4</span>
-              <h3>CI holds the line</h3>
-              <p>
-                The same conventions run as ESLint rules. A test that breaks one fails the build, in
-                CI and in the editor, with or without an agent.
-              </p>
-              <code class="inline">eslint . &amp;&amp; cue verify --ci</code>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- Rules ---------- -->
-      <section id="rules">
-        <div class="wrap split">
-          <div>
-            <span class="eyebrow">Rules your agent cannot ignore</span>
-            <h2>A document is a suggestion. A failing build is not.</h2>
-            <p class="lead" style="margin: 0; text-align: left; font-size: 18px">
-              An agent can talk itself past a style guide. It cannot talk itself past a red build.
-              Cue ships your conventions as real ESLint rules, and every message says what is wrong,
-              why, and what to write instead.
-            </p>
-            <ul class="points">
+        <!-- ======== House rules ======== -->
+        <section class="leaf">
+          <aside class="margin">
+            <span class="note">House rules. Posted by the stage door.</span>
+          </aside>
+          <div class="body stack">
+            <h2>Your repo stays yours</h2>
+            <ul class="house">
               <li>
-                <span
-                  ><strong>Messages written for a model.</strong> "Violates rule" teaches an agent
-                  to route around it; naming the replacement teaches it to fix the test.</span
-                >
+                <h3>Running init twice changes nothing</h3>
+                <p>Every write goes through a plan you can read first.</p>
               </li>
               <li>
-                <span
-                  ><strong>One source of truth.</strong> The rules live in one file. Change it and
-                  the ESLint rules, the docs and the agent instructions all update together.</span
-                >
+                <h3>Your edits are never overwritten</h3>
+                <p>
+                  A file you changed by hand is reported and left alone. Existing files are touched
+                  only inside a marked region.
+                </p>
               </li>
               <li>
-                <span
-                  ><strong>Ask any rule why.</strong> <code>cue explain no-hard-waits</code> prints
-                  the reason and the alternative.</span
-                >
+                <h3>Uninstall is exact</h3>
+                <p>
+                  Removal reverses what was installed from a recorded manifest, not from guesswork.
+                </p>
               </li>
             </ul>
           </div>
-          <div>
-            <div class="code-card">
-              <div class="tab"><span>tests/checkout.spec.ts</span><span>ESLint</span></div>
-              <pre><span class="t-fn">test</span>(<span class="t-ok">'pays with a saved card'</span>, <span class="t-acc">async</span> ({ checkout }) =&gt; {
-  <span class="t-acc">await</span> checkout.<span class="t-fn">payWithSavedCard</span>();
-<span class="err-line">  <span class="t-acc">await</span> page.<span class="t-fn">waitForTimeout</span>(<span class="t-warn">3000</span>);</span>  <span class="t-acc">await</span> <span class="t-fn">expect</span>(checkout.confirmation).<span class="t-fn">toBeVisible</span>();
-});</pre>
-            </div>
-            <div class="code-card">
-              <div class="tab"><span>Problems</span><span class="t-acc">1 error</span></div>
-              <pre><span class="t-acc">error</span>  <span class="t-dim">no-hard-waits</span>
-waitForTimeout waits on the clock, not on the app.
-Wait on the state you actually care about with a
-web-first assertion, which retries until the
-condition holds: <span class="t-ok">await expect(locator).toBeVisible()</span>,
-<span class="t-ok">.toHaveText()</span>, <span class="t-ok">.toBeEnabled()</span>. For a network
-round-trip, use <span class="t-ok">await page.waitForResponse(...)</span>.</pre>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="alt" style="padding: 72px 0">
-        <div class="wrap">
-          <div class="section-head center">
-            <span class="eyebrow">Eleven rules, ten enforced automatically</span>
-            <h2>The conventions, out of the box</h2>
-            <p>Start with these, then edit one YAML file to make them yours.</p>
+        <!-- ======== Not proven ======== -->
+        <section class="leaf">
+          <aside class="margin">
+            <span class="note">Previews, not opening night.</span>
+          </aside>
+          <div class="body stack">
+            <h2>Does it make agents write better tests? Not measured yet.</h2>
+            <p class="lede">
+              Cue includes a harness that records and scores agent runs. No benchmark has been run,
+              so we don't claim better tests. What you can check today is the mechanism: rules that
+              fail the build, and selectors verified against the running app. The numbers will go
+              here when they exist, whatever they say.
+            </p>
           </div>
-          <div class="rules">
-            <span class="chip">no-hard-waits</span>
-            <span class="chip">web-first-assertions</span>
-            <span class="chip">no-raw-selectors</span>
-            <span class="chip">no-locators-in-tests</span>
-            <span class="chip">strict-zod-objects</span>
-            <span class="chip">no-focused-tests</span>
-            <span class="chip">skips-need-a-reason</span>
-            <span class="chip">require-test-tags</span>
-            <span class="chip">no-explicit-any</span>
-            <span class="chip">no-hardcoded-urls</span>
-            <span class="chip review" title="Documented, reviewed by humans, never reported"
-              >selectors-from-agent-kb · review only</span
+        </section>
+
+        <!-- ======== FAQ ======== -->
+        <section class="leaf" id="faq">
+          <aside class="margin">
+            <span class="note">Questions from the house.</span>
+          </aside>
+          <div class="body">
+            <h2>Questions</h2>
+            <details>
+              <summary>Do I need an AI agent to use it?</summary>
+              <p>
+                No. The ESLint rules work on their own, in CI and in your editor, and catch the same
+                mistakes from people.
+              </p>
+            </details>
+            <details>
+              <summary>Which agents does it set up?</summary>
+              <p>
+                Claude Code, Cursor, Codex, Grok, Gemini CLI and OpenCode. Every agent reads
+                <code>AGENTS.md</code>, so the baseline applies even to one Cue doesn't detect.
+              </p>
+            </details>
+            <details>
+              <summary>Does it work on an existing, messy suite?</summary>
+              <p>
+                That's the main target. Cue leaves files it doesn't own alone, and the map is useful
+                long before the whole app is surveyed.
+              </p>
+            </details>
+            <details>
+              <summary>Why the long package name?</summary>
+              <p>
+                Always install the scoped <code>@wiluszdamian/cue-cli</code>. An unscoped name run
+                through <code>npx</code> can fetch an unrelated package. Once installed, the short
+                <code>cue</code> command is enough.
+              </p>
+            </details>
+            <details>
+              <summary>Does anything leave my machine?</summary>
+              <p>
+                No. The CLI, the ESLint plugin, the map and the MCP server all run locally. There is
+                no hosted service.
+              </p>
+            </details>
+          </div>
+        </section>
+
+        <!-- ======== Finale ======== -->
+        <section class="finale">
+          <span class="label">Final call</span>
+          <h2>Places, please.</h2>
+          <div class="install">
+            <code id="cmd-install-2">npx @wiluszdamian/cue-cli init</code>
+            <button class="copy" type="button" data-copy="cmd-install-2">Copy</button>
+          </div>
+          <p style="color: var(--pencil)">A plan first. Nothing written until you say yes.</p>
+        </section>
+      </main>
+
+      <footer>
+        <div class="page">
+          <span>Cue · MIT licensed · Built on Playwright, not affiliated with Microsoft</span>
+          <nav aria-label="Footer">
+            <a href="https://github.com/wiluszdamian/project-cue">GitHub</a>
+            <a href="#docs">Docs</a>
+            <a href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md"
+              >Changelog</a
+            >
+            <a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli">npm</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <div id="view-docs" class="docs" hidden>
+      <aside class="docs-side" aria-label="Documentation">
+        <label class="search" for="docs-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="docs-search" type="search" placeholder="Search docs" autocomplete="off" />
+          <kbd>/</kbd>
+        </label>
+        <nav class="docs-nav" id="docs-nav">
+          <div class="group">
+            <span class="group-title">Getting started</span>
+            <a href="#docs-intro" data-page="intro">Introduction</a>
+            <a href="#docs-quickstart" data-page="quickstart">Quickstart</a>
+            <a href="#docs-agents" data-page="agents">Set up your agent</a>
+          </div>
+          <div class="group">
+            <span class="group-title">Your application</span>
+            <a href="#docs-survey" data-page="survey">Teach it your app</a>
+            <a href="#docs-verify" data-page="verify">Keep the map current</a>
+          </div>
+          <div class="group">
+            <span class="group-title">Reference</span>
+            <a href="#docs-commands" data-page="commands">Commands</a>
+            <a href="#docs-rules" data-page="rules">Rules</a>
+            <a href="#docs-owners" data-page="owners">Who decides what</a>
+          </div>
+          <p class="no-hits" id="no-hits" hidden>No page matches.</p>
+        </nav>
+      </aside>
+
+      <div class="docs-main" id="docs-main">
+        <!-- ===== Introduction ===== -->
+        <article data-doc="intro" data-title="Introduction" data-group="Getting started">
+          <span class="crumb">Getting started</span>
+          <h1>Introduction</h1>
+          <p class="desc">
+            Cue helps you and your AI agent write Playwright tests that match how your team already
+            works.
+          </p>
+          <p>
+            If you have asked an agent for a test and got back something that looked right but used
+            a button that doesn't exist, or ignored every convention in your project, Cue is built
+            for that problem.
+          </p>
+          <h2 id="intro-two">The two things it does</h2>
+          <div class="cards">
+            <a class="dcard" href="#docs-rules"
+              ><strong>Checks your tests</strong
+              ><span
+                >Rules that run on every save and every push. A test that breaks one fails the
+                build, not the code review.</span
+              ></a
+            >
+            <a class="dcard" href="#docs-survey"
+              ><strong>Learns your app</strong
+              ><span
+                >It visits your app, writes down what is on each page and remembers, so nobody
+                guesses what a button is called.</span
+              ></a
             >
           </div>
-        </div>
-      </section>
-
-      <!-- ---------- App map ---------- -->
-      <section id="map">
-        <div class="wrap split reverse">
-          <div>
-            <span class="eyebrow">A map of your actual application</span>
-            <h2>Selectors that exist, with a date attached</h2>
-            <p class="lead" style="margin: 0; text-align: left; font-size: 18px">
-              Cue writes down what is on each page after actually looking, and reads your product
-              source to cross-check it. Every fact can answer the question "why does Cue believe
-              this?".
-            </p>
-            <ul class="points">
-              <li>
-                <span
-                  ><strong>Confidence you can read.</strong> Confirmed in source and seen running,
-                  runtime-only, or code-only: the agent knows which locators may move.</span
-                >
-              </li>
-              <li>
-                <span
-                  ><strong>Freshness, not folklore.</strong> Knowledge ages. Stale routes are
-                  re-surveyed one at a time instead of re-crawling the whole app.</span
-                >
-              </li>
-              <li>
-                <span
-                  ><strong>Unknown means unknown.</strong> When there is no entry, Cue says so and
-                  tells the agent which command fills the gap. It never guesses.</span
-                >
-              </li>
-            </ul>
-            <div class="verdicts" aria-label="Verify verdicts">
-              <span class="chip pass">PASS</span>
-              <span class="chip partial">PARTIAL</span>
-              <span class="chip">NOT VERIFIED</span>
-              <span class="chip fail">FAIL</span>
-              <span class="chip">EMPTY</span>
-            </div>
-          </div>
-          <div class="code-card">
-            <div class="tab"><span>cue locator "Log in" --route /login</span></div>
-            <pre><span class="t-dim">Route:     </span> /login
-<span class="t-dim">Locator:   </span> <span class="t-ok">getByRole('button', { name: 'Log in' })</span>
-<span class="t-dim">Test id:   </span> login-submit
-<span class="t-dim">Confidence:</span> <span class="t-fn">confirmed</span> — Present in the product source
-            and seen running.
-<span class="t-dim">Freshness: </span> <span class="t-fn">fresh</span>
-
-<span class="t-dim">Other matches on this route:</span>
-  getByRole('link', { name: 'Forgot password?' })</pre>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- MCP ---------- -->
-      <section class="alt" id="mcp">
-        <div class="wrap split">
-          <div>
-            <span class="eyebrow">Built for agents</span>
-            <h2>Every install ships an MCP server</h2>
-            <p class="lead" style="margin: 0; text-align: left; font-size: 18px">
-              Three read-only lookups, small enough to answer a question without eating the context
-              your agent needs for the real task. It runs next to Playwright MCP, not instead of it.
-            </p>
-            <ul class="points">
-              <li>
-                <span
-                  ><strong><code>explain_rule</code></strong> — why a rule exists, and what to write
-                  instead.</span
-                >
-              </li>
-              <li>
-                <span
-                  ><strong><code>resolve_owner</code></strong> — which source of advice wins on a
-                  topic.</span
-                >
-              </li>
-              <li>
-                <span
-                  ><strong><code>resolve_locator</code></strong> — a real selector, with confidence
-                  and freshness.</span
-                >
-              </li>
-            </ul>
-          </div>
-          <div class="chat" aria-label="Example agent conversation">
-            <div class="msg user">Write a test that a locked-out user sees an error on login.</div>
-            <div class="tool">
-              <b>resolve_locator</b>("Log in", route: "/login") → getByRole('button', { name: 'Log
-              in' }) · confirmed · fresh
-            </div>
-            <div class="tool"><b>resolve_owner</b>("test data strategy") → cue (wins)</div>
-            <div class="tool">
-              <b>explain_rule</b>("require-test-tags") → every test carries a canonical tag from
-              rules/tags.yaml
-            </div>
-            <div class="msg agent">
-              Added <code>tests/login.spec.ts</code> using the <code>LoginPage</code> object and the
-              surveyed locators, tagged <code>@auth</code>. ESLint passes.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- Ownership ---------- -->
-      <section id="owners">
-        <div class="wrap">
-          <div class="section-head">
-            <span class="eyebrow">A tie-breaker for your agent</span>
-            <h2>Cue doesn't teach Playwright. It decides who does.</h2>
+          <h2 id="intro-guessing">Why guessing is the expensive part</h2>
+          <p>
+            An agent has never seen your app. Ask it for the log-in button and it invents something
+            plausible, like <code>#login-btn</code>. The test then fails as if your app were broken,
+            and somebody spends an afternoon debugging a login page that works.
+          </p>
+          <div class="callout note">
+            <strong>Note</strong>
             <p>
-              Your agent loads Microsoft's official Playwright skills, Playwright MCP and a
-              community reference skill. None of them knows the others exist, so when they disagree
-              it picks one more or less at random. Cue installs all three and adds one table that
-              says which source wins.
+              When something isn't in the map, Cue says "I don't know, go and look" instead of
+              guessing. That refusal is the point.
             </p>
           </div>
-          <div class="table-scroll">
-            <table class="owners">
+          <h2 id="intro-isnt">What it isn't</h2>
+          <ul>
+            <li>
+              <strong>Not a Playwright tutorial.</strong> Playwright's own docs are kept current by
+              the people who build it. Cue points you at them.
+            </li>
+            <li>
+              <strong>Not a replacement for your process.</strong> It has opinions about tests, none
+              about your roadmap or tickets.
+            </li>
+            <li>
+              <strong>Not magic.</strong> It stops an agent from inventing details it doesn't have.
+              It can't explain a feature nobody has explained.
+            </li>
+          </ul>
+        </article>
+
+        <!-- ===== Quickstart ===== -->
+        <article data-doc="quickstart" data-title="Quickstart" data-group="Getting started" hidden>
+          <span class="crumb">Getting started</span>
+          <h1>Quickstart</h1>
+          <p class="desc">Add Cue to a Playwright project in about five minutes.</p>
+          <h2 id="qs-before">Before you start</h2>
+          <p>
+            You need Node.js 22.13 or newer. Cue works with npm, pnpm, yarn and bun and detects
+            which one you use.
+          </p>
+          <h2 id="qs-steps">Set it up</h2>
+          <ol class="steps">
+            <li>
+              <h3>Run init</h3>
+              <p>
+                From the folder your tests live in, or will live in. It finds your agents, lists
+                every file it wants to create and why, and waits. Nothing is written until you say
+                yes.
+              </p>
+              <div class="codegroup" data-tabs>
+                <div class="tabs" role="tablist">
+                  <button type="button" role="tab" aria-selected="true">npm</button>
+                  <button type="button" role="tab" aria-selected="false">pnpm</button>
+                  <button type="button" role="tab" aria-selected="false">yarn</button>
+                  <button type="button" role="tab" aria-selected="false">bun</button>
+                </div>
+                <pre><code>npx @wiluszdamian/cue-cli init</code></pre>
+                <pre hidden><code>pnpm dlx @wiluszdamian/cue-cli init</code></pre>
+                <pre hidden><code>yarn dlx @wiluszdamian/cue-cli init</code></pre>
+                <pre hidden><code>bunx @wiluszdamian/cue-cli init</code></pre>
+              </div>
+            </li>
+            <li>
+              <h3>Finish the install</h3>
+              <p>
+                <code>init</code> prints the remaining steps for your package manager, usually the
+                dev dependencies and the browsers.
+              </p>
+              <pre class="code"><code>npx playwright install</code></pre>
+            </li>
+            <li>
+              <h3>Check the wiring</h3>
+              <p>
+                Every problem <code>doctor</code> reports comes with the exact command that fixes
+                it.
+              </p>
+              <pre class="code"><code>npx @wiluszdamian/cue-cli doctor</code></pre>
+            </li>
+            <li>
+              <h3>Survey a page, then ask for a test</h3>
+              <p>
+                Map the pages your tests touch, then ask your agent. It reads the rules and the map
+                on its own.
+              </p>
+              <pre class="code"><code>cue survey http://localhost:3000/login</code></pre>
+            </li>
+          </ol>
+          <h2 id="qs-files">What you get</h2>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>What it's for</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>AGENTS.md</code></td>
+                  <td>The house rules, in the file every agent reads on its own</td>
+                </tr>
+                <tr>
+                  <td><code>eslint.config.mjs</code></td>
+                  <td>Turns the rules into checks that run</td>
+                </tr>
+                <tr>
+                  <td><code>tests/</code>, <code>pages/</code>, <code>fixtures/</code></td>
+                  <td>Where things go, with a working example of each</td>
+                </tr>
+                <tr>
+                  <td><code>.agent-kb/</code></td>
+                  <td>Where knowledge about your app is stored</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout tip">
+            <strong>Tip</strong>
+            <p>
+              Already have a suite and only want the rules? Run <code>init --bare</code> to skip the
+              folder layout.
+            </p>
+          </div>
+        </article>
+
+        <!-- ===== Agents ===== -->
+        <article
+          data-doc="agents"
+          data-title="Set up your agent"
+          data-group="Getting started"
+          hidden
+        >
+          <span class="crumb">Getting started</span>
+          <h1>Set up your agent</h1>
+          <p class="desc">
+            Cue wires itself into the agents it finds. You can add or remove one at any time.
+          </p>
+          <h2 id="ag-supported">Supported agents</h2>
+          <div class="chips">
+            <span>Claude Code</span><span>Cursor</span><span>Codex</span><span>Grok</span
+            ><span>Gemini CLI</span><span>OpenCode</span>
+          </div>
+          <p>
+            Every agent reads <code>AGENTS.md</code>, so the baseline applies even to an agent Cue
+            doesn't detect.
+          </p>
+          <h2 id="ag-manage">Add or remove one</h2>
+          <pre class="code"><code>cue add cursor
+cue remove cursor
+cue list</code></pre>
+          <h2 id="ag-catalog">Just the conventions</h2>
+          <p>
+            The skill catalog installs without the CLI. The difference is what happens when an agent
+            ignores the advice: with the catalog alone, nothing; with the ESLint preset, the build
+            fails.
+          </p>
+          <div class="callout warn">
+            <strong>Warning</strong>
+            <p>
+              Always run the scoped name, <code>@wiluszdamian/cue-cli</code>. An unscoped name
+              through <code>npx</code> can fetch an unrelated package.
+            </p>
+          </div>
+        </article>
+
+        <!-- ===== Survey ===== -->
+        <article
+          data-doc="survey"
+          data-title="Teach it your app"
+          data-group="Your application"
+          hidden
+        >
+          <span class="crumb">Your application</span>
+          <h1>Teach it your app</h1>
+          <p class="desc">Let Cue visit your app and write down what is actually there.</p>
+          <h2 id="sv-survey">Survey a page</h2>
+          <pre class="code"><code>cue survey http://localhost:3000/login</code></pre>
+          <p>It opens the page, notes everything you can interact with, and saves it:</p>
+          <div class="codegroup">
+            <div class="tabs"><span class="filename">.agent-kb/app-map/login.yaml</span></div>
+            <pre><code>route: /login
+title: Sign in
+verifiedAt: 2026-09-10T18:39:26.471Z
+elements:
+  - role: button
+    name: Log in
+    locator: "getByRole('button', { name: 'Log in' })"
+    confidence: runtime-only
+links:
+  - name: Forgot password?
+    href: /forgot</code></pre>
+          </div>
+          <div class="callout warn">
+            <strong>Warning</strong>
+            <p>Point it at a development or staging environment, never production.</p>
+          </div>
+          <h2 id="sv-lookup">Look things up</h2>
+          <pre class="code"><code>cue locator "log in button"</code></pre>
+          <p>
+            When there is no entry, Cue refuses and names the command that fills the gap. A tool
+            that guesses here is worse than no tool.
+          </p>
+          <h2 id="sv-confidence">Confidence</h2>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>confirmed</code></td>
+                  <td>In your app's code and seen on the page.</td>
+                </tr>
+                <tr>
+                  <td><code>runtime-only</code></td>
+                  <td>
+                    Seen on the page, not found in your code. It may come from a library and may
+                    move.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>code-only</code></td>
+                  <td>In your code, never seen. It may be dead or behind a feature flag.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout note">
+            <strong>Note</strong>
+            <p>
+              Commit <code>.agent-kb/</code>. Values that look like passwords, tokens or email
+              addresses are stripped before writing, but read the first commit anyway.
+            </p>
+          </div>
+        </article>
+
+        <!-- ===== Verify ===== -->
+        <article
+          data-doc="verify"
+          data-title="Keep the map current"
+          data-group="Your application"
+          hidden
+        >
+          <span class="crumb">Your application</span>
+          <h1>Keep the map current</h1>
+          <p class="desc">
+            Apps change. <code>verify</code> checks the map against the running app and says plainly
+            what it did not check.
+          </p>
+          <h2 id="vf-run">Run it</h2>
+          <pre class="code"><code>cue verify --base-url http://localhost:3000</code></pre>
+          <h2 id="vf-verdicts">Verdicts</h2>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Verdict</th>
+                  <th>Means</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>PASS</code></td>
+                  <td>Every route was checked and matches.</td>
+                </tr>
+                <tr>
+                  <td><code>PARTIAL</code></td>
+                  <td>Some routes were checked; the rest were not.</td>
+                </tr>
+                <tr>
+                  <td><code>NOT VERIFIED</code></td>
+                  <td>Nothing was looked at, for example no <code>--base-url</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>FAIL</code></td>
+                  <td>Drift, an unreachable route or an unreadable file.</td>
+                </tr>
+                <tr>
+                  <td><code>EMPTY</code></td>
+                  <td>Nothing has been surveyed yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h2 id="vf-ci">In CI</h2>
+          <p>
+            <code>--ci</code> exits 1 on <code>FAIL</code> only. <code>--ci=strict</code> exits 1
+            unless the verdict is <code>PASS</code>, so "nobody looked" is never a green build.
+          </p>
+          <pre class="code"><code>cue verify --base-url $STAGING_URL --ci=strict</code></pre>
+          <h2 id="vf-refresh">Re-survey one route</h2>
+          <p>
+            When a single route is stale, survey that route again instead of crawling the whole app.
+          </p>
+        </article>
+
+        <!-- ===== Commands ===== -->
+        <article data-doc="commands" data-title="Commands" data-group="Reference" hidden>
+          <span class="crumb">Reference</span>
+          <h1>Commands</h1>
+          <p class="desc">Every command, with what it is for.</p>
+          <h2 id="cmd-init"><code>init</code></h2>
+          <p>
+            Sets up a project. Shows the plan first and waits for a yes. Without a terminal it
+            applies nothing unless you pass <code>--yes</code>.
+          </p>
+          <div class="params">
+            <div class="param">
+              <code>--target &lt;a,b&gt;</code><span class="type">string</span>
+              <p>Set up for specific agents.</p>
+            </div>
+            <div class="param">
+              <code>--bare</code><span class="type">flag</span>
+              <p>Skip the Playwright folder layout.</p>
+            </div>
+            <div class="param">
+              <code>--yes</code><span class="type">flag</span>
+              <p>Do not ask. Required without a terminal.</p>
+            </div>
+            <div class="param">
+              <code>--force</code><span class="type">flag</span>
+              <p>Overwrite files you edited. Use with care.</p>
+            </div>
+          </div>
+          <h2 id="cmd-doctor"><code>doctor</code></h2>
+          <p>
+            Checks everything is wired up. <code>--ci</code> fails on errors;
+            <code>--offline</code> skips network checks.
+          </p>
+          <h2 id="cmd-survey"><code>survey &lt;url&gt;</code></h2>
+          <p>
+            Visits a page and records what is on it. <code>--from &lt;file&gt;</code> reads a
+            snapshot captured elsewhere.
+          </p>
+          <h2 id="cmd-locator"><code>locator &lt;element&gt;</code></h2>
+          <p>
+            Looks up a selector with its confidence and freshness. <code>--route</code> narrows it
+            to one page.
+          </p>
+          <h2 id="cmd-verify"><code>verify</code></h2>
+          <p>
+            Checks the map against the app. See <a href="#docs-verify">Keep the map current</a>.
+          </p>
+          <h2 id="cmd-explain"><code>explain &lt;rule-id&gt;</code></h2>
+          <p>Why a rule exists, and what to write instead.</p>
+          <h2 id="cmd-uninstall"><code>uninstall</code></h2>
+          <p>Removes exactly what <code>init</code> installed, from the recorded manifest.</p>
+        </article>
+
+        <!-- ===== Rules ===== -->
+        <article data-doc="rules" data-title="Rules" data-group="Reference" hidden>
+          <span class="crumb">Reference</span>
+          <h1>Rules</h1>
+          <p class="desc">
+            Eleven rules, ten enforced by ESLint. Each one says what is wrong, why, and what to
+            write instead.
+          </p>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule</th>
+                  <th>Check</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>no-hard-waits</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>web-first-assertions</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>no-raw-selectors</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>no-locators-in-tests</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>strict-zod-objects</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>no-focused-tests</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>skips-need-a-reason</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>require-test-tags</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>no-explicit-any</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>no-hardcoded-urls</code></td>
+                  <td>enforced</td>
+                </tr>
+                <tr>
+                  <td><code>selectors-from-agent-kb</code></td>
+                  <td>review only</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h2 id="rl-example">Example: no-hard-waits</h2>
+          <div class="codegroup" data-tabs>
+            <div class="tabs" role="tablist">
+              <button type="button" role="tab" aria-selected="true">Bad</button>
+              <button type="button" role="tab" aria-selected="false">Good</button>
+            </div>
+            <pre><code>await page.click('#submit');
+await page.waitForTimeout(3000);</code></pre>
+            <pre hidden><code>await checkout.submit();
+await expect(checkout.confirmation).toBeVisible();</code></pre>
+          </div>
+          <h2 id="rl-change">Changing a rule</h2>
+          <p>
+            Rules live in one YAML file. Edit it and regenerate; the ESLint rules, the docs and the
+            agent instructions update together.
+          </p>
+        </article>
+
+        <!-- ===== Owners ===== -->
+        <article data-doc="owners" data-title="Who decides what" data-group="Reference" hidden>
+          <span class="crumb">Reference</span>
+          <h1>Who decides what</h1>
+          <p class="desc">
+            When sources of Playwright advice disagree, this table says which one wins.
+          </p>
+          <div class="table">
+            <table>
               <thead>
                 <tr>
                   <th>Topic</th>
@@ -1272,237 +2336,342 @@ round-trip, use <span class="t-ok">await page.waitForResponse(...)</span>.</pre>
               </thead>
               <tbody>
                 <tr>
-                  <td>Page objects, locator strategy, test structure and tagging</td>
-                  <td>cue <span class="wins">(wins)</span></td>
+                  <td>Page objects and locator organisation</td>
+                  <td><code>cue</code> (wins)</td>
                 </tr>
                 <tr>
-                  <td>Your app's selectors, routes and domain vocabulary</td>
-                  <td>agent-kb <span class="wins">(wins)</span></td>
+                  <td>Test structure, tagging and assertions</td>
+                  <td><code>cue</code> (wins)</td>
                 </tr>
                 <tr>
-                  <td>Running, debugging, tracing and reports</td>
-                  <td>playwright-official</td>
+                  <td>Fixtures and environment configuration</td>
+                  <td><code>cue</code> (wins)</td>
                 </tr>
                 <tr>
-                  <td>Single scripted browser actions from an agent</td>
-                  <td>playwright-mcp</td>
+                  <td>Application selectors and test ids</td>
+                  <td><code>agent-kb</code> (wins)</td>
                 </tr>
                 <tr>
-                  <td>Accessibility, visual regression, Electron and other specialist corners</td>
-                  <td>reference-skill</td>
+                  <td>Running, filtering and debugging tests</td>
+                  <td><code>playwright-official</code></td>
+                </tr>
+                <tr>
+                  <td>Tracing, video, screenshots and reports</td>
+                  <td><code>playwright-official</code></td>
+                </tr>
+                <tr>
+                  <td>Single scripted browser actions</td>
+                  <td><code>playwright-mcp</code></td>
+                </tr>
+                <tr>
+                  <td>Accessibility, visual regression, Electron</td>
+                  <td><code>reference-skill</code></td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </section>
-
-      <!-- ---------- Promises ---------- -->
-      <section class="alt">
-        <div class="wrap">
-          <div class="section-head center">
-            <span class="eyebrow">Your repo stays yours</span>
-            <h2>Three promises about your files</h2>
-          </div>
-          <div class="cards">
-            <div class="card">
-              <div class="ico" aria-hidden="true">♻️</div>
-              <h3>Idempotent</h3>
-              <p>
-                Running <code>init</code> twice changes nothing. Every write goes through a plan you
-                can read first.
-              </p>
-            </div>
-            <div class="card">
-              <div class="ico" aria-hidden="true">🔒</div>
-              <h3>Never overwrites your edits</h3>
-              <p>
-                A file you edited by hand is reported and left alone. Existing files are only
-                touched inside a marked region.
-              </p>
-            </div>
-            <div class="card">
-              <div class="ico" aria-hidden="true">↩️</div>
-              <h3>Exact uninstall</h3>
-              <p>
-                Removing Cue reverses exactly what was installed, from a recorded manifest, not from
-                guesswork.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- Honesty ---------- -->
-      <section>
-        <div class="wrap">
-          <div class="honest">
-            <span class="eyebrow">What we don't claim</span>
-            <h2>Does it make agents write better tests? Not proven yet.</h2>
+          <div class="callout note">
+            <strong>Note</strong>
             <p>
-              Cue includes a benchmark harness that records and scores agent runs. No benchmark has
-              been run, so we don't claim better tests. What we can show is the mechanism: rules
-              that fail the build, and selectors checked against the running app.
-            </p>
-            <p>When the numbers exist, they'll be here, including if they're unflattering.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- FAQ ---------- -->
-      <section class="alt" id="faq">
-        <div class="wrap">
-          <div class="section-head center">
-            <span class="eyebrow">FAQ</span>
-            <h2>Questions, answered</h2>
-          </div>
-          <div class="faq">
-            <details>
-              <summary>What is Cue?</summary>
-              <p>
-                A sidecar for existing Playwright repositories. It gives AI coding agents your
-                team's testing rules as ESLint rules, and a knowledge base of your application's
-                real routes and selectors in <code>.agent-kb/</code>. It doesn't replace Playwright
-                or your framework.
-              </p>
-            </details>
-            <details>
-              <summary>Do I need an AI agent to use it?</summary>
-              <p>
-                No. The ESLint rules work on their own, in CI and in your editor, and catch the same
-                mistakes from people. The agent wiring is a bonus, not a requirement.
-              </p>
-            </details>
-            <details>
-              <summary>Which agents does it support?</summary>
-              <p>
-                Claude Code, Cursor, Codex, Grok, Gemini CLI and OpenCode. Every agent reads
-                <code>AGENTS.md</code>, so the baseline applies even to one Cue doesn't detect.
-              </p>
-            </details>
-            <details>
-              <summary>Why the scoped package name?</summary>
-              <p>
-                Always install <code>@wiluszdamian/cue-cli</code>. Running an unscoped name with
-                <code>npx</code> on a machine that hasn't installed it can fetch an unrelated
-                package. Once it is installed locally, the short command is enough.
-              </p>
-            </details>
-            <details>
-              <summary>Does it work on an existing, messy test suite?</summary>
-              <p>
-                That's the main target. Cue is built for brownfield repositories: it leaves files it
-                doesn't own alone, and the knowledge base is useful long before the app is fully
-                mapped.
-              </p>
-            </details>
-            <details>
-              <summary>Does it need a hosted service?</summary>
-              <p>
-                No. Everything runs locally: the CLI, the ESLint plugin, the knowledge base and the
-                MCP server. Node.js 22.13 or newer is the only requirement.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- ---------- CTA ---------- -->
-      <div class="cta">
-        <div class="wrap">
-          <h2>Give your agent a cue.</h2>
-          <p>One command. A plan first. Nothing written until you say yes.</p>
-          <div class="install">
-            <div class="cmd">
-              <span class="prompt">$</span>
-              <code id="install-cmd-2">npx @wiluszdamian/cue-cli init</code>
-              <button class="copy" type="button" data-copy="install-cmd-2">Copy</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <footer>
-      <div class="wrap">
-        <div class="foot-grid">
-          <div>
-            <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true">C</span>Cue</a>
-            <p style="max-width: 320px">
-              Playwright tests for you and your agent. Open source, MIT licensed.
+              A topic that isn't listed is a gap to report, not an invitation to improvise. Agents
+              can ask over MCP with <code>resolve_owner</code>.
             </p>
           </div>
-          <div>
-            <h4>Product</h4>
-            <ul>
-              <li><a href="#how">How it works</a></li>
-              <li><a href="#rules">Rules</a></li>
-              <li><a href="#map">App map</a></li>
-              <li><a href="#mcp">MCP server</a></li>
-            </ul>
+        </article>
+
+        <footer class="docs-foot">
+          <div class="helpful">
+            <span>Was this page helpful?</span>
+            <button type="button" data-helpful>Yes</button>
+            <button type="button" data-helpful>No</button>
+            <span id="helpful-thanks" hidden>Thanks.</span>
           </div>
-          <div>
-            <h4>Resources</h4>
-            <ul>
-              <li><a href="https://github.com/wiluszdamian/project-cue/tree/main/docs">Docs</a></li>
-              <li>
-                <a href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md"
-                  >Changelog</a
-                >
-              </li>
-              <li><a href="#faq">FAQ</a></li>
-            </ul>
+          <div class="pager">
+            <a id="pg-prev" href="#docs"><small>Previous</small><span></span></a>
+            <a id="pg-next" href="#docs"><small>Next</small><span></span></a>
           </div>
-          <div>
-            <h4>Community</h4>
-            <ul>
-              <li><a href="https://github.com/wiluszdamian/project-cue">GitHub</a></li>
-              <li><a href="https://github.com/wiluszdamian/project-cue/issues">Issues</a></li>
-              <li><a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli">npm</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="foot-bottom">
-          <span>© 2026 Cue contributors · MIT License</span>
-          <span>Built on Playwright. Not affiliated with Microsoft.</span>
-        </div>
+        </footer>
       </div>
-    </footer>
+
+      <aside class="docs-toc" aria-label="On this page">
+        <span class="group-title">On this page</span>
+        <nav id="toc"></nav>
+      </aside>
+    </div>
 
     <script>
       (function () {
         var root = document.documentElement;
+        root.classList.add('js');
+        var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Theme switch: Auto follows the system, Light and Dark pin a choice.
+        var themeButtons = document.querySelectorAll('[data-theme-set]');
+        function applyTheme(choice) {
+          if (choice === 'light' || choice === 'dark') root.setAttribute('data-theme', choice);
+          else root.removeAttribute('data-theme');
+          themeButtons.forEach(function (b) {
+            b.setAttribute('aria-checked', String(b.getAttribute('data-theme-set') === choice));
+          });
+        }
+        var savedTheme = 'system';
         try {
-          var saved = localStorage.getItem('cue-theme');
-          if (saved) root.setAttribute('data-theme', saved);
+          savedTheme = localStorage.getItem('cue-theme') || 'system';
         } catch (e) {}
-        document.getElementById('theme').addEventListener('click', function () {
-          var current =
-            root.getAttribute('data-theme') ||
-            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-          var next = current === 'dark' ? 'light' : 'dark';
-          root.setAttribute('data-theme', next);
-          try {
-            localStorage.setItem('cue-theme', next);
-          } catch (e) {}
+        applyTheme(savedTheme);
+        themeButtons.forEach(function (b) {
+          b.addEventListener('click', function () {
+            var choice = b.getAttribute('data-theme-set');
+            applyTheme(choice);
+            try {
+              localStorage.setItem('cue-theme', choice);
+            } catch (e) {}
+          });
         });
-        document.querySelectorAll('[data-copy]').forEach(function (button) {
-          button.addEventListener('click', function () {
-            var text = document
-              .getElementById(button.dataset.copy)
-              .textContent.replace(/\s+/g, ' ')
-              .trim();
-            var label = button.textContent;
-            navigator.clipboard.writeText(text).then(function () {
-              button.textContent = 'Copied';
-              button.classList.add('done');
-              setTimeout(function () {
-                button.textContent = label;
-                button.classList.remove('done');
-              }, 1600);
+
+        // Docs: a hash starting with "docs" opens the docs view on that page.
+        var landing = document.getElementById('view-landing');
+        var docs = document.getElementById('view-docs');
+        var articles = Array.prototype.slice.call(docs.querySelectorAll('article[data-doc]'));
+        var navLinks = Array.prototype.slice.call(docs.querySelectorAll('.docs-nav a[data-page]'));
+        var order = navLinks.map(function (a) {
+          return a.getAttribute('data-page');
+        });
+        var toc = document.getElementById('toc');
+        var prev = document.getElementById('pg-prev');
+        var next = document.getElementById('pg-next');
+        var tocObserver = null;
+
+        function showPage(id) {
+          if (order.indexOf(id) < 0) id = 'intro';
+          var current = null;
+          articles.forEach(function (a) {
+            var on = a.getAttribute('data-doc') === id;
+            a.hidden = !on;
+            if (on) current = a;
+          });
+          navLinks.forEach(function (a) {
+            a.classList.toggle('active', a.getAttribute('data-page') === id);
+          });
+          document.title = current.getAttribute('data-title') + ' · Cue docs';
+
+          toc.innerHTML = '';
+          var heads = Array.prototype.slice.call(current.querySelectorAll('h2[id]'));
+          heads.forEach(function (h) {
+            var a = document.createElement('a');
+            a.href = '#docs-' + id;
+            a.textContent = h.textContent;
+            a.addEventListener('click', function (ev) {
+              ev.preventDefault();
+              h.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+            });
+            toc.appendChild(a);
+          });
+          if (tocObserver) tocObserver.disconnect();
+          if ('IntersectionObserver' in window && heads.length) {
+            tocObserver = new IntersectionObserver(
+              function (entries) {
+                entries.forEach(function (entry) {
+                  if (!entry.isIntersecting) return;
+                  var i = heads.indexOf(entry.target);
+                  Array.prototype.forEach.call(toc.children, function (a, j) {
+                    a.classList.toggle('active', i === j);
+                  });
+                });
+              },
+              { rootMargin: '-70px 0px -70% 0px' },
+            );
+            heads.forEach(function (h) {
+              tocObserver.observe(h);
+            });
+          }
+
+          var i = order.indexOf(id);
+          setPager(prev, order[i - 1]);
+          setPager(next, order[i + 1]);
+        }
+        function setPager(el, id) {
+          if (!id) {
+            el.hidden = true;
+            return;
+          }
+          el.hidden = false;
+          el.href = '#docs-' + id;
+          el.querySelector('span').textContent = docs
+            .querySelector('article[data-doc="' + id + '"]')
+            .getAttribute('data-title');
+        }
+
+        function route() {
+          var hash = location.hash.slice(1);
+          var inDocs = hash === 'docs' || hash.indexOf('docs-') === 0;
+          landing.hidden = inDocs;
+          docs.hidden = !inDocs;
+          if (inDocs) {
+            showPage(hash.slice(5));
+            window.scrollTo(0, 0);
+          } else {
+            document.title = 'Cue: Playwright rules and an app map for AI agents';
+            var target = hash && document.getElementById(hash);
+            if (target) target.scrollIntoView();
+          }
+        }
+        window.addEventListener('hashchange', route);
+        route();
+
+        // Code group tabs.
+        document.querySelectorAll('[data-tabs]').forEach(function (group) {
+          var tabs = group.querySelectorAll('[role="tab"]');
+          var panes = group.querySelectorAll('pre');
+          tabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () {
+              tabs.forEach(function (t, j) {
+                t.setAttribute('aria-selected', String(i === j));
+                panes[j].hidden = i !== j;
+              });
             });
           });
         });
+
+        // Sidebar search filters pages by title and content.
+        var search = document.getElementById('docs-search');
+        var noHits = document.getElementById('no-hits');
+        search.addEventListener('input', function () {
+          var q = search.value.trim().toLowerCase();
+          var hits = 0;
+          navLinks.forEach(function (a) {
+            var art = docs.querySelector('article[data-doc="' + a.getAttribute('data-page') + '"]');
+            var match = !q || art.textContent.toLowerCase().indexOf(q) >= 0;
+            a.hidden = !match;
+            if (match) hits++;
+          });
+          docs.querySelectorAll('.group').forEach(function (g) {
+            g.hidden = !g.querySelector('a:not([hidden])');
+          });
+          noHits.hidden = hits > 0;
+        });
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === '/' && !docs.hidden && document.activeElement !== search) {
+            ev.preventDefault();
+            search.focus();
+          }
+        });
+
+        document.querySelectorAll('[data-helpful]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            document.getElementById('helpful-thanks').hidden = false;
+          });
+        });
+
+        // Copy buttons.
+        document.querySelectorAll('[data-copy]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var el = document.getElementById(btn.getAttribute('data-copy'));
+            var text = el.textContent.replace(/\s+/g, ' ').trim();
+            var label = btn.textContent;
+            var done = function () {
+              btn.textContent = 'Copied';
+              btn.classList.add('done');
+              setTimeout(function () {
+                btn.textContent = label;
+                btn.classList.remove('done');
+              }, 1600);
+            };
+            try {
+              navigator.clipboard.writeText(text).then(done, function () {
+                selectText(el);
+              });
+            } catch (e) {
+              selectText(el);
+            }
+          });
+        });
+        function selectText(el) {
+          var range = document.createRange();
+          range.selectNodeContents(el);
+          var sel = getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+
+        // Pencil corrections draw in when scrolled to. They start drawn, so the
+        // page is complete without script; only ones below the fold reset.
+        var marks = document.querySelectorAll('[data-reveal]');
+        if (reduced || !('IntersectionObserver' in window)) {
+          marks.forEach(function (m) {
+            m.classList.remove('pending');
+          });
+        } else {
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  setTimeout(function () {
+                    entry.target.classList.remove('pending');
+                  }, 150);
+                  io.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.6 },
+          );
+          marks.forEach(function (m) {
+            io.observe(m);
+          });
+        }
+
+        // Calling the show: the cue light holds red on a standby and goes green
+        // on the go, while the script advances line by line.
+        var consoleEl = document.getElementById('console');
+        var lines = Array.prototype.slice.call(document.querySelectorAll('#script .ln'));
+        var lamp = document.getElementById('console-lamp');
+        var barLamp = document.getElementById('bar-lamp');
+        var state = document.getElementById('console-state');
+        var timer = null;
+
+        function setLight(cue) {
+          var go = cue === 'go';
+          lamp.classList.toggle('go', go);
+          barLamp.classList.toggle('go', go);
+          state.textContent = go ? 'Go' : 'Standby';
+        }
+
+        function run() {
+          clearTimeout(timer);
+          consoleEl.classList.add('running');
+          lines.forEach(function (l) {
+            l.classList.remove('on', 'now');
+          });
+          setLight('standby');
+          var i = 0;
+          (function step() {
+            if (i > 0) lines[i - 1].classList.remove('now');
+            if (i >= lines.length) {
+              timer = setTimeout(function () {
+                consoleEl.classList.remove('running');
+              }, 400);
+              return;
+            }
+            var line = lines[i];
+            line.classList.add('on', 'now');
+            var cue = line.getAttribute('data-cue');
+            if (cue) setLight(cue);
+            i++;
+            var wait = cue === 'standby' ? 1100 : cue === 'go' ? 520 : 300;
+            timer = setTimeout(step, wait);
+          })();
+        }
+
+        document.getElementById('replay').addEventListener('click', function () {
+          if (reduced) return;
+          run();
+        });
+
+        if (reduced) {
+          setLight('go');
+        } else {
+          setTimeout(run, 700);
+        }
       })();
     </script>
   </body>
