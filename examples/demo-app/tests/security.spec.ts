@@ -6,7 +6,7 @@ test.describe('security settings', () => {
     { tag: ['@smoke'] },
     async ({ loginPage, securityPage }) => {
       await loginPage.open();
-      await loginPage.logIn('admin@demo.test', 'admin-pass');
+      await loginPage.signIn('admin@demo.test', 'admin-pass');
       await securityPage.open();
 
       await expect(securityPage.heading).toBeVisible();
@@ -21,7 +21,7 @@ test.describe('security settings', () => {
     { tag: ['@regression'] },
     async ({ loginPage, securityPage }) => {
       await loginPage.open();
-      await loginPage.logIn('admin@demo.test', 'admin-pass');
+      await loginPage.signIn('admin@demo.test', 'admin-pass');
       await securityPage.open();
       await securityPage.changePassword('guess', 'a-new-password');
 
@@ -34,7 +34,7 @@ test.describe('security settings', () => {
     { tag: ['@regression'] },
     async ({ loginPage, securityPage }) => {
       await loginPage.open();
-      await loginPage.logIn('user@demo.test', 'user-pass');
+      await loginPage.signIn('user@demo.test', 'user-pass');
       await securityPage.open();
 
       await expect(securityPage.forbiddenHeading).toBeVisible();

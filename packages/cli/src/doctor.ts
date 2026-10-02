@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Rules } from '@understudy/engine';
-import { readAllRouteMaps } from '@understudy/engine';
+import { readAllRouteMaps, SURVEY_STALE_COMMAND } from '@understudy/engine';
 import { detectAgents, type TargetId } from './agents.js';
 import { inspect } from './install.js';
 import { MANIFEST_PATH, type Manifest } from './manifest.js';
@@ -330,7 +330,7 @@ function checkKnowledgeBase(ctx: DoctorContext): CheckResult {
       detail:
         `${String(stale.length)} of ${String(maps.length)} surveyed route(s) have not been confirmed in over a month: ` +
         `${stale.map((m) => m.map.route).join(', ')}. Treat those as candidates, not facts.`,
-      fix: `understudy survey <url>${stale[0]?.map.route ?? ''}`,
+      fix: SURVEY_STALE_COMMAND,
     };
   }
 

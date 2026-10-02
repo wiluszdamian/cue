@@ -7,6 +7,7 @@ import {
   type KnowledgeIndex,
   type LocatorFact,
 } from '../knowledge/index.js';
+import { surveyCommand } from './advice.js';
 import { freshnessAdvice } from './freshness.js';
 import { loadKnowledge } from './load-knowledge.js';
 import { routeToFilename } from './snapshot/index.js';
@@ -113,7 +114,7 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
       remedy:
         route === undefined
           ? 'understudy survey <url>   # map the route this element is on'
-          : `understudy survey <url>${route}   # this route has not been surveyed`,
+          : `${surveyCommand(route)}   # this route has not been surveyed`,
       knownRoutes,
     };
   }
@@ -124,7 +125,7 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
     changes.length === 0
       ? freshnessAdvice(best.freshness, best.route)
       : `${freshnessAdvice(best.freshness, best.route)} A file it was read from has changed, so it may no longer be right: ` +
-        `run \`understudy survey\` on ${best.route} before relying on it.`;
+        `run \`${surveyCommand(best.route)}\` before relying on it.`;
 
   return {
     kind: 'found',

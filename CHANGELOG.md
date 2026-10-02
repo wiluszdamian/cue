@@ -12,6 +12,10 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Changed
 
+- Where a message tells you to look at a page again, it now gives the narrowest command that
+  will do (`understudy survey --route /login --base-url <url>`, or `--stale`) instead of a bare
+  `survey <url>`.
+
 - **`selectors-from-agent-kb` is now enforced.** It was a manual rule: stated, never
   checked. It now runs in the linter and in the engine's `analyze` (a new `knowledge`
   detector) using the same analyzer as `understudy check`, against the `.agent-kb`
@@ -66,6 +70,14 @@ rather than deletion, and stay documented for one major cycle.
   checked, so the verdict is `PARTIAL`), and `verify --json` prints the report.
 
 ### Added
+
+- **`survey` can look at some pages again.** `--route /a,/b` surveys the pages you name,
+  `--stale` those with something stale or read from code that has changed, and
+  `--affected-by <git range>` those read from files changed over the range. It prints a plan
+  with the reason for each page before opening anything (`--dry-run` stops there), skips pages
+  with a parameter and says why, carries on past a page that fails, and reports each as
+  updated, unchanged or failed. The address comes from `--base-url` or `UNDERSTUDY_BASE_URL` and
+  is never written to `.agent-kb`.
 
 - **Notes go stale when the code behind them changes, not only with age.** A route whose
   elements were confirmed by a `data-testid` records the product file it came from; `verify`

@@ -145,7 +145,7 @@ describe('what it reports', () => {
     expect(text).toContain("Unknown locator: getByRole('button', { name: 'Sign in' })");
     expect(text).toContain('Route: /login');
     expect(text).toContain("getByRole('button', { name: 'Log in' })  (/login)");
-    expect(text).toContain('understudy survey <url>/login');
+    expect(text).toContain('understudy survey --route /login --base-url <url>');
   });
 
   it('says when the match was last confirmed', () => {

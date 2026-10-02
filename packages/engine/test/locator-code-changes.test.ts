@@ -128,7 +128,7 @@ describe('checking a test', () => {
     expect(finding?.verdict).toBe('stale');
     expect(finding?.suggestion).toContain('the code it was read from may have changed');
     expect(finding?.suggestion).toContain('app/Login.tsx changed since it was confirmed');
-    expect(finding?.suggestion).toContain('understudy survey <url>/login');
+    expect(finding?.suggestion).toContain('understudy survey --route /login --base-url <url>');
   });
 
   it('is unchanged when it is not given the files: age and failed checks are all it knew', () => {

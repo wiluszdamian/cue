@@ -93,7 +93,7 @@ ruleTester.run('selectors-from-agent-kb (finding the knowledge base)', rule, {
           column: 14,
           data: {
             detail:
-              "getByRole('button', { name: 'Sign in now' }) is not in the knowledge base. Nearest known: getByRole('button', { name: 'Log in' }) on /login. Use that, or run `understudy survey <url>/login` if the element is new.",
+              "getByRole('button', { name: 'Sign in now' }) is not in the knowledge base. Nearest known: getByRole('button', { name: 'Log in' }) on /login. Use that, or run `understudy survey --route /login --base-url <url>` if the element is new.",
           },
         },
       ],

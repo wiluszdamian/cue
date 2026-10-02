@@ -196,6 +196,43 @@ try {
     expect(result.status === 0, `/${page} surveyed`, result.out);
   }
 
+  begin('look at some pages again, by name, and not all of them');
+  const plan = cli(project, [
+    'survey',
+    '--route',
+    '/signup,/items/[id]',
+    '--base-url',
+    base,
+    '--dry-run',
+  ]);
+  expect(plan.status === 0, 'the plan is shown', plan.out);
+  expect(
+    plan.out.includes('/signup') && plan.out.includes('skipped'),
+    'a page with a parameter is skipped',
+    plan.out,
+  );
+  expect(plan.out.includes('Dry run: nothing was opened'), 'a dry run opens nothing');
+  const again = cli(
+    project,
+    ['survey', '--route', '/signup', '--base-url', base, '--env', 'e2e'],
+    withCli,
+  );
+  expect(again.status === 0, 'the named page is surveyed again', again.out);
+  expect(
+    again.out.includes('unchanged') && again.out.includes('1 unchanged'),
+    'and found as it was',
+    again.out,
+  );
+  expect(again.out.includes('/login') === false, 'the other pages are left alone', again.out);
+  const noAddress = run([understudy, 'survey', '--route', '/signup', '--cwd', project], {
+    env: { UNDERSTUDY_BASE_URL: '' },
+  });
+  expect(
+    noAddress.status === 2 && noAddress.out.includes('--base-url'),
+    'it asks for the address instead of guessing',
+    noAddress.out,
+  );
+
   begin('look a locator up');
   const locator = cli(project, ['locator', 'log in', '--route', '/login']);
   expect(

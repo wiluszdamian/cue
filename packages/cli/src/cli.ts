@@ -22,7 +22,21 @@ import {
   survey,
   SurveyError,
 } from './survey.js';
-import { changedFiles, findProductRoot, workingTreeFiles } from '@understudy/engine';
+import {
+  changedFiles,
+  findProductRoot,
+  indexKnowledge,
+  loadKnowledge,
+  selectSurveyTargets,
+  workingTreeFiles,
+} from '@understudy/engine';
+import {
+  formatPlan,
+  formatResults,
+  parseBaseUrl,
+  surveyTargets,
+  targetsExitCode,
+} from './survey-targets.js';
 import { productFiles } from './product-files.js';
 import {
   CHECK_FORMATS,
@@ -54,6 +68,7 @@ const USAGE = `understudy <command> [options]
   list                 show available and installed targets
   explain <rule-id>    why a rule exists, and what to do instead
   survey <url>         map a live route into .agent-kb
+  survey --route|--stale|--affected-by  look at some pages again, not the whole app
   extract              read the product source into .agent-kb
   check [files...]     check the locators in tests against the knowledge base
   verify               check the map against the application (and say what was not checked)
@@ -77,11 +92,15 @@ Options
   --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
-  --base-url <url>     environment to verify the map against
+  --base-url <url>     environment to verify the map against, or to survey routes of
+                       (or set UNDERSTUDY_BASE_URL)
   --env <name>         name this environment (staging) in what survey and verify record
   --source <path>      the product source, to see whether code behind the map changed (verify)
   --affected-by <range> check only the routes read from files changed over this git range (verify)
-  --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked)
+  --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked);
+                       with survey, the pages to look at again
+  --stale              survey: the pages with something stale or read from changed code
+  --dry-run            survey: show the plan, open nothing
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
   --cwd <path>         project root (default: current directory)
@@ -154,6 +173,98 @@ async function confirm(question: string, assumeYes: boolean): Promise<Answer> {
   } finally {
     rl.close();
   }
+}
+
+/**
+ * `survey --route | --stale | --affected-by`: look at some pages again, not the whole
+ * application. The plan is shown before anything is opened, and `--dry-run` stops there.
+ */
+function runTargetedSurvey(input: {
+  projectRoot: string;
+  routes: string | undefined;
+  stale: boolean;
+  range: string | undefined;
+  flags: Readonly<Record<string, string | true>>;
+}): number {
+  const { projectRoot, flags } = input;
+  const out = (text: string): void => void process.stdout.write(`${text}\n`);
+  const err = (text: string): void => void process.stderr.write(`${text}\n`);
+
+  if (flags['from'] !== undefined) {
+    err(
+      '--from is for one page at a time: use it with a URL, not with --route, --stale or --affected-by.',
+    );
+    return 2;
+  }
+
+  // The address of the environment: needed to open pages, never written down.
+  const rawBase = asString(flags['base-url']) ?? process.env['UNDERSTUDY_BASE_URL'];
+  if (rawBase === undefined || rawBase === '') {
+    err(
+      'Surveying a route needs the address of the environment: --base-url <url>, or set UNDERSTUDY_BASE_URL.\n' +
+        'It is used to open the pages and is not saved in .agent-kb.',
+    );
+    return 2;
+  }
+  const base = parseBaseUrl(rawBase);
+  if (!base.ok) {
+    err(base.reason);
+    return 2;
+  }
+
+  // Where the code behind the map is, for "possibly stale" and for --affected-by.
+  const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+  let changedPaths: string[] | undefined;
+  if (input.range !== undefined) {
+    if (productRoot === undefined) {
+      err('--affected-by reads git history in the product: pass --source <path> to it.');
+      return 2;
+    }
+    const changed = changedFiles(input.range, productRoot);
+    if (!changed.ok) {
+      err(changed.reason);
+      return 2;
+    }
+    changedPaths = changed.files;
+  }
+
+  const index = indexKnowledge(loadKnowledge(projectRoot).kb);
+  const targets = selectSurveyTargets(
+    index,
+    {
+      ...(input.routes === undefined
+        ? {}
+        : { routes: input.routes.split(',').map((route) => route.trim()) }),
+      ...(input.stale ? { stale: true } : {}),
+      ...(changedPaths === undefined ? {} : { changedPaths }),
+    },
+    { files: productRoot === undefined ? undefined : workingTreeFiles(productRoot) },
+  );
+
+  if (targets.length === 0) {
+    out(
+      changedPaths !== undefined
+        ? `Nothing to survey: none of the ${String(changedPaths.length)} changed file(s) is one a surveyed page was read from.`
+        : 'Nothing to survey: no surveyed page is stale or read from code that has changed.',
+    );
+    return 0;
+  }
+
+  out(formatPlan(targets, base.url));
+  if (flags['dry-run'] === true) {
+    out('\nDry run: nothing was opened or written.');
+    return 0;
+  }
+
+  const results = surveyTargets({
+    projectRoot,
+    baseUrl: base.url,
+    driver: createPlaywrightCliDriver(projectRoot, asString(flags['playwright-cli'])),
+    targets,
+    environment: asString(flags['env']),
+  });
+  out(formatResults(results));
+  return targetsExitCode(results);
 }
 
 async function main(): Promise<number> {
@@ -296,10 +407,31 @@ async function main(): Promise<number> {
 
     case 'survey': {
       const url = positional[0];
-      if (url === undefined) {
-        err('survey needs a URL, e.g. understudy survey https://staging.example.com/login');
+      const routes = asString(flags['route']);
+      const stale = flags['stale'] === true;
+      const range = asString(flags['affected-by']);
+      const targeted = routes !== undefined || stale || range !== undefined;
+
+      if (flags['action'] !== undefined) {
+        err(
+          'survey --action is not implemented yet: nothing records actions so far. ' +
+            'Use --route <path> for the page the action is on.',
+        );
         return 2;
       }
+      if (url !== undefined && targeted) {
+        err('Give survey a URL or one of --route, --stale and --affected-by, not both.');
+        return 2;
+      }
+      if (url === undefined && !targeted) {
+        err(
+          'survey needs a URL, e.g. understudy survey https://staging.example.com/login,\n' +
+            'or says which pages to look at again: --route /login, --stale, or --affected-by <git range>.',
+        );
+        return 2;
+      }
+      if (url === undefined) return runTargetedSurvey({ projectRoot, routes, stale, range, flags });
+
       const from = asString(flags['from']);
       const result = survey({
         projectRoot,

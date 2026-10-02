@@ -98,3 +98,12 @@ export {
   type LocatorUnknown,
   type ResolveOptions,
 } from './resolve-locator.js';
+
+export { SURVEY_STALE_COMMAND, surveyCommand } from './advice.js';
+
+export {
+  normaliseRoute,
+  selectSurveyTargets,
+  type SurveySelectors,
+  type SurveyTarget,
+} from './survey-targets.js';

@@ -31,4 +31,14 @@ export class LoginPage {
     await this.passwordField.fill(password);
     await this.logInButton.click();
   }
+
+  /**
+   * Logs in and waits until the session exists. A test that goes straight on to another
+   * page would otherwise interrupt the redirect that follows the login, and sometimes
+   * arrive with no session at all.
+   */
+  async signIn(email: string, password: string): Promise<void> {
+    await this.logIn(email, password);
+    await this.page.waitForURL(/\/dashboard$/);
+  }
 }

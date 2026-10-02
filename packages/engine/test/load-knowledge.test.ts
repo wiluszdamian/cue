@@ -440,7 +440,7 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
       remedy:
         route === undefined
           ? 'understudy survey <url>   # map the route this element is on'
-          : `understudy survey <url>${route}   # this route has not been surveyed`,
+          : `understudy survey --route ${route} --base-url <url>   # this route has not been surveyed`,
       knownRoutes,
     };
   }

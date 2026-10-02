@@ -3,6 +3,7 @@ import {
   type LocatorUse,
   type TestSourceScan,
 } from '../agent-kb/extract-locators.js';
+import { surveyCommand } from '../agent-kb/advice.js';
 import { routeToFilename } from '../agent-kb/snapshot/index.js';
 import {
   dependencyChanges,
@@ -222,7 +223,7 @@ export function analyzeLocators(input: AnalyzeLocatorsInput): LocatorFinding[] {
           nearest: near(),
           suggestion:
             `The product source has test id "${judged.query}", but nobody has seen it on a page. ` +
-            `Run \`understudy survey <url>${routeContext ?? '/…'}\` to confirm where it appears.`,
+            `Run \`${surveyCommand(routeContext)}\` to confirm where it appears.`,
         };
       }
       const nearList = near();
@@ -246,7 +247,7 @@ export function analyzeLocators(input: AnalyzeLocatorsInput): LocatorFinding[] {
           `${use.locator} exists on ${pathOf(found)}, not on ${routeContext ?? 'this route'}. ` +
           `Either this test is on the wrong page, or it has moved on since its last page.goto ` +
           `(the checker does not follow clicks and redirects; add // understudy-route: or a goto if so), ` +
-          `or run \`understudy survey <url>${routeContext ?? ''}\` to see what is really there.`,
+          `or run \`${surveyCommand(routeContext)}\` to see what is really there.`,
       };
     }
 
@@ -419,7 +420,7 @@ function unknownAdvice(
     );
   }
   const closest = near[0];
-  const survey = `understudy survey <url>${routeContext ?? '/…'}`;
+  const survey = surveyCommand(routeContext);
   return closest === undefined
     ? `${expression} is not in the knowledge base and nothing similar is. Do not guess: run \`${survey}\` and use what it finds.`
     : `${expression} is not in the knowledge base. Nearest known: ${closest.expression} on ${closest.route}. ` +
@@ -443,7 +444,7 @@ function adviceFor(
           : index.freshness(fact) === 'stale'
             ? 'it has not been confirmed recently'
             : `the code it was read from may have changed (${codeChange ?? 'a file it depends on'})`;
-      return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but ${why}. Run \`understudy survey <url>${pathOf(fact)}\` before relying on it.`;
+      return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but ${why}. Run \`${surveyCommand(pathOf(fact))}\` before relying on it.`;
     }
     case 'unverified':
       return `${expression} matches ${fact.expression} on ${pathOf(fact)}, but that is only inferred (${index.coverage(fact)}), never seen running. Survey ${pathOf(fact)} to confirm it.`;
