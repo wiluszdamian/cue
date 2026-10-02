@@ -1,0 +1,17 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs slug="agents">
+      <h2 id="ag-supported">Supported agents</h2>
+      <div class="chips"><span>Claude Code</span><span>Cursor</span><span>Codex</span><span>Grok</span><span>Gemini CLI</span><span>OpenCode</span></div>
+      <p>Every agent reads <code>AGENTS.md</code>, so the baseline applies even to an agent Cue doesn't detect.</p>
+      <h2 id="ag-manage">Add or remove one</h2>
+      <pre class="code"><code>cue add cursor
+cue remove cursor
+cue list</code></pre>
+      <h2 id="ag-catalog">Just the conventions</h2>
+      <p>The skill catalog installs without the CLI. The difference is what happens when an agent ignores the advice: with the catalog alone, nothing; with the ESLint preset, the build fails.</p>
+      <div class="callout warn"><strong>Warning</strong><p>Always run the scoped name, <code>@wiluszdamian/cue-cli</code>. An unscoped name through <code>npx</code> can fetch an unrelated package.</p></div>
+    
+</Docs>

@@ -1,0 +1,54 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs slug="quickstart">
+      <h2 id="qs-before">Before you start</h2>
+      <p>You need Node.js 22.13 or newer. Cue works with npm, pnpm, yarn and bun and detects which one you use.</p>
+      <h2 id="qs-steps">Set it up</h2>
+      <ol class="steps">
+        <li>
+          <h3>Run init</h3>
+          <p>From the folder your tests live in, or will live in. It finds your agents, lists every file it wants to create and why, and waits. Nothing is written until you say yes.</p>
+          <div class="codegroup" data-tabs>
+            <div class="tabs" role="tablist">
+              <button type="button" role="tab" aria-selected="true">npm</button>
+              <button type="button" role="tab" aria-selected="false">pnpm</button>
+              <button type="button" role="tab" aria-selected="false">yarn</button>
+              <button type="button" role="tab" aria-selected="false">bun</button>
+            </div>
+            <pre><code>npx @wiluszdamian/cue-cli init</code></pre>
+            <pre hidden><code>pnpm dlx @wiluszdamian/cue-cli init</code></pre>
+            <pre hidden><code>yarn dlx @wiluszdamian/cue-cli init</code></pre>
+            <pre hidden><code>bunx @wiluszdamian/cue-cli init</code></pre>
+          </div>
+        </li>
+        <li>
+          <h3>Finish the install</h3>
+          <p><code>init</code> prints the remaining steps for your package manager, usually the dev dependencies and the browsers.</p>
+          <pre class="code"><code>npx playwright install</code></pre>
+        </li>
+        <li>
+          <h3>Check the wiring</h3>
+          <p>Every problem <code>doctor</code> reports comes with the exact command that fixes it.</p>
+          <pre class="code"><code>npx @wiluszdamian/cue-cli doctor</code></pre>
+        </li>
+        <li>
+          <h3>Survey a page, then ask for a test</h3>
+          <p>Map the pages your tests touch, then ask your agent. It reads the rules and the map on its own.</p>
+          <pre class="code"><code>cue survey http://localhost:3000/login</code></pre>
+        </li>
+      </ol>
+      <h2 id="qs-files">What you get</h2>
+      <div class="table"><table>
+        <thead><tr><th>File</th><th>What it's for</th></tr></thead>
+        <tbody>
+          <tr><td><code>AGENTS.md</code></td><td>The house rules, in the file every agent reads on its own</td></tr>
+          <tr><td><code>eslint.config.mjs</code></td><td>Turns the rules into checks that run</td></tr>
+          <tr><td><code>tests/</code>, <code>pages/</code>, <code>fixtures/</code></td><td>Where things go, with a working example of each</td></tr>
+          <tr><td><code>.agent-kb/</code></td><td>Where knowledge about your app is stored</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout tip"><strong>Tip</strong><p>Already have a suite and only want the rules? Run <code>init --bare</code> to skip the folder layout.</p></div>
+    
+</Docs>

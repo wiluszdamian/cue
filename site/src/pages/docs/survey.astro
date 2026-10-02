@@ -1,0 +1,38 @@
+---
+import Docs from '../../layouts/Docs.astro';
+---
+
+<Docs slug="survey">
+      <h2 id="sv-survey">Survey a page</h2>
+      <pre class="code"><code>cue survey http://localhost:3000/login</code></pre>
+      <p>It opens the page, notes everything you can interact with, and saves it:</p>
+      <div class="codegroup">
+        <div class="tabs"><span class="filename">.agent-kb/app-map/login.yaml</span></div>
+        <pre><code>route: /login
+title: Sign in
+verifiedAt: 2026-09-10T18:39:26.471Z
+elements:
+  - role: button
+    name: Log in
+    locator: "getByRole('button', &#123; name: 'Log in' &#125;)"
+    confidence: runtime-only
+links:
+  - name: Forgot password?
+    href: /forgot</code></pre>
+      </div>
+      <div class="callout warn"><strong>Warning</strong><p>Point it at a development or staging environment, never production.</p></div>
+      <h2 id="sv-lookup">Look things up</h2>
+      <pre class="code"><code>cue locator "log in button"</code></pre>
+      <p>When there is no entry, Cue refuses and names the command that fills the gap. A tool that guesses here is worse than no tool.</p>
+      <h2 id="sv-confidence">Confidence</h2>
+      <div class="table"><table>
+        <thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>confirmed</code></td><td>In your app's code and seen on the page.</td></tr>
+          <tr><td><code>runtime-only</code></td><td>Seen on the page, not found in your code. It may come from a library and may move.</td></tr>
+          <tr><td><code>code-only</code></td><td>In your code, never seen. It may be dead or behind a feature flag.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout note"><strong>Note</strong><p>Commit <code>.agent-kb/</code>. Values that look like passwords, tokens or email addresses are stripped before writing, but read the first commit anyway.</p></div>
+    
+</Docs>

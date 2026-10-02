@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import Icons from '../components/Icons.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { url } from '../lib/url';
+
+interface Props {
+  title: string;
+  description: string;
+  inDocs?: boolean;
+}
+const { title, description, inDocs = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href={url('brand/cue-mark-light.svg')} media="(prefers-color-scheme: light)" />
+    <link rel="icon" href={url('brand/cue-mark-dark.svg')} media="(prefers-color-scheme: dark)" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      // Apply a pinned theme before first paint, so a dark choice never flashes light.
+      try {
+        var t = localStorage.getItem('cue-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <Icons />
+    <Header inDocs={inDocs} />
+    <slot />
+    {!inDocs && <Footer />}
+  </body>
+</html>
