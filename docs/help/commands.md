@@ -74,6 +74,45 @@ npx @understudy/cli locator "log in button"
 npx @understudy/cli locator "submit" --route /checkout
 ```
 
+### `understudy check`
+
+Check that the locators in your tests name things the notes know about.
+
+```bash
+npx @understudy/cli check
+npx @understudy/cli check tests/login.spec.ts
+npx @understudy/cli check tests --ci
+npx @understudy/cli check --ci=strict --format github
+```
+
+With no arguments it looks at test files (`*.spec.ts`, `*.test.ts`) and any file with an
+`// understudy-route: /login` comment, which is how a page object says which page it is
+on. Given a directory it takes everything TypeScript in it; given a pattern, whatever matches.
+
+Each locator comes back as one of:
+
+| Verdict       | Meaning                                                                                |
+| ------------- | -------------------------------------------------------------------------------------- |
+| `known`       | Exactly one element the notes trust matches.                                           |
+| `unknown`     | Nothing matches. Very likely invented. The nearest real locator is shown.              |
+| `wrong-route` | It exists, but on a different page from the one the test is on.                        |
+| `ambiguous`   | Several elements match, so Playwright would refuse it.                                 |
+| `stale`       | It matches something that failed its last check, or has not been confirmed in a month. |
+| `unverified`  | It matches something only inferred, never seen on a page.                              |
+| `undecidable` | The code alone cannot say: a variable, a regular expression, `getByText`, CSS.         |
+
+Undecidable locators are always counted and listed. They are not judged, and nothing
+here pretends otherwise.
+
+| Option            | Does                                                             |
+| ----------------- | ---------------------------------------------------------------- |
+| `--ci[=advisory]` | Exit 1 on `unknown` and `wrong-route`: what fails at runtime.    |
+| `--ci=strict`     | Exit 1 on any finding, and when nothing could be checked at all. |
+| `--format <name>` | `human` (default), `agent`, `json`, `sarif` or `github`.         |
+
+Without `--ci` the exit code is always 0. With nothing in `.agent-kb`, it says to run
+`extract` and `survey` rather than listing every locator as unknown.
+
 ### `understudy verify`
 
 Check the notes still match the real app, and say plainly what was not checked.
