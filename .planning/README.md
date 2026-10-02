@@ -57,7 +57,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | done |
 | 20 | [MCP: rozszerzone resolve_* / get_evidence / get_freshness](tickets/20-mcp-resolution.md) | P1.4 | 09 | done |
 | 21 | [MCP: `get_context`](tickets/21-mcp-get-context.md) | P1.4 | 20 | done |
-| 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | todo |
+| 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | done |
 | 23 | [Macierz kompatybilności i pinowanie wersji](tickets/23-compatibility-matrix.md) | P1.6 | 04 | todo |
 | 24 | [i18n przez prawdziwy parser (zagnieżdżone klucze)](tickets/24-i18n-real-parser.md) | P1 | 05 | todo |
 | 25 | [Wiedza z istniejących testów i Page Objects](tickets/25-extract-existing-tests.md) | P1 | 09, 10, 19 | todo |

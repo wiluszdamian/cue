@@ -1,8 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Rules } from '@understudy/engine';
-import { readAllRouteMaps, SURVEY_STALE_COMMAND } from '@understudy/engine';
 import { detectAgents, type TargetId } from './agents.js';
+import { knowledgeChecks, probeKnowledge } from './doctor-knowledge.js';
 import { inspect } from './install.js';
 import { MANIFEST_PATH, type Manifest } from './manifest.js';
 import { existsOnPath, resolvePlaywrightCli } from './browser/resolve.js';
@@ -38,6 +38,9 @@ export interface DoctorContext {
   readonly offline?: boolean;
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly home?: string;
+  /** For the knowledge checks: the clock, and where the product source is if not beside the project. */
+  readonly now?: Date;
+  readonly source?: string | undefined;
 }
 
 function readPackageJson(projectRoot: string): Record<string, unknown> | undefined {
@@ -294,57 +297,6 @@ function checkOfficialSkills(ctx: DoctorContext): CheckResult {
   };
 }
 
-function checkKnowledgeBase(ctx: DoctorContext): CheckResult {
-  const kb = join(ctx.projectRoot, '.agent-kb');
-  if (!existsSync(kb)) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      detail: 'No .agent-kb/. Without it, every selector an agent writes is a guess.',
-      fix: 'understudy init',
-    };
-  }
-
-  const maps = readAllRouteMaps(ctx.projectRoot);
-  if (maps.length === 0) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      detail:
-        '.agent-kb/ exists but no route has been surveyed, so it cannot answer a single question about the application.',
-      fix: 'understudy survey <url>',
-    };
-  }
-
-  const stale = maps.filter((m) => m.freshness === 'stale');
-  const ageing = maps.filter((m) => m.freshness === 'ageing');
-
-  if (stale.length > 0) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      // A warning, not an error: stale entries are still usable as candidates.
-      detail:
-        `${String(stale.length)} of ${String(maps.length)} surveyed route(s) have not been confirmed in over a month: ` +
-        `${stale.map((m) => m.map.route).join(', ')}. Treat those as candidates, not facts.`,
-      fix: SURVEY_STALE_COMMAND,
-    };
-  }
-
-  return {
-    id: 'agent-kb',
-    title: 'Knowledge base',
-    status: 'ok',
-    detail:
-      `${String(maps.length)} route(s) surveyed` +
-      (ageing.length > 0 ? `, ${String(ageing.length)} ageing` : ', all fresh') +
-      '.',
-  };
-}
-
 /** An agent someone uses but nobody wired up silently ignores the conventions. */
 function checkTargetCoverage(ctx: DoctorContext): CheckResult[] {
   const installed = new Set<TargetId>(ctx.manifest?.targets ?? []);
@@ -425,7 +377,7 @@ export function runChecks(ctx: DoctorContext): CheckResult[] {
     ...checkTargetCoverage(ctx),
     checkPlaywrightCli(ctx),
     checkOfficialSkills(ctx),
-    checkKnowledgeBase(ctx),
+    ...knowledgeChecks(probeKnowledge(ctx.projectRoot, ctx.now, ctx.source)),
   ];
 }
 

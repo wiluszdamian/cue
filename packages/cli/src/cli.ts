@@ -737,6 +737,7 @@ async function main(): Promise<number> {
           detection,
           understudyVersion: VERSION,
           ...(flags['offline'] === true ? { offline: true } : {}),
+          source: asString(flags['source']),
         }),
       );
 
