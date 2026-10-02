@@ -26,7 +26,7 @@ import { PRODUCT_DIR } from './paths.js';
  *
  * Reading either gives the same in-memory map, so nothing downstream knows which it
  * was; reading version 1 migrates in memory and leaves the file alone. Whatever is
- * written is version 2. A version newer than this Understudy knows is refused: an
+ * written is version 2. A version newer than this Cue knows is refused: an
  * older reader that carried on would drop whatever the newer one added, and then
  * save the loss.
  */
@@ -37,8 +37,8 @@ export class UnsupportedSchemaVersionError extends Error {
     readonly file: string,
   ) {
     super(
-      `${file} is schema version ${String(found)}, but this Understudy reads up to ` +
-        `${String(ROUTE_MAP_VERSION)}. Upgrade @understudy/cli rather than editing the file: ` +
+      `${file} is schema version ${String(found)}, but this Cue reads up to ` +
+        `${String(ROUTE_MAP_VERSION)}. Upgrade @wiluszdamian/cue rather than editing the file: ` +
         'an older reader would drop whatever the newer one added, and save the loss.',
     );
     this.name = 'UnsupportedSchemaVersionError';

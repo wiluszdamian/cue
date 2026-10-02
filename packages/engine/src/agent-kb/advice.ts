@@ -4,12 +4,10 @@
  * form that will do: a route when one is known, not "survey the app".
  */
 
-/** `understudy survey --route /login --base-url <url>`, or the plain form for a page not yet named. */
+/** `cue survey --route /login --base-url <url>`, or the plain form for a page not yet named. */
 export function surveyCommand(route?: string): string {
-  return route === undefined
-    ? 'understudy survey <url>'
-    : `understudy survey --route ${route} --base-url <url>`;
+  return route === undefined ? 'cue survey <url>' : `cue survey --route ${route} --base-url <url>`;
 }
 
 /** For everything that has gone stale at once, rather than one named route. */
-export const SURVEY_STALE_COMMAND = 'understudy survey --stale --base-url <url>';
+export const SURVEY_STALE_COMMAND = 'cue survey --stale --base-url <url>';

@@ -21,7 +21,7 @@ const ago = (days: number): string => new Date(NOW.getTime() - days * DAY).toISO
 
 let root: string;
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-v2-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-v2-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -268,12 +268,12 @@ describe('reading version 1', () => {
   });
 });
 
-describe('a version this Understudy does not know', () => {
+describe('a version this Cue does not know', () => {
   it('is refused with an instruction to upgrade, and named in the listing', () => {
     write(LOGIN, stringify({ schemaVersion: 3, route: '/login', anything: 'new' }));
 
     expect(() => readRouteMap(root, '/login', NOW)).toThrow(UnsupportedSchemaVersionError);
-    expect(() => readRouteMap(root, '/login', NOW)).toThrow(/Upgrade @understudy\/cli/);
+    expect(() => readRouteMap(root, '/login', NOW)).toThrow(/Upgrade @wiluszdamian\/cue/);
 
     const reading = readAllRouteMapsWithErrors(root, NOW);
     expect(reading.maps).toEqual([]);

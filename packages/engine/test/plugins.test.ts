@@ -14,7 +14,7 @@ import { loadSkills } from '../src/skills.js';
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..', '..');
 const SKILLS = join(REPO_ROOT, 'skills');
-const PLUGIN = join(REPO_ROOT, 'plugins', 'understudy');
+const PLUGIN = join(REPO_ROOT, 'plugins', 'cue');
 const VERSION = readFileSync(join(REPO_ROOT, 'VERSION'), 'utf8').trim();
 
 function readJson(path: string): Record<string, unknown> {
@@ -53,8 +53,8 @@ describe('the plugin package', () => {
     }
   });
 
-  it('has a model-invocable on-ramp named understudy', () => {
-    const onRamp = bundled.find((s) => s.frontmatter.name === 'understudy');
+  it('has a model-invocable on-ramp named cue', () => {
+    const onRamp = bundled.find((s) => s.frontmatter.name === 'cue');
     expect(onRamp).toBeDefined();
     expect(onRamp?.frontmatter['disable-model-invocation']).toBe(false);
     expect(onRamp?.body.toLowerCase()).toContain('it is working if');
@@ -101,7 +101,7 @@ describe('manifests', () => {
 
   it('declares the Agent Plugins schema on the portable manifest', () => {
     expect(pluginJson.$schema).toBe('https://agent-plugins.org/schemas/1.0.0/plugin.schema.json');
-    expect(pluginJson.name).toBe('understudy');
+    expect(pluginJson.name).toBe('cue');
     expect(pluginJson.license).toBe('MIT');
   });
 
@@ -117,20 +117,20 @@ describe('manifests', () => {
       command: 'npx',
       args: ['-y', `@playwright/mcp@${compatibility.tools['@playwright/mcp']?.tested ?? ''}`],
     };
-    const ours = { command: 'npx', args: ['-y', `@understudy/mcp@${VERSION}`] };
+    const ours = { command: 'npx', args: ['-y', `@wiluszdamian/cue-mcp@${VERSION}`] };
 
     const servers = mcp.mcpServers as Record<string, { command: string; args: string[] }>;
     expect(servers.playwright?.command).toBe(npx.command);
     expect(servers.playwright?.args).toEqual(npx.args);
-    expect(servers.understudy?.args).toEqual(ours.args);
+    expect(servers.cue?.args).toEqual(ours.args);
 
     const dotted = mcpDot.mcpServers as Record<string, { command: string; args: string[] }>;
     expect(dotted.playwright).toEqual(npx);
-    expect(dotted.understudy).toEqual(ours);
+    expect(dotted.cue).toEqual(ours);
 
     const geminiServers = gemini.mcpServers as Record<string, { command: string; args: string[] }>;
     expect(geminiServers.playwright).toEqual(npx);
-    expect(geminiServers.understudy).toEqual(ours);
+    expect(geminiServers.cue).toEqual(ours);
   });
 
   it('ships the point lookups everywhere the browser server goes', () => {
@@ -144,7 +144,7 @@ describe('manifests', () => {
       ['gemini-extension.json', gemini],
     ] as const) {
       const servers = manifest.mcpServers as Record<string, unknown>;
-      expect(Object.keys(servers).sort(), name).toEqual(['playwright', 'understudy']);
+      expect(Object.keys(servers).sort(), name).toEqual(['cue', 'playwright']);
     }
   });
 });
@@ -160,21 +160,21 @@ describe('marketplaces', () => {
     const grokPlugins = grok.plugins as { source: string }[];
     const agentsPlugins = agents.plugins as { source: { path: string } }[];
 
-    expect(claudePlugins[0]?.source).toBe('./plugins/understudy');
-    expect(grokPlugins[0]?.source).toBe('./plugins/understudy');
-    expect(agentsPlugins[0]?.source.path).toBe('./plugins/understudy');
-    expect(existsSync(join(REPO_ROOT, 'plugins', 'understudy', 'plugin.json'))).toBe(true);
+    expect(claudePlugins[0]?.source).toBe('./plugins/cue');
+    expect(grokPlugins[0]?.source).toBe('./plugins/cue');
+    expect(agentsPlugins[0]?.source.path).toBe('./plugins/cue');
+    expect(existsSync(join(REPO_ROOT, 'plugins', 'cue', 'plugin.json'))).toBe(true);
 
     const cursorMeta = cursor.metadata as { pluginRoot: string };
     expect(cursorMeta.pluginRoot).toBe('plugins');
     const cursorPlugins = cursor.plugins as { source: string }[];
-    expect(cursorPlugins[0]?.source).toBe('understudy');
+    expect(cursorPlugins[0]?.source).toBe('cue');
   });
 
   it('names the marketplace after the product, not an agent', () => {
-    expect(claude.name).toBe('understudy');
-    expect(cursor.name).toBe('understudy');
-    expect(grok.name).toBe('understudy');
-    expect(agents.name).toBe('understudy');
+    expect(claude.name).toBe('cue');
+    expect(cursor.name).toBe('cue');
+    expect(grok.name).toBe('cue');
+    expect(agents.name).toBe('cue');
   });
 });

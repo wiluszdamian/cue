@@ -277,7 +277,7 @@ export function buildTaskContext(
         ? 'Routes known: none.'
         : `Routes known: ${known.slice(0, 10).join(', ')}${known.length > 10 ? `, …(${String(known.length - 10)} more)` : ''}`,
       '',
-      'suggested action: `understudy survey --route <path> --base-url <url>` for the page the task is about, or `understudy extract --source <dir>` for what the code declares.',
+      'suggested action: `cue survey --route <path> --base-url <url>` for the page the task is about, or `cue extract --source <dir>` for what the code declares.',
     ].join('\n');
     return { found: false, text, routes: [], tokens: estimateTokens(text) };
   }

@@ -1,5 +1,5 @@
 import js from '@eslint/js';
-import understudy from '@understudy/eslint-plugin';
+import cue from '@wiluszdamian/cue-eslint-plugin';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -34,7 +34,7 @@ export default defineConfig([
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
-  understudy.configs.recommended,
+  cue.configs.recommended,
 
   {
     languageOptions: {

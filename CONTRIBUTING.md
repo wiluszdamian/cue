@@ -25,7 +25,7 @@ between the two. Use `pnpm tsc`. See the "Two TypeScripts" section of
 
 ### 1. Decide whether it is ours
 
-Understudy is an integrator. A rule belongs in the constitution only if it is
+Cue is an integrator. A rule belongs in the constitution only if it is
 **prescriptive**, **enforceable**, and **owned by nobody else**.
 
 It is _not_ ours if it is about:
@@ -115,7 +115,7 @@ pnpm verify
 ```
 
 Never edit `packages/*/src/generated/`, `docs/constitution.md`,
-`docs/rules/*.md`, `plugins/understudy/`, `.claude-plugin/`, `.cursor-plugin/`,
+`docs/rules/*.md`, `plugins/cue/`, `.claude-plugin/`, `.cursor-plugin/`,
 `.grok-plugin/`, `.agents/plugins/`, or root `gemini-extension.json` by hand.
 `pnpm sync:check` compares them byte-for-byte with what `rules/` and `skills/`
 produce, and CI runs it.
@@ -141,7 +141,7 @@ in a directory with a space in its name, extracts from the demo app, surveys it 
 URL carries `&` and `%`), looks a locator up, checks the reference page objects, runs
 the demo's Playwright tests, verifies the map, then breaks the app and verifies again.
 Run `pnpm build` first, and install Chromium once with
-`pnpm --filter @understudy/demo-app exec playwright install chromium`. CI runs it on
+`pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium`. CI runs it on
 Ubuntu for every push and on Windows weekly (`e2e-windows.yml`); pass `--keep` to leave
 the project it built behind for inspection.
 

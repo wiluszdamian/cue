@@ -38,7 +38,7 @@ export interface AnalyzeOptions {
 }
 
 const DEFAULT_DOCS_BASE =
-  'https://github.com/understudy-dev/understudy/blob/main/docs/constitution.md';
+  'https://github.com/wiluszdamian/project-cue/blob/main/docs/constitution.md';
 
 export function docsUrlFor(rule: Rule, base = DEFAULT_DOCS_BASE): string {
   return `${base}#${rule.docsAnchor}`;

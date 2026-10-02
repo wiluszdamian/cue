@@ -21,7 +21,7 @@ import {
  * alone never can, and where the two disagree the disagreement is kept.
  */
 
-const SETTINGS_PAGE = `// understudy-route: /settings
+const SETTINGS_PAGE = `// cue-route: /settings
 import type { Page } from '@playwright/test';
 
 export class SettingsPage {
@@ -74,8 +74,8 @@ function write(root: string, path: string, content: string): void {
 }
 
 beforeEach(() => {
-  product = mkdtempSync(join(tmpdir(), 'understudy-tests-product-'));
-  project = mkdtempSync(join(tmpdir(), 'understudy-tests-project-'));
+  product = mkdtempSync(join(tmpdir(), 'cue-tests-product-'));
+  project = mkdtempSync(join(tmpdir(), 'cue-tests-project-'));
   write(product, 'pages/settings-page.ts', SETTINGS_PAGE);
   write(product, 'tests/login.spec.ts', LOGIN_SPEC);
 });

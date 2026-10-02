@@ -51,7 +51,7 @@ hear about it.
 If you do not know what something is called, look it up.
 
 ```bash
-npx @wiluszdamian/cue-cli locator "checkout button"
+npx @wiluszdamian/cue locator "checkout button"
 ```
 
 If Cue does not know either, it says so and tells you which page to go and

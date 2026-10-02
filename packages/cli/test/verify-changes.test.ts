@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { changedFiles, extract, workingTreeFiles } from '@understudy/engine';
+import { changedFiles, extract, workingTreeFiles } from '@wiluszdamian/cue-engine';
 import { survey, type CaptureResult, type SnapshotDriver } from '../src/survey.js';
 import { formatVerifyReport, verify, verifyExitCode } from '../src/verify.js';
 
@@ -47,8 +47,8 @@ function writeProduct(path: string, text: string): void {
 }
 
 beforeEach(() => {
-  product = mkdtempSync(join(tmpdir(), 'understudy-product-'));
-  project = mkdtempSync(join(tmpdir(), 'understudy-project-'));
+  product = mkdtempSync(join(tmpdir(), 'cue-product-'));
+  project = mkdtempSync(join(tmpdir(), 'cue-project-'));
 
   git('init', '-q');
   writeProduct('app/Login.tsx', LOGIN_TSX);
@@ -163,7 +163,7 @@ describe('code that changed since the map was made', () => {
 
   it('has nothing to say about routes that depend on no file', () => {
     // Surveyed with no extract: nothing was confirmed against the source.
-    const bare = mkdtempSync(join(tmpdir(), 'understudy-bare-'));
+    const bare = mkdtempSync(join(tmpdir(), 'cue-bare-'));
     try {
       survey({
         projectRoot: bare,

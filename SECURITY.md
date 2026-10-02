@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Understudy is pre-1.0. Only the latest published version receives fixes.
+Cue is pre-1.0. Only the latest published version receives fixes.
 
 ## Reporting a vulnerability
 

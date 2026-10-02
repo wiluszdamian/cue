@@ -1,15 +1,15 @@
 {
-  "name": "understudy",
+  "name": "cue",
   "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
-  "owner": { "name": "Understudy" },
+  "owner": { "name": "Cue" },
   "plugins": [
     {
-      "name": "understudy",
-      "source": "./plugins/understudy",
+      "name": "cue",
+      "source": "./plugins/cue",
       "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
       "version": "0.8.0",
-      "author": { "name": "Understudy" },
-      "homepage": "https://github.com/wiluszdamian/understudy",
+      "author": { "name": "Cue" },
+      "homepage": "https://github.com/wiluszdamian/project-cue",
       "keywords": ["playwright", "testing", "e2e", "typescript", "agent-skills"],
       "category": "development"
     }

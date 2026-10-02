@@ -3,7 +3,7 @@
  * Bakes rules/ and compatibility.yaml into the CLI, the same way rules/ is baked into
  * the ESLint plugin.
  *
- * `understudy init` runs inside somebody else's repository, where there is no rules/
+ * `cue init` runs inside somebody else's repository, where there is no rules/
  * directory and no compatibility.yaml to read. The constitution, the ownership table
  * and the tested tool versions therefore ship inside the published package. The
  * generated files are committed so a change to either source shows up as a reviewable
@@ -18,7 +18,7 @@ import {
   loadCompatibility,
   loadRules,
   validateRules,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
@@ -40,13 +40,13 @@ const outputs = [
     source: `// GENERATED FILE — do not edit.
 //
 // Source:     rules/constitution.yaml, rules/tags.yaml, rules/ownership.yaml
-// Regenerate: pnpm --filter @understudy/cli generate
+// Regenerate: pnpm --filter @wiluszdamian/cue generate
 //
 // The CLI runs in projects that have no rules/ directory, so the rules travel
 // with the package. Committed on purpose: a constitution change should be
 // visible here in review.
 
-import type { Constitution, Ownership, TagSet } from '@understudy/engine';
+import type { Constitution, Ownership, TagSet } from '@wiluszdamian/cue-engine';
 
 export const CONSTITUTION = ${JSON.stringify(rules.constitution, null, 2)} as unknown as Constitution;
 
@@ -61,13 +61,13 @@ export const OWNERSHIP = ${JSON.stringify(rules.ownership, null, 2)} as unknown 
     source: `// GENERATED FILE — do not edit.
 //
 // Source:     compatibility.yaml
-// Regenerate: pnpm --filter @understudy/cli generate
+// Regenerate: pnpm --filter @wiluszdamian/cue generate
 //
 // The versions of other people's tools this release was run against. They travel with
 // the package because the MCP configuration \`init\` writes pins them, and \`doctor\`
 // compares what a project has installed with them.
 
-import type { Compatibility } from '@understudy/engine';
+import type { Compatibility } from '@wiluszdamian/cue-engine';
 
 export const COMPATIBILITY = ${JSON.stringify(compatibility, null, 2)} as unknown as Compatibility;
 `,
@@ -91,14 +91,14 @@ for (const output of outputs) {
       current = readFileSync(target, 'utf8');
     } catch {
       process.stderr.write(
-        `src/generated/${output.file} is missing. Run: pnpm --filter @understudy/cli generate\n`,
+        `src/generated/${output.file} is missing. Run: pnpm --filter @wiluszdamian/cue generate\n`,
       );
       failed = true;
       continue;
     }
     if (current !== formatted) {
       process.stderr.write(
-        `src/generated/${output.file} is out of date with its source.\nRun: pnpm --filter @understudy/cli generate\n`,
+        `src/generated/${output.file} is out of date with its source.\nRun: pnpm --filter @wiluszdamian/cue generate\n`,
       );
       failed = true;
     } else {

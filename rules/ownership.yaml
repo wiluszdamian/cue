@@ -17,7 +17,7 @@
 schemaVersion: 1
 
 owners:
-  - id: understudy
+  - id: cue
     name: Cue
     kind: internal
     maintainer: The Cue Authors
@@ -57,7 +57,7 @@ owners:
     name: Playwright best-practices reference skill
     kind: external
     maintainer: Currents Software Inc. (MIT)
-    install: optional, chosen during `understudy init`
+    install: optional, chosen during `cue init`
     consult: >
       The owner of general Playwright practice — the areas Cue has no
       opinion about because someone else already maintains one.
@@ -74,9 +74,9 @@ owners:
       focused tool turns into a worse version of a general one.
 
 topics:
-  # ---------------------------------------------------------------- understudy
+  # ---------------------------------------------------------------- cue
   - topic: page object model and locator organisation
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [stage-map]
     keywords:
@@ -95,7 +95,7 @@ topics:
       spec names intent; the page object holds the addressing.
 
   - topic: test structure, tagging and assertions
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [canon]
     keywords: [test structure, tag, tagging, given when then, assertion, skip, only, focused]
@@ -104,7 +104,7 @@ topics:
       hard waits, no committed .only.
 
   - topic: locator strategy and selector priority
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [locator-policy]
     keywords:
@@ -125,7 +125,7 @@ topics:
       come from different places.
 
   - topic: fixtures, dependency injection and environment configuration
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [harness]
     keywords: [fixture, mergetests, dependency injection, baseurl, environment, import point]
@@ -134,7 +134,7 @@ topics:
       config, never to a spec.
 
   - topic: API testing and response schemas
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [wire-contract]
     keywords: [api test, request fixture, zod, schema, contract, response shape, negative test]
@@ -143,14 +143,14 @@ topics:
       is not an assertion.
 
   - topic: type safety in the suite
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [strict-types]
     keywords: [type safety, any, unknown, strict mode, generics, typescript config]
     note: A test suite's types are load-bearing for correctness, not convenience.
 
   - topic: test data strategy
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [seed-policy]
     keywords: [test data, factory, fixture data, seed, static data, invalid values]
@@ -159,7 +159,7 @@ topics:
       versus static data is still to be written.
 
   - topic: how the knowledge base gets populated
-    owner: understudy
+    owner: cue
     precedence: absolute
     skills: [cartography]
     keywords:
@@ -195,7 +195,7 @@ topics:
     note: >
       No model has ever seen this application. A plausible selector fails at
       runtime in a way that reads like an application bug. If it is not in
-      .agent-kb, run `understudy survey` — do not guess.
+      .agent-kb, run `cue survey` — do not guess.
 
   - topic: application behaviour, routes and domain vocabulary
     owner: agent-kb

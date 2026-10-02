@@ -5,7 +5,7 @@ Everything up to the paid call is automated and free. The paid call is yours to 
 credentials. This page is the whole procedure, in order.
 
 What it measures: the same model, asked the same seven tasks on the demo application,
-once with nothing and once with Understudy's `AGENTS.md` and knowledge base in front of
+once with nothing and once with Cue's `AGENTS.md` and knowledge base in front of
 it, five times each. Every answer is compiled, run once in a real browser, and — where the
 task names a defect — run again with the defect switched on. See
 [the guide](../docs/guides/does-it-work.md) for what each number means.
@@ -15,7 +15,7 @@ task names a defect — run again with the defect switched on. See
 ```bash
 pnpm install
 pnpm build
-pnpm --filter @understudy/demo-app exec playwright install chromium
+pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium
 ```
 
 Credentials come from the Anthropic SDK: set `ANTHROPIC_API_KEY`, or use an `ant auth
@@ -25,7 +25,7 @@ login` profile.
 
 ```bash
 pnpm verify
-pnpm --filter @understudy/benchmark test:integration
+pnpm --filter @wiluszdamian/cue-benchmark test:integration
 ```
 
 Both must be green before anything is spent. The second one drives a real browser against
@@ -38,7 +38,7 @@ works from one that does not.
 node scripts/prepare-benchmark-project.mjs
 ```
 
-This writes `benchmarks/project/`: Understudy installed, and a knowledge base of the demo
+This writes `benchmarks/project/`: Cue installed, and a knowledge base of the demo
 application made the way a user would make one (`extract`, then `survey` for the pages that
 need no session, then the pages behind a login from captured snapshots). No model is called.
 Look at `benchmarks/project/.agent-kb/app-map/` before going on: this is what the model
@@ -48,12 +48,12 @@ is told is true.
 
 ```bash
 RESULTS=benchmarks/results/$(date +%F)-claude-opus-5-5
-pnpm --filter @understudy/benchmark exec understudy-benchmark record "$RESULTS/recordings" \
+pnpm --filter @wiluszdamian/cue-benchmark exec cue-benchmark record "$RESULTS/recordings" \
   --project benchmarks/project --prompt-set 2 --runs 5 --model claude-opus-5-5
 ```
 
 It prints the number of calls before it makes any: 7 prompts × 2 conditions × 5 runs = **70**.
-Roughly, the input is small (about 70 tokens per call without Understudy, about 1,600 with it,
+Roughly, the input is small (about 70 tokens per call without Cue, about 1,600 with it,
 so ~65,000 in total) and the output is whatever the model writes: a test file is usually
 1,000–3,000 tokens, so expect ~70,000–210,000 output tokens, and at most 16,000 per call
 (1.1 million in the worst case). Price that with the current rates for the model you chose.
@@ -66,7 +66,7 @@ changes under a result is how a benchmark stops being reproducible.
 ## 4. Score it (free, repeatable)
 
 ```bash
-pnpm --filter @understudy/benchmark exec understudy-benchmark "$RESULTS/recordings" \
+pnpm --filter @wiluszdamian/cue-benchmark exec cue-benchmark "$RESULTS/recordings" \
   --project benchmarks/project --prompt-set 2 --execute --report "$RESULTS/report"
 ```
 
@@ -85,7 +85,7 @@ compile, did not pass, or did not notice its defect, each linked to its recordin
 
 - If the report says **hand-written fixtures**, something is wrong: these should be a
   model's answers, each with a `recordedAt`.
-- If it says Understudy does **not** help on both static metrics, that is the result.
+- If it says Cue does **not** help on both static metrics, that is the result.
   `docs/07-benchmark-and-evaluation.md` in the planning pack is explicit that no measurable
   difference means the premise is false, and the report does not soften it.
 - "Wrong route" locators are partly the checker's limit (it does not follow clicks), not
@@ -108,4 +108,4 @@ Then update, with the numbers as they are and the limits as they are:
 - The line on the README / landing page that says the project makes no claim.
 - `CHANGELOG.md`.
 
-Do not round in Understudy's favour, and do not drop a run because it was unflattering.
+Do not round in Cue's favour, and do not drop a run because it was unflattering.

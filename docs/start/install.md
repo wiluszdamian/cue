@@ -18,7 +18,7 @@ one you use on its own.
 From the folder your tests live in — or will live in:
 
 ```bash
-npx @wiluszdamian/cue-cli init
+npx @wiluszdamian/cue init
 ```
 
 It will:
@@ -44,7 +44,7 @@ Already have a test suite and just want the rules? Use `--bare` and Cue
 will skip the folder layout.
 
 ```bash
-npx @wiluszdamian/cue-cli init --bare
+npx @wiluszdamian/cue init --bare
 ```
 
 ## Finish the setup
@@ -53,14 +53,14 @@ npx @wiluszdamian/cue-cli init --bare
 Usually:
 
 ```bash
-npm install --save-dev @understudy/eslint-plugin @wiluszdamian/cue-cli
+npm install --save-dev @wiluszdamian/cue-eslint-plugin @wiluszdamian/cue
 npx playwright install
 ```
 
 Then check everything landed:
 
 ```bash
-npx @wiluszdamian/cue-cli doctor
+npx @wiluszdamian/cue doctor
 ```
 
 ## Reading the doctor report

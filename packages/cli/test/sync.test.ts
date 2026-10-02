@@ -27,7 +27,7 @@ const VERSION = '0.1.0-test';
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-sync-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-sync-'));
   writeFileSync(join(root, 'package.json'), '{"name":"demo","private":true}');
 });
 
@@ -38,7 +38,7 @@ afterEach(() => {
 const options = (extra: Record<string, unknown> = {}) => ({
   projectRoot: root,
   detection,
-  understudyVersion: VERSION,
+  cueVersion: VERSION,
   ...extra,
 });
 
@@ -60,7 +60,7 @@ function addTopic(): void {
       '  - topic: test data strategy',
       [
         '  - topic: flaky test triage',
-        '    owner: understudy',
+        '    owner: cue',
         '    precedence: absolute',
         '    skills: []',
         '    keywords: [flaky, quarantine, retry policy, unstable test]',
@@ -186,7 +186,7 @@ describe('sync', () => {
     const manifest = readManifest(root);
     writeFileSync(join(root, 'stale.md'), 'left behind\n');
     writeFileSync(
-      join(root, '.understudy/install.json'),
+      join(root, '.cue/install.json'),
       JSON.stringify(
         {
           ...manifest,

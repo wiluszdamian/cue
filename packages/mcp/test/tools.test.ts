@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { hashSnapshot, loadRules, parseSnapshot, writeRouteMap } from '@understudy/engine';
+import { hashSnapshot, loadRules, parseSnapshot, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server.js';
 import {
@@ -39,7 +39,7 @@ let root: string;
 let context: ToolContext;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-mcp-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-mcp-'));
   const parsed = parseSnapshot(SNAPSHOT);
   const now = new Date().toISOString();
   writeRouteMap(root, {
@@ -76,7 +76,7 @@ describe('loading the rules', () => {
   });
 
   it('falls back rather than dying on a malformed rules/', () => {
-    const broken = mkdtempSync(join(tmpdir(), 'understudy-broken-'));
+    const broken = mkdtempSync(join(tmpdir(), 'cue-broken-'));
     mkdirSync(join(broken, 'rules'), { recursive: true });
     writeFileSync(join(broken, 'rules', 'constitution.yaml'), 'not: [valid', 'utf8');
 
@@ -139,7 +139,7 @@ describe('explain_rule', () => {
   it('says what a rule checked against the knowledge base does not cover', () => {
     const answer = explainRule(context, 'selectors-from-agent-kb');
     expect(answer).toContain('Checked against .agent-kb only');
-    expect(answer).toContain('understudy check');
+    expect(answer).toContain('cue check');
     expect(answer).not.toContain('Not mechanically enforced');
   });
 
@@ -153,7 +153,7 @@ describe('explain_rule', () => {
 describe('resolve_owner', () => {
   it('names the owner and its precedence', () => {
     const answer = resolveOwner(context, 'which locator should I use');
-    expect(answer).toContain('understudy');
+    expect(answer).toContain('cue');
     expect(answer).toContain('ABSOLUTE');
   });
 
@@ -189,7 +189,7 @@ describe('resolve_locator', () => {
     // The point of the knowledge base, and the easiest thing to lose in a protocol.
     const answer = resolveLocatorTool(context, 'delete account button');
     expect(answer).toContain('Do not guess a selector');
-    expect(answer).toContain('understudy survey');
+    expect(answer).toContain('cue survey');
   });
 
   it('can be narrowed to one route', () => {

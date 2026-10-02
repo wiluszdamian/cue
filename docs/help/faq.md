@@ -67,7 +67,7 @@ and removing those is usually the single biggest speed-up available.
 ## What if I already have a test suite?
 
 ```bash
-npx @wiluszdamian/cue-cli init --bare
+npx @wiluszdamian/cue init --bare
 ```
 
 That gives you the rules without imposing a folder layout. Expect the first run

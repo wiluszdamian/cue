@@ -3,7 +3,7 @@
  * compared with an earlier run. Adding a prompt means a new version, not an edit.
  *
  * Written the way somebody would actually ask — no hint of a rule, no mention of
- * Understudy — and each targets rules the constitution can check mechanically.
+ * Cue — and each targets rules the constitution can check mechanically.
  */
 
 export const PROMPT_SET_VERSION = 1;

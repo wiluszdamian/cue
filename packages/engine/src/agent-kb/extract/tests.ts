@@ -190,7 +190,7 @@ export function readExistingTests(file: SourceFileRef): ExistingTests {
 
   if (withoutRoute > 0) {
     gaps.push(
-      `${file.path}: ${String(withoutRoute)} role locator(s) had no page to attach to (no page.goto before them, no understudy-route comment), so they were not recorded`,
+      `${file.path}: ${String(withoutRoute)} role locator(s) had no page to attach to (no page.goto before them, no cue-route comment), so they were not recorded`,
     );
   }
 

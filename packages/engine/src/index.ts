@@ -1,5 +1,5 @@
 /**
- * @understudy/engine — the core the rest of Understudy is generated from.
+ * @wiluszdamian/cue-engine — the core the rest of Cue is generated from.
  *
  * Everything here reads `rules/` and produces diagnostics or documentation from
  * it. Nothing here knows about agents, targets, or the CLI: those layers depend

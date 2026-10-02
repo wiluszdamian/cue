@@ -17,7 +17,7 @@ the afternoon on it before realising the app was fine all along.
 Let Cue look at the real thing:
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://localhost:3000/login
+npx @wiluszdamian/cue survey http://localhost:3000/login
 ```
 
 It opens the page, notes everything you can interact with, and saves it:
@@ -68,9 +68,9 @@ inventing one.
 to go next. Work through the pages your tests actually touch:
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://localhost:3000/login
-npx @wiluszdamian/cue-cli survey http://localhost:3000/forgot
-npx @wiluszdamian/cue-cli survey http://localhost:3000/dashboard
+npx @wiluszdamian/cue survey http://localhost:3000/login
+npx @wiluszdamian/cue survey http://localhost:3000/forgot
+npx @wiluszdamian/cue survey http://localhost:3000/dashboard
 ```
 
 <Callout>
@@ -81,7 +81,7 @@ npx @wiluszdamian/cue-cli survey http://localhost:3000/dashboard
 ## Looking things up
 
 ```bash
-npx @wiluszdamian/cue-cli locator "log in button"
+npx @wiluszdamian/cue locator "log in button"
 ```
 
 ```

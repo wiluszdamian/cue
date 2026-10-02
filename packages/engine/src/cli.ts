@@ -13,12 +13,12 @@ import { formatValidationProblems, validateRules } from './validate.js';
 /**
  * A thin development entry point, not the product CLI.
  *
- * The user-facing `understudy` binary (doctor, init, describe, explore) is a
+ * The user-facing `cue` binary (doctor, init, describe, explore) is a
  * later package. This one exists so `rules:validate` and the fixture tests can
  * run the engine from CI without a second layer in between.
  */
 
-const USAGE = `understudy-engine <command>
+const USAGE = `cue-engine <command>
 
   validate  <rulesDir>              check rules/ loads and is internally consistent
   analyze   <rulesDir> [glob...]    run the constitution over files

@@ -1,4 +1,4 @@
-import type { Rules } from '@understudy/engine';
+import type { Rules } from '@wiluszdamian/cue-engine';
 import type { TargetId } from '../agents.js';
 import type { DesiredFile } from '../install.js';
 import type { PackageManager } from '../package-manager.js';
@@ -18,7 +18,7 @@ export interface TargetContext {
   readonly projectRoot: string;
   readonly packageManager: PackageManager;
   readonly rules: Rules;
-  readonly understudyVersion: string;
+  readonly cueVersion: string;
   /** Default true; `--bare` turns it off for a repository that already has a suite. */
   readonly scaffold?: boolean;
 }

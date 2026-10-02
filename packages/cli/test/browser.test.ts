@@ -98,7 +98,7 @@ describe('resolvePlaywrightCli', () => {
   let root: string;
 
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'understudy cli-'));
+    root = mkdtempSync(join(tmpdir(), 'cue cli-'));
   });
 
   afterEach(() => {

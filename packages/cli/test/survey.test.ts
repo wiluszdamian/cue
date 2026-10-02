@@ -2,7 +2,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { readAllRouteMaps } from '@understudy/engine';
+import { readAllRouteMaps } from '@wiluszdamian/cue-engine';
 import { survey, SurveyError, type CaptureResult, type SnapshotDriver } from '../src/survey.js';
 import { verify } from '../src/verify.js';
 
@@ -20,7 +20,7 @@ const driverReturning = (result: CaptureResult): SnapshotDriver => ({ capture: (
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-survey-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-survey-'));
 });
 
 afterEach(() => {

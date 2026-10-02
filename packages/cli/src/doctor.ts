@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { judgeVersions, type Rules } from '@understudy/engine';
+import { judgeVersions, type Rules } from '@wiluszdamian/cue-engine';
 import { detectAgents, type TargetId } from './agents.js';
 import { COMPATIBILITY } from './generated/compatibility.js';
 import { knowledgeChecks, probeKnowledge } from './doctor-knowledge.js';
@@ -35,7 +35,7 @@ export interface DoctorContext {
   readonly manifest: Manifest | undefined;
   readonly rules: Rules | undefined;
   readonly detection: Detection;
-  readonly understudyVersion: string;
+  readonly cueVersion: string;
   readonly offline?: boolean;
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly home?: string;
@@ -79,17 +79,17 @@ function checkInitialised(ctx: DoctorContext): CheckResult {
   if (ctx.manifest) {
     return {
       id: 'init',
-      title: 'Understudy is installed',
+      title: 'Cue is installed',
       status: 'ok',
       detail: `${MANIFEST_PATH} lists ${ctx.manifest.files.length} managed files across ${ctx.manifest.targets.length} targets.`,
     };
   }
   return {
     id: 'init',
-    title: 'Understudy is installed',
+    title: 'Cue is installed',
     status: 'error',
     detail: `No ${MANIFEST_PATH}. Nothing has been installed in this project yet.`,
-    fix: 'understudy init',
+    fix: 'cue init',
   };
 }
 
@@ -101,7 +101,7 @@ function checkPackageManager(ctx: DoctorContext): CheckResult {
       title: 'Package manager',
       status: 'warn',
       detail: `Could not tell — ${evidence}. Assuming ${manager}, so printed commands may be wrong.`,
-      fix: 'understudy doctor --package-manager <npm|pnpm|yarn|bun>',
+      fix: 'cue doctor --package-manager <npm|pnpm|yarn|bun>',
     };
   }
   return {
@@ -114,7 +114,7 @@ function checkPackageManager(ctx: DoctorContext): CheckResult {
 
 function checkEslintPlugin(ctx: DoctorContext): CheckResult {
   const deps = dependencyNames(readPackageJson(ctx.projectRoot));
-  if (!deps.has('@understudy/eslint-plugin')) {
+  if (!deps.has('@wiluszdamian/cue-eslint-plugin')) {
     return {
       id: 'eslint-plugin',
       title: 'ESLint plugin installed',
@@ -122,14 +122,14 @@ function checkEslintPlugin(ctx: DoctorContext): CheckResult {
       // Without this the conventions are a document, which an agent talks itself past.
       detail:
         'The ESLint plugin is not a dependency. Without it nothing enforces the constitution — the rules become advice.',
-      fix: addDevCommand(ctx.detection.manager, ['@understudy/eslint-plugin']),
+      fix: addDevCommand(ctx.detection.manager, ['@wiluszdamian/cue-eslint-plugin']),
     };
   }
   return {
     id: 'eslint-plugin',
     title: 'ESLint plugin installed',
     status: 'ok',
-    detail: '@understudy/eslint-plugin is a dependency of this project.',
+    detail: '@wiluszdamian/cue-eslint-plugin is a dependency of this project.',
   };
 }
 
@@ -142,18 +142,18 @@ function checkEslintWired(ctx: DoctorContext): CheckResult {
       title: 'ESLint preset wired up',
       status: 'error',
       detail: 'No flat ESLint config found, so the plugin never runs.',
-      fix: 'understudy init  # creates eslint.config.mjs',
+      fix: 'cue init  # creates eslint.config.mjs',
     };
   }
 
   const content = readFileSync(join(ctx.projectRoot, config), 'utf8');
-  if (!content.includes('@understudy/eslint-plugin') && !content.includes('understudy')) {
+  if (!content.includes('@wiluszdamian/cue-eslint-plugin') && !content.includes('cue')) {
     return {
       id: 'eslint-config',
       title: 'ESLint preset wired up',
       status: 'error',
-      detail: `${config} exists but does not reference the Understudy preset, so no rule is enforced.`,
-      fix: `Add to ${config}:  import understudy from '@understudy/eslint-plugin';  …understudy.configs.recommended`,
+      detail: `${config} exists but does not reference the Cue preset, so no rule is enforced.`,
+      fix: `Add to ${config}:  import cue from '@wiluszdamian/cue-eslint-plugin';  …cue.configs.recommended`,
     };
   }
 
@@ -161,7 +161,7 @@ function checkEslintWired(ctx: DoctorContext): CheckResult {
     id: 'eslint-config',
     title: 'ESLint preset wired up',
     status: 'ok',
-    detail: `${config} references the Understudy preset.`,
+    detail: `${config} references the Cue preset.`,
   };
 }
 
@@ -173,25 +173,24 @@ function checkAgentsFile(ctx: DoctorContext): CheckResult {
       title: 'AGENTS.md present',
       status: 'error',
       detail: 'AGENTS.md is the always-loaded layer every agent reads. It is missing.',
-      fix: 'understudy init',
+      fix: 'cue init',
     };
   }
   const content = readFileSync(path, 'utf8');
-  if (!content.includes('BEGIN UNDERSTUDY')) {
+  if (!content.includes('BEGIN CUE')) {
     return {
       id: 'agents-md',
       title: 'AGENTS.md present',
       status: 'warn',
-      detail:
-        'AGENTS.md exists but contains no Understudy section, so no ownership table is loaded.',
-      fix: 'understudy sync',
+      detail: 'AGENTS.md exists but contains no Cue section, so no ownership table is loaded.',
+      fix: 'cue sync',
     };
   }
   return {
     id: 'agents-md',
     title: 'AGENTS.md present',
     status: 'ok',
-    detail: 'AGENTS.md carries the Understudy section.',
+    detail: 'AGENTS.md carries the Cue section.',
   };
 }
 
@@ -203,7 +202,7 @@ function checkContentFresh(ctx: DoctorContext): CheckResult {
       title: 'Generated content is current',
       status: 'unchecked',
       detail: 'Needs both an install manifest and a readable rule set.',
-      fix: 'understudy init',
+      fix: 'cue init',
     };
   }
 
@@ -214,7 +213,7 @@ function checkContentFresh(ctx: DoctorContext): CheckResult {
       projectRoot: ctx.projectRoot,
       packageManager: ctx.detection.manager,
       rules: ctx.rules,
-      understudyVersion: ctx.understudyVersion,
+      cueVersion: ctx.cueVersion,
     })) {
       const state = inspect(ctx.projectRoot, file, ctx.manifest);
       if (state.kind === 'managed-modified') stale.push(`${file.path} (edited by hand)`);
@@ -227,7 +226,7 @@ function checkContentFresh(ctx: DoctorContext): CheckResult {
       id: 'sync',
       title: 'Generated content is current',
       status: 'ok',
-      detail: 'Every managed file matches what Understudy would write.',
+      detail: 'Every managed file matches what Cue would write.',
     };
   }
 
@@ -235,8 +234,8 @@ function checkContentFresh(ctx: DoctorContext): CheckResult {
     id: 'sync',
     title: 'Generated content is current',
     status: 'warn',
-    detail: `Diverged from what Understudy would write:\n${stale.map((s) => `      ${s}`).join('\n')}`,
-    fix: 'understudy sync   # shows a diff before changing anything',
+    detail: `Diverged from what Cue would write:\n${stale.map((s) => `      ${s}`).join('\n')}`,
+    fix: 'cue sync   # shows a diff before changing anything',
   };
 }
 
@@ -293,7 +292,7 @@ function checkOfficialSkills(ctx: DoctorContext): CheckResult {
     title: 'Official Playwright skills installed',
     status: 'warn',
     detail:
-      'Not found. Understudy delegates running, debugging and tracing to these rather than documenting them itself.',
+      'Not found. Cue delegates running, debugging and tracing to these rather than documenting them itself.',
     fix: execCommand(ctx.detection.manager, 'playwright-cli install --skills'),
   };
 }
@@ -348,7 +347,7 @@ function checkToolVersions(ctx: DoctorContext): CheckResult[] {
     detail:
       finding.verdict === 'not-judged'
         ? `${finding.version} is not a plain release, so it was not compared with the tested range ${finding.range}.`
-        : `${finding.version} is outside ${finding.range}, which is what this release of Understudy was run against (last tested: ${finding.tested}). It may work; nothing here has shown that it does.`,
+        : `${finding.version} is outside ${finding.range}, which is what this release of Cue was run against (last tested: ${finding.tested}). It may work; nothing here has shown that it does.`,
     fix: addDevCommand(ctx.detection.manager, [`${finding.tool}@${finding.tested}`]),
   }));
 }
@@ -371,7 +370,7 @@ function checkTargetCoverage(ctx: DoctorContext): CheckResult[] {
       title: `${agent.name} detected but not configured`,
       status: 'warn',
       detail: `Evidence: ${agent.evidence.join(', ')}. AGENTS.md still applies, but nothing agent-specific is wired up.`,
-      fix: `understudy add ${agent.id}`,
+      fix: `cue add ${agent.id}`,
     });
   }
 

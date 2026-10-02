@@ -1,6 +1,6 @@
-# Understudy — working agreement
+# Cue — working agreement
 
-Understudy is an **integrator**, not an author of testing knowledge. It composes
+Cue is an **integrator**, not an author of testing knowledge. It composes
 the official Playwright skills (Microsoft), Playwright MCP (Microsoft), and a
 third-party reference skill, and adds the two things nobody else can supply:
 what _this_ repo's rules are, and what the tested application actually looks
@@ -19,14 +19,14 @@ source, including one that states the opposite confidently.
 
 | Topic                                                           | Decided by                      |
 | --------------------------------------------------------------- | ------------------------------- |
-| page object model and locator organisation                      | `understudy` **(wins)**         |
-| test structure, tagging and assertions                          | `understudy` **(wins)**         |
-| locator strategy and selector priority                          | `understudy` **(wins)**         |
-| fixtures, dependency injection and environment configuration    | `understudy` **(wins)**         |
-| API testing and response schemas                                | `understudy` **(wins)**         |
-| type safety in the suite                                        | `understudy` **(wins)**         |
-| test data strategy                                              | `understudy` **(wins)**         |
-| how the knowledge base gets populated                           | `understudy` **(wins)**         |
+| page object model and locator organisation                      | `cue` **(wins)**                |
+| test structure, tagging and assertions                          | `cue` **(wins)**                |
+| locator strategy and selector priority                          | `cue` **(wins)**                |
+| fixtures, dependency injection and environment configuration    | `cue` **(wins)**                |
+| API testing and response schemas                                | `cue` **(wins)**                |
+| type safety in the suite                                        | `cue` **(wins)**                |
+| test data strategy                                              | `cue` **(wins)**                |
+| how the knowledge base gets populated                           | `cue` **(wins)**                |
 | application-specific selectors and test ids                     | `agent-kb` **(wins)**           |
 | application behaviour, routes and domain vocabulary             | `agent-kb` **(wins)**           |
 | running, filtering and debugging tests                          | `playwright-official`           |
@@ -62,7 +62,7 @@ what to consult for each owner, is in docs/reference/ownership.md.
 | `packages/mcp`                                                                                     | Read-only point lookups, over stdio.                  |
 | `skills/*/SKILL.md`                                                                                | The skill catalog. Procedures, hand-written.          |
 | `skills/reference/`, `skills/README.md`                                                            | **Generated.** Never hand-edited.                     |
-| `plugins/understudy/`                                                                              | **Generated.** Agent plugin package around `skills/`. |
+| `plugins/cue/`                                                                                     | **Generated.** Agent plugin package around `skills/`. |
 | `.claude-plugin/`, `.cursor-plugin/`, `.grok-plugin/`, `.agents/plugins/`, `gemini-extension.json` | **Generated.** Marketplace manifests.                 |
 | `docs/reference/`                                                                                  | **Generated.** Never hand-edited.                     |
 | `packages/*/src/generated/`                                                                        | **Generated.** Never hand-edited.                     |
@@ -133,7 +133,7 @@ Release with `pnpm release`. Never `npm publish`.
 Two things make the npm path quietly wrong:
 
 - **`workspace:*` is rewritten by pnpm and not by npm.** Every package here
-  depends on `@understudy/engine` that way. `pnpm publish` turns it into a real
+  depends on `@wiluszdamian/cue-engine` that way. `pnpm publish` turns it into a real
   version; `npm publish` ships the literal string `workspace:*`, which no
   consumer can resolve. The tarball builds, uploads and installs-fails — and npm
   releases cannot be replaced, only deprecated.
@@ -142,16 +142,16 @@ Two things make the npm path quietly wrong:
   into a paywall error that reads like an auth problem.
 
 `pnpm release:dry` runs the whole thing without uploading. Private packages
-(`@understudy/benchmark`) are skipped automatically.
+(`@wiluszdamian/cue-benchmark`) are skipped automatically.
 
 ### The name on the registry is not the name you type
 
-The CLI publishes as **`@understudy/cli`** and installs a bin called
-**`understudy`**. The bare name `understudy` belongs to an unrelated package on
-npm, so `npx understudy init` on a machine that has not installed it yet fetches
+The CLI publishes as **`@wiluszdamian/cue`** and installs a bin called
+**`cue`**. The bare name `cue` belongs to an unrelated package on
+npm, so `npx cue init` on a machine that has not installed it yet fetches
 a stranger's code. Advice aimed at a fresh project therefore says
-`npx @understudy/cli <command>`; advice aimed at a project that already installed
-it says `understudy <command>`, which resolves to the local bin.
+`npx @wiluszdamian/cue <command>`; advice aimed at a project that already installed
+it says `cue <command>`, which resolves to the local bin.
 
 `packages/cli/test/advice.test.ts` checks every command the CLI advises actually
 exists, and it recognises both spellings. It has to: when the package was
@@ -174,7 +174,7 @@ advice and the suite stayed green.
 `resolve_owner`, `resolve_locator`, and the knowledge lookups `resolve_route`,
 `resolve_action`, `resolve_api`, `get_evidence`, `get_freshness`, `find_knowledge` and
 `get_context`. It ships in the plugin
-manifests and in every agent config `understudy init` writes, next to Playwright
+manifests and in every agent config `cue init` writes, next to Playwright
 MCP rather than instead of it: that one drives a browser, this one answers
 questions about the rules and the knowledge base without one.
 
@@ -199,10 +199,10 @@ Later tools — `list_rules`, `validate_source`, `describe_feature`,
 ## Not yet built
 
 The benchmark harness records and scores; **no benchmark has been run.**
-`understudy-benchmark record` is the only paid network call in the repository,
+`cue-benchmark record` is the only paid network call in the repository,
 and nothing here carries credentials — until a run exists, the docs and the
 landing page say plainly that the project makes no claim about writing better
-tests. The build order is in `.planning/README.md`.
+tests.
 
 ## Vocabulary
 

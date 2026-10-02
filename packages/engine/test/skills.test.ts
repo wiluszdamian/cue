@@ -43,7 +43,7 @@ describe('the catalog', () => {
       .filter((s) => !s.frontmatter['disable-model-invocation'])
       .map((s) => s.frontmatter.name)
       .sort();
-    expect(invocable).toEqual(['compose', 'resolve-locator', 'resolve-owner', 'understudy']);
+    expect(invocable).toEqual(['compose', 'cue', 'resolve-locator', 'resolve-owner']);
   });
 
   it('keeps every description inside the context budget', () => {
@@ -141,7 +141,7 @@ describe('the catalog points at the guarantee', () => {
     const readme = readFileSync(join(SKILLS, 'README.md'), 'utf8');
     // Skills-only users should learn from the skills that they have no enforcement.
     expect(readme).toContain('does not get you the **guarantee**');
-    expect(readme).toContain('understudy init');
+    expect(readme).toContain('cue init');
   });
 
   it('credits the upstream sources it composes', () => {

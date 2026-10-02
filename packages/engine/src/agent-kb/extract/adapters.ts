@@ -280,7 +280,7 @@ export const i18nAdapter: Adapter = {
 // ----------------------------------------------------------- existing tests
 
 const TEST_FILE = /\.(spec|test)\.(ts|tsx|mts|cts)$/;
-const ROUTE_NOTE = 'understudy-route:';
+const ROUTE_NOTE = 'cue-route:';
 
 /** A page object is a class holding a `Page`; the cheap sign of one is the type written out. */
 const HOLDS_PAGE = /:\s*Page\b/;

@@ -1,6 +1,6 @@
-# @understudy/mcp
+# @wiluszdamian/cue-mcp
 
-Point lookups over the Understudy rules and the project knowledge base.
+Point lookups over the Cue rules and the project knowledge base.
 
 Everything here is read-only, and every answer is short on purpose. An MCP
 answer is paid for out of the same context window the actual task needs, so each
@@ -34,7 +34,7 @@ spot is the failure the knowledge base exists to prevent.
 
 ## Install
 
-Installed for you by `understudy init`, alongside Playwright MCP. The snippets
+Installed for you by `cue init`, alongside Playwright MCP. The snippets
 below are for wiring it up by hand.
 
 **Claude Code** — `.mcp.json`
@@ -42,7 +42,7 @@ below are for wiring it up by hand.
 ```json
 {
   "mcpServers": {
-    "understudy": { "command": "npx", "args": ["-y", "@understudy/mcp@latest"] }
+    "cue": { "command": "npx", "args": ["-y", "@wiluszdamian/cue-mcp@latest"] }
   }
 }
 ```
@@ -56,22 +56,22 @@ below are for wiring it up by hand.
 **Codex** — `.codex/config.toml`
 
 ```toml
-[mcp_servers.understudy]
+[mcp_servers.cue]
 command = "npx"
-args = ["-y", "@understudy/mcp@latest"]
+args = ["-y", "@wiluszdamian/cue-mcp@latest"]
 ```
 
 **Grok** — `~/.grok/config.toml`, same TOML block. Grok reads its MCP config
-from your home directory rather than the project, so `understudy init` does not
-write it and `understudy doctor` cannot verify it.
+from your home directory rather than the project, so `cue init` does not
+write it and `cue doctor` cannot verify it.
 
 Swap `npx -y` for `pnpm dlx`, `yarn dlx` or `bunx` to match your package
-manager; `understudy init` picks the right one from what it detects.
+manager; `cue init` picks the right one from what it detects.
 
 ## Running it directly
 
 ```bash
-npx -y @understudy/mcp@latest --project /path/to/project
+npx -y @wiluszdamian/cue-mcp@latest --project /path/to/project
 ```
 
 `--project` defaults to the working directory and decides where the knowledge

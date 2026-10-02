@@ -1,5 +1,5 @@
 /**
- * `understudy extract` — the product's structure, from its own source.
+ * `cue extract` — the product's structure, from its own source.
  *
  * The static half of the knowledge base. Where `survey` reports what a page
  * looked like when it ran, this reports what the code says exists — and the

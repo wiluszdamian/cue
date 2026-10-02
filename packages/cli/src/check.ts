@@ -16,10 +16,10 @@ import {
   type LoadIssue,
   type LocatorFinding,
   type LocatorVerdict,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 
 /**
- * `understudy check` — do the locators in these tests name things the knowledge
+ * `cue check` — do the locators in these tests name things the knowledge
  * base knows? The same question the lint rule asks, answered by the same
  * analyzer, for a person or an agent that has just written a test.
  */
@@ -54,7 +54,7 @@ const SKIP_DIRS = new Set([
 ]);
 const SOURCE = /\.(ts|tsx|mts|cts)$/;
 const TEST_NAME = /\.(spec|test)\.(ts|tsx|mts|cts)$/;
-const ANNOTATION = 'understudy-route:';
+const ANNOTATION = 'cue-route:';
 
 function walk(root: string, dir: string, found: string[]): void {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -161,7 +161,7 @@ export function check(options: CheckOptions): CheckReport {
       ? {
           noFilesReason:
             options.targets.length === 0
-              ? 'No test files found (*.spec.ts, *.test.ts, or a file with an understudy-route comment).'
+              ? 'No test files found (*.spec.ts, *.test.ts, or a file with an cue-route comment).'
               : `Nothing matched ${options.targets.join(', ')}.`,
         }
       : {}),
@@ -234,8 +234,8 @@ export function formatHuman(report: CheckReport, now: Date = new Date()): string
   if (report.nothingKnown) {
     lines.push(
       'Nothing is known about this application yet, so no locator can be checked.',
-      'Run: understudy extract --source <path>   (what the product source declares)',
-      'Run: understudy survey <url>              (what is on the page)',
+      'Run: cue extract --source <path>   (what the product source declares)',
+      'Run: cue survey <url>              (what is on the page)',
       '',
       summaryLine(report),
     );

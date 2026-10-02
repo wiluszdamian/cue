@@ -31,7 +31,7 @@ import {
   loadKnowledge,
   selectSurveyTargets,
   workingTreeFiles,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import {
   formatPlan,
   formatResults,
@@ -55,15 +55,15 @@ import {
   formatExtractResult,
   formatLocatorAnswer,
   resolveLocator,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { checkExitCode, formatSyncReport, NotInstalledError, planSync, runSync } from './sync.js';
 import { getTarget, optionalTargets, TARGETS } from './targets/index.js';
 
 const VERSION = '0.8.0';
 
-const USAGE = `understudy <command> [options]
+const USAGE = `cue <command> [options]
 
-  init                 install Understudy in this project
+  init                 install Cue in this project
   doctor               check that everything is wired up
   sync                 rewrite managed files from the current rules
   add <target>         add an agent target
@@ -73,7 +73,7 @@ const USAGE = `understudy <command> [options]
   survey <url>         map a live route into .agent-kb
   survey --route|--stale|--affected-by  look at some pages again, not the whole app
   extract              read the product source into .agent-kb
-  discover             what is in this repository and what Understudy could learn from it
+  discover             what is in this repository and what Cue could learn from it
   check [files...]     check the locators in tests against the knowledge base
   verify               check the map against the application (and say what was not checked)
   verify-map           old name for verify
@@ -98,7 +98,7 @@ Options
   --source <path>      where the product source lives (extract)
   --adapter <a,b>      restrict extract to named adapters
   --base-url <url>     environment to verify the map against, or to survey routes of
-                       (or set UNDERSTUDY_BASE_URL)
+                       (or set CUE_BASE_URL)
   --env <name>         name this environment (staging) in what survey and verify record
   --source <path>      the product source: where discover and extract read from, and what verify
                        compares the map with
@@ -205,10 +205,10 @@ function runTargetedSurvey(input: {
   }
 
   // The address of the environment: needed to open pages, never written down.
-  const rawBase = asString(flags['base-url']) ?? process.env['UNDERSTUDY_BASE_URL'];
+  const rawBase = asString(flags['base-url']) ?? process.env['CUE_BASE_URL'];
   if (rawBase === undefined || rawBase === '') {
     err(
-      'Surveying a route needs the address of the environment: --base-url <url>, or set UNDERSTUDY_BASE_URL.\n' +
+      'Surveying a route needs the address of the environment: --base-url <url>, or set CUE_BASE_URL.\n' +
         'It is used to open the pages and is not saved in .agent-kb.',
     );
     return 2;
@@ -322,7 +322,7 @@ async function main(): Promise<number> {
       const prepared = planInit({
         projectRoot,
         detection,
-        understudyVersion: VERSION,
+        cueVersion: VERSION,
         ...(command === 'add'
           ? { targets: [...existing, ...positional] }
           : targetList
@@ -354,7 +354,7 @@ async function main(): Promise<number> {
         {
           projectRoot,
           detection,
-          understudyVersion: VERSION,
+          cueVersion: VERSION,
           ...(flags['force'] === true ? { force: true } : {}),
         },
         prepared,
@@ -379,7 +379,7 @@ async function main(): Promise<number> {
       const options = {
         projectRoot,
         detection,
-        understudyVersion: VERSION,
+        cueVersion: VERSION,
         ...(flags['force'] === true ? { force: true } : {}),
       };
       const report = planSync(options);
@@ -391,7 +391,7 @@ async function main(): Promise<number> {
         // build step quietly rewriting files under it.
         if (report.stale > 0) {
           out('');
-          out('Run `understudy sync` to bring them up to date.');
+          out('Run `cue sync` to bring them up to date.');
         }
         return checkExitCode(report);
       }
@@ -435,7 +435,7 @@ async function main(): Promise<number> {
       }
       if (url === undefined && !targeted) {
         err(
-          'survey needs a URL, e.g. understudy survey https://staging.example.com/login,\n' +
+          'survey needs a URL, e.g. cue survey https://staging.example.com/login,\n' +
             'or says which pages to look at again: --route /login, --stale, or --affected-by <git range>.',
         );
         return 2;
@@ -515,7 +515,7 @@ async function main(): Promise<number> {
     case 'verify-map':
     case 'verify': {
       if (command === 'verify-map') {
-        err('verify-map is now `understudy verify`; the old name will be removed.');
+        err('verify-map is now `cue verify`; the old name will be removed.');
       }
       const ci = flags['ci'];
       if (ci !== undefined && ci !== true && ci !== 'advisory' && ci !== 'strict') {
@@ -568,7 +568,7 @@ async function main(): Promise<number> {
     case 'locator': {
       const query = positional.join(' ');
       if (query.length === 0) {
-        err('locator needs a description, e.g. understudy locator "log in button" --route /login');
+        err('locator needs a description, e.g. cue locator "log in button" --route /login');
         return 2;
       }
       out(
@@ -589,7 +589,7 @@ async function main(): Promise<number> {
     case 'context': {
       const task = positional.join(' ');
       if (task.length === 0) {
-        err('context needs a task, e.g. understudy context "test changing the password"');
+        err('context needs a task, e.g. cue context "test changing the password"');
         return 2;
       }
       const rawBudget = asString(flags['max-tokens']);
@@ -622,13 +622,13 @@ async function main(): Promise<number> {
         return 2;
       }
       if (id === 'agents') {
-        err('The baseline cannot be removed on its own — use `understudy uninstall`.');
+        err('The baseline cannot be removed on its own — use `cue uninstall`.');
         return 2;
       }
 
       const manifest = readManifest(projectRoot);
       if (!manifest) {
-        err('Nothing to remove: Understudy is not installed in this project.');
+        err('Nothing to remove: Cue is not installed in this project.');
         return 1;
       }
 
@@ -649,7 +649,7 @@ async function main(): Promise<number> {
     case 'uninstall': {
       const manifest = readManifest(projectRoot);
       if (!manifest) {
-        err('Understudy is not installed in this project.');
+        err('Cue is not installed in this project.');
         return 1;
       }
       const answer = await confirm(
@@ -669,7 +669,7 @@ async function main(): Promise<number> {
       });
       out(`Removed ${removal.removed.length} file(s).`);
       for (const kept of removal.kept) out(`  kept ${kept.path} — ${kept.reason}`);
-      out(`\nThe manifest at .understudy/ is left for you to delete.`);
+      out(`\nThe manifest at .cue/ is left for you to delete.`);
       return 0;
     }
 
@@ -698,7 +698,7 @@ async function main(): Promise<number> {
       }
       const rule = rules.constitution.rules.find((r) => r.id === id);
       if (!rule) {
-        err(`No rule called "${id}". Run \`understudy explain\` for the list.`);
+        err(`No rule called "${id}". Run \`cue explain\` for the list.`);
         return 2;
       }
       const oneLine = (text: string): string => text.replace(/\s+/g, ' ').trim();
@@ -735,7 +735,7 @@ async function main(): Promise<number> {
           manifest: readManifest(projectRoot),
           rules,
           detection,
-          understudyVersion: VERSION,
+          cueVersion: VERSION,
           ...(flags['offline'] === true ? { offline: true } : {}),
           source: asString(flags['source']),
         }),

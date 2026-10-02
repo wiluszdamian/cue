@@ -12,7 +12,7 @@ import { arch, platform, release } from 'node:os';
 
 export interface RunMetadata {
   /** The versions of the tools the answers were run with. Absent where not installed. */
-  readonly understudyVersion?: string;
+  readonly cueVersion?: string;
   readonly commit?: string;
   /** The working tree had uncommitted changes, so the commit does not fully describe the run. */
   readonly dirty?: boolean;
@@ -56,12 +56,12 @@ export function collectMetadata(sources: MetadataSources): RunMetadata {
   const commit = git(sources.repoRoot, ['rev-parse', 'HEAD']);
   const status =
     commit === undefined ? undefined : git(sources.repoRoot, ['status', '--porcelain']);
-  const understudyVersion = versionOf(join(sources.repoRoot, 'package.json'));
+  const cueVersion = versionOf(join(sources.repoRoot, 'package.json'));
   const playwrightVersion = installedVersion(sources.demoRoot, '@playwright/test');
   const playwrightCliVersion = installedVersion(sources.demoRoot, '@playwright/cli');
 
   return {
-    ...(understudyVersion === undefined ? {} : { understudyVersion }),
+    ...(cueVersion === undefined ? {} : { cueVersion }),
     ...(commit === undefined ? {} : { commit }),
     ...(status === undefined ? {} : { dirty: status.length > 0 }),
     ...(playwrightVersion === undefined ? {} : { playwrightVersion }),

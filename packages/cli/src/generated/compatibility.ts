@@ -1,13 +1,13 @@
 // GENERATED FILE — do not edit.
 //
 // Source:     compatibility.yaml
-// Regenerate: pnpm --filter @understudy/cli generate
+// Regenerate: pnpm --filter @wiluszdamian/cue generate
 //
 // The versions of other people's tools this release was run against. They travel with
 // the package because the MCP configuration `init` writes pins them, and `doctor`
 // compares what a project has installed with them.
 
-import type { Compatibility } from '@understudy/engine';
+import type { Compatibility } from '@wiluszdamian/cue-engine';
 
 export const COMPATIBILITY = {
   schemaVersion: 1,
@@ -22,7 +22,7 @@ export const COMPATIBILITY = {
     '@playwright/mcp': {
       range: '>=0.0.83 <0.1.0',
       tested: '0.0.83',
-      role: 'browser calls from an agent, next to the Understudy server',
+      role: 'browser calls from an agent, next to the Cue server',
     },
     '@playwright/test': {
       range: '>=1.63.0 <2.0.0',

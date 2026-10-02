@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
-import { clearKnowledgeCache, writeRouteMap } from '@understudy/engine';
+import { clearKnowledgeCache, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterAll, describe, it } from 'vitest';
 import { rules } from '../src/index.js';
 
@@ -16,7 +16,7 @@ const ruleTester = new RuleTester({ languageOptions: { parser } });
 
 /** A project that knows the login page, surveyed just now. */
 function projectWithKnowledge(): string {
-  const root = mkdtempSync(join(tmpdir(), 'understudy-eslint-kb-'));
+  const root = mkdtempSync(join(tmpdir(), 'cue-eslint-kb-'));
   const at = new Date().toISOString();
   writeRouteMap(root, {
     schemaVersion: 2,
@@ -40,7 +40,7 @@ function projectWithKnowledge(): string {
 }
 
 function bareProject(): string {
-  return mkdtempSync(join(tmpdir(), 'understudy-eslint-bare-'));
+  return mkdtempSync(join(tmpdir(), 'cue-eslint-bare-'));
 }
 
 const code = (call: string): string =>
@@ -93,7 +93,7 @@ ruleTester.run('selectors-from-agent-kb (finding the knowledge base)', rule, {
           column: 14,
           data: {
             detail:
-              "getByRole('button', { name: 'Sign in now' }) is not in the knowledge base. Nearest known: getByRole('button', { name: 'Log in' }) on /login. Use that, or run `understudy survey --route /login --base-url <url>` if the element is new.",
+              "getByRole('button', { name: 'Sign in now' }) is not in the knowledge base. Nearest known: getByRole('button', { name: 'Log in' }) on /login. Use that, or run `cue survey --route /login --base-url <url>` if the element is new.",
           },
         },
       ],

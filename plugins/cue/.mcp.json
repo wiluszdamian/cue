@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "cue": { "command": "npx", "args": ["-y", "@wiluszdamian/cue-mcp@0.8.0"] },
+    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@0.0.83"] }
+  }
+}

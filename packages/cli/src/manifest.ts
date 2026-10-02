@@ -6,11 +6,11 @@ import { TARGET_IDS, type TargetId } from './agents.js';
 
 /**
  * The record of what `init` wrote. Without it, `remove` deletes by convention and
- * takes a file the user wrote. Each entry hashes the content as Understudy wrote
+ * takes a file the user wrote. Each entry hashes the content as Cue wrote
  * it, so a hash that no longer matches means the file is the user's from now on.
  */
 
-export const MANIFEST_PATH = '.understudy/install.json';
+export const MANIFEST_PATH = '.cue/install.json';
 export const MANIFEST_SCHEMA_VERSION = 1;
 
 /**
@@ -32,7 +32,7 @@ export const ManagedFileSchema = z.strictObject({
 
 export const ManifestSchema = z.strictObject({
   schemaVersion: z.literal(MANIFEST_SCHEMA_VERSION),
-  understudyVersion: z.string().min(1),
+  cueVersion: z.string().min(1),
   packageManager: z.string().min(1),
   targets: z.array(z.enum(TARGET_IDS)),
   files: z.array(ManagedFileSchema),
@@ -49,11 +49,11 @@ export function hashContent(content: string): string {
   return createHash('sha256').update(content.replace(/\r\n/g, '\n'), 'utf8').digest('hex');
 }
 
-export function emptyManifest(understudyVersion: string, packageManager: string): Manifest {
+export function emptyManifest(cueVersion: string, packageManager: string): Manifest {
   const now = new Date().toISOString();
   return {
     schemaVersion: MANIFEST_SCHEMA_VERSION,
-    understudyVersion,
+    cueVersion,
     packageManager,
     targets: [],
     files: [],

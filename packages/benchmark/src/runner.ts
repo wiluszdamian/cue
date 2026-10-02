@@ -6,7 +6,7 @@ import {
   readAllRouteMaps,
   type KnowledgeIndex,
   type Rules,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { CONDITIONS, type Agent, type AgentResponse, type Condition } from './agent.js';
 import {
   summariseExecution,
@@ -457,32 +457,32 @@ function summariseCondition(g: Gathered): ConditionResult {
 }
 
 export interface Comparison {
-  readonly violationsPerFile: { bare: number; understudy: number; change: number };
-  readonly groundedRate: { bare: number | undefined; understudy: number | undefined };
+  readonly violationsPerFile: { bare: number; cue: number; change: number };
+  readonly groundedRate: { bare: number | undefined; cue: number | undefined };
   /** True when the layer measurably helped on both metrics. */
   readonly supportsPremise: boolean;
 }
 
 export function compare(result: BenchmarkResult): Comparison {
   const bare = result.conditions.find((c) => c.condition === 'bare');
-  const understudy = result.conditions.find((c) => c.condition === 'understudy');
+  const cue = result.conditions.find((c) => c.condition === 'cue');
 
   const bareViolations = bare?.compliance.violationsPerFile ?? 0;
-  const understudyViolations = understudy?.compliance.violationsPerFile ?? 0;
+  const cueViolations = cue?.compliance.violationsPerFile ?? 0;
   const bareGrounded = bare?.grounding.groundedRate;
-  const understudyGrounded = understudy?.grounding.groundedRate;
+  const cueGrounded = cue?.grounding.groundedRate;
 
   return {
     violationsPerFile: {
       bare: bareViolations,
-      understudy: understudyViolations,
-      change: understudyViolations - bareViolations,
+      cue: cueViolations,
+      change: cueViolations - bareViolations,
     },
-    groundedRate: { bare: bareGrounded, understudy: understudyGrounded },
+    groundedRate: { bare: bareGrounded, cue: cueGrounded },
     supportsPremise:
-      understudyViolations < bareViolations &&
-      understudyGrounded !== undefined &&
+      cueViolations < bareViolations &&
+      cueGrounded !== undefined &&
       bareGrounded !== undefined &&
-      understudyGrounded > bareGrounded,
+      cueGrounded > bareGrounded,
   };
 }

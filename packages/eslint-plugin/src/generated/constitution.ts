@@ -1,12 +1,12 @@
 // GENERATED FILE — do not edit.
 //
 // Source:    rules/constitution.yaml, rules/tags.yaml
-// Regenerate: pnpm --filter @understudy/eslint-plugin generate
+// Regenerate: pnpm --filter @wiluszdamian/cue-eslint-plugin generate
 //
 // Committed on purpose: a constitution change shows up as a diff here in review,
 // and the published package works without rules/.
 
-import type { Constitution, TagSet } from '@understudy/engine';
+import type { Constitution, TagSet } from '@wiluszdamian/cue-engine';
 
 export const CONSTITUTION = {
   "schemaVersion": 1,
@@ -280,7 +280,7 @@ export const CONSTITUTION = {
       "tier": "MUST",
       "severity": "warn",
       "title": "Selectors come from .agent-kb or from fresh exploration",
-      "rationale": "This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; understudy check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.\n",
+      "rationale": "This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; cue check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.\n",
       "detector": {
         "kind": "knowledge",
         "check": "locators"
@@ -290,7 +290,7 @@ export const CONSTITUTION = {
       ],
       "exclude": [],
       "autofix": false,
-      "message": "This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run understudy survey <url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n",
+      "message": "This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run cue survey <url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n",
       "skill": "locator-policy",
       "docsAnchor": "selectors-from-agent-kb",
       "examples": {

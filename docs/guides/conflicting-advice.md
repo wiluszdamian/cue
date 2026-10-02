@@ -20,7 +20,7 @@ there was a tie.
 Ask it directly:
 
 ```bash
-npx @wiluszdamian/cue-cli locator "how do I record a trace"
+npx @wiluszdamian/cue locator "how do I record a trace"
 ```
 
 Or in an assistant that has the skills installed, `/resolve-owner`.

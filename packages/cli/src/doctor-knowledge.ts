@@ -12,7 +12,7 @@ import {
   type FileStateProvider,
   type KnowledgeIndex,
   type LoadIssue,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { check } from './check.js';
 import type { CheckResult } from './doctor.js';
 
@@ -70,7 +70,7 @@ function summary(probe: KnowledgeProbe): CheckResult {
       status: 'warn',
       detail:
         'No .agent-kb/. Without it, every selector an agent writes is a guess. It is filled by looking at the running application, or by reading the product source if it is here.',
-      fix: 'understudy survey <url>   # or: understudy extract --source <dir>',
+      fix: 'cue survey <url>   # or: cue extract --source <dir>',
     };
   }
 
@@ -82,7 +82,7 @@ function summary(probe: KnowledgeProbe): CheckResult {
       status: 'warn',
       detail:
         '.agent-kb/ exists but holds nothing usable, so it cannot answer a single question about the application.',
-      fix: 'understudy survey <url>',
+      fix: 'cue survey <url>',
     };
   }
 
@@ -101,13 +101,13 @@ function unusableFiles(probe: KnowledgeProbe): CheckResult[] {
       id: 'kb:files',
       title: 'Surveyed pages are readable',
       match: (path: string) => path.startsWith('.agent-kb/app-map/'),
-      fix: 'delete the file named above, then: understudy survey --route <route> --base-url <url>',
+      fix: 'delete the file named above, then: cue survey --route <route> --base-url <url>',
     },
     {
       id: 'kb:product-files',
       title: 'Extracted product files are readable',
       match: (path: string) => !path.startsWith('.agent-kb/app-map/'),
-      fix: 'understudy extract --source <dir>',
+      fix: 'cue extract --source <dir>',
     },
   ] as const;
 
@@ -184,7 +184,7 @@ function conflicts(probe: KnowledgeProbe): CheckResult[] {
       title: 'Sources agree with each other',
       status: 'warn',
       detail: `${plural(found.length, 'fact')} where two sources disagree: ${listed(found.map((c) => `${c.factId} (${c.field}: ${c.values.map((v) => String(v.value)).join(' vs ')})`))}. Neither is picked for you; look at the page again and keep the one that is true.`,
-      fix: route === undefined ? 'understudy verify --base-url <url>' : surveyCommand(route),
+      fix: route === undefined ? 'cue verify --base-url <url>' : surveyCommand(route),
     },
   ];
 }
@@ -198,7 +198,7 @@ function testsAgainstNotes(probe: KnowledgeProbe): CheckResult[] {
       title: 'Locators in tests are known',
       status: 'warn',
       detail: `${plural(unknown.length, 'locator')} in the tests that the notes do not know about: ${listed(unknown.map((u) => `${u.where} ${u.expression}`))}.`,
-      fix: 'understudy check',
+      fix: 'cue check',
     },
   ];
 }
@@ -211,7 +211,7 @@ function testIdsInSource(probe: KnowledgeProbe): CheckResult[] {
       title: 'Test ids are still in the source',
       status: 'warn',
       detail: `${plural(probe.testIdsGone.length, 'test id')} in the notes that the product source no longer contains: ${listed(probe.testIdsGone)}. A test using one will not find it.`,
-      fix: 'understudy extract --source <dir>',
+      fix: 'cue extract --source <dir>',
     },
   ];
 }
@@ -232,7 +232,7 @@ function duplicates(probe: KnowledgeProbe): CheckResult[] {
       title: 'Each element is noted once',
       status: 'warn',
       detail: `${plural(repeated.length, 'element')} noted under more than one id, so a lookup may answer with either: ${listed(repeated.map((ids) => ids.join(' = ')))}.`,
-      fix: route === undefined ? 'understudy survey <url>' : surveyCommand(route),
+      fix: route === undefined ? 'cue survey <url>' : surveyCommand(route),
     },
   ];
 }
@@ -256,7 +256,7 @@ function coverage(probe: KnowledgeProbe): CheckResult[] {
       status: 'warn',
       detail: `${plural(unseen.length, 'page')} known from the code that nobody has looked at, so nothing is known about what is on them: ${listed(unseen)}.`,
       // A page with a parameter cannot be named; it has to be reached through a real address.
-      fix: reachable === undefined ? 'understudy survey <url>' : surveyCommand(reachable),
+      fix: reachable === undefined ? 'cue survey <url>' : surveyCommand(reachable),
     },
   ];
 }

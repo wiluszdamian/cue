@@ -36,7 +36,7 @@ const cliScript = join(
 );
 
 // The CLI drops a `.playwright-cli/` folder in its working directory.
-const work = mkdtempSync(join(tmpdir(), 'understudy-capture-'));
+const work = mkdtempSync(join(tmpdir(), 'cue-capture-'));
 
 function cli(...args) {
   const result = spawnSync(process.execPath, [cliScript, ...args], {

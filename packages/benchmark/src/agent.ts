@@ -8,10 +8,10 @@ import type { Prompt } from './prompts.js';
  * changes without paying for the model again.
  */
 
-/** `bare` is the assistant alone; `understudy` adds AGENTS.md and the knowledge base. */
-export type Condition = 'bare' | 'understudy';
+/** `bare` is the assistant alone; `cue` adds AGENTS.md and the knowledge base. */
+export type Condition = 'bare' | 'cue';
 
-export const CONDITIONS: readonly Condition[] = ['bare', 'understudy'];
+export const CONDITIONS: readonly Condition[] = ['bare', 'cue'];
 
 export interface AgentRequest {
   readonly prompt: Prompt;

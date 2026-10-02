@@ -56,9 +56,9 @@ disagree, something has to decide. Otherwise it picks one more or less at random
 ## The order things happen in
 
 ```
-Set up once          npx @wiluszdamian/cue-cli init
+Set up once          npx @wiluszdamian/cue init
      ↓
-Learn the app        npx @wiluszdamian/cue-cli survey <url>
+Learn the app        npx @wiluszdamian/cue survey <url>
      ↓
 Write tests          your assistant, or you
      ↓

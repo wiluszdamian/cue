@@ -9,12 +9,12 @@ import {
   scanSource,
   surveyCommand,
   type PlaywrightConfigFacts,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { detectAgents, type DetectedAgent } from './agents.js';
 import { readManifest } from './manifest.js';
 
 /**
- * `understudy discover` — what is in this repository, and what could Understudy
+ * `cue discover` — what is in this repository, and what could Cue
  * learn from it? Read-only from first line to last: it opens files and writes none,
  * and ends with the commands that would act on what it found, so a person sees the
  * plan before anything changes.
@@ -82,7 +82,7 @@ export interface DiscoveryReport {
     readonly detected: readonly DetectedAgent[];
     readonly instructionFiles: readonly string[];
   };
-  readonly understudy: {
+  readonly cue: {
     readonly installed: boolean;
     readonly version: string | undefined;
     readonly surveyedRoutes: readonly string[];
@@ -225,13 +225,13 @@ export function discover(options: DiscoverOptions): DiscoveryReport {
   });
   const instructionFiles = INSTRUCTION_FILES.filter((file) => existsSync(join(root, file)));
 
-  // ---- Understudy itself
+  // ---- Cue itself
   let manifestVersion: string | undefined;
   let installed = false;
   try {
     const manifest = readManifest(root);
     installed = manifest !== undefined;
-    manifestVersion = manifest?.understudyVersion;
+    manifestVersion = manifest?.cueVersion;
   } catch {
     // A manifest that cannot be read is `doctor`'s to explain.
   }
@@ -261,7 +261,7 @@ export function discover(options: DiscoverOptions): DiscoveryReport {
       notes: scan.notes,
     },
     agents: { detected, instructionFiles },
-    understudy: {
+    cue: {
       installed,
       version: manifestVersion,
       surveyedRoutes: surveyed,
@@ -288,25 +288,25 @@ function nextSteps(
   source: string | undefined,
 ): string[] {
   const steps: string[] = [];
-  const { understudy, sources } = report;
+  const { cue, sources } = report;
 
-  if (!understudy.installed) steps.push('understudy init');
+  if (!cue.installed) steps.push('cue init');
 
   const supplies = sources.findings.some((finding) => finding.found > 0);
-  if (supplies && understudy.elements === 0) {
-    steps.push(`understudy extract --source ${source ?? '.'}`);
+  if (supplies && cue.elements === 0) {
+    steps.push(`cue extract --source ${source ?? '.'}`);
   }
 
-  const unsurveyed = sources.routes.filter((route) => !understudy.surveyedRoutes.includes(route));
+  const unsurveyed = sources.routes.filter((route) => !cue.surveyedRoutes.includes(route));
   const concrete = unsurveyed.filter((route) => !/[[\]{}:]/.test(route));
   for (const route of concrete.slice(0, 3)) steps.push(surveyCommand(route));
   if (concrete.length > 3)
     steps.push(`…and ${String(concrete.length - 3)} more route(s) the source declares`);
-  if (concrete.length === 0 && understudy.surveyedRoutes.length === 0) steps.push(surveyCommand());
+  if (concrete.length === 0 && cue.surveyedRoutes.length === 0) steps.push(surveyCommand());
 
-  if (report.tests.specFiles > 0 && understudy.elements > 0) steps.push('understudy check');
+  if (report.tests.specFiles > 0 && cue.elements > 0) steps.push('cue check');
 
-  steps.push('understudy doctor');
+  steps.push('cue doctor');
   return steps;
 }
 
@@ -316,7 +316,7 @@ const yes = '✓';
 const no = '-';
 
 export function formatDiscovery(report: DiscoveryReport): string {
-  const lines: string[] = ['', `Understudy discover — ${report.root}`, ''];
+  const lines: string[] = ['', `Cue discover — ${report.root}`, ''];
 
   lines.push('Playwright');
   if (report.playwright.config === undefined) {
@@ -358,7 +358,7 @@ export function formatDiscovery(report: DiscoveryReport): string {
   lines.push('');
 
   lines.push(
-    `What the source could tell Understudy (${String(report.sources.filesRead)} file(s) read in ${report.sources.root})`,
+    `What the source could tell Cue (${String(report.sources.filesRead)} file(s) read in ${report.sources.root})`,
   );
   for (const finding of report.sources.findings) {
     lines.push(
@@ -382,15 +382,15 @@ export function formatDiscovery(report: DiscoveryReport): string {
   }
   lines.push('');
 
-  lines.push('Understudy here');
+  lines.push('Cue here');
   lines.push(
-    report.understudy.installed
-      ? `  ${yes} set up${report.understudy.version === undefined ? '' : ` (${report.understudy.version})`}`
+    report.cue.installed
+      ? `  ${yes} set up${report.cue.version === undefined ? '' : ` (${report.cue.version})`}`
       : `  ${no} not set up`,
   );
   lines.push(
-    report.understudy.elements > 0
-      ? `  ${yes} .agent-kb knows ${String(report.understudy.surveyedRoutes.length)} surveyed route(s), ${String(report.understudy.elements)} element(s)`
+    report.cue.elements > 0
+      ? `  ${yes} .agent-kb knows ${String(report.cue.surveyedRoutes.length)} surveyed route(s), ${String(report.cue.elements)} element(s)`
       : `  ${no} .agent-kb knows nothing about the application yet`,
   );
   lines.push('');
@@ -427,5 +427,5 @@ export function formatDiscoverySummary(report: DiscoveryReport): string {
       .filter((f) => f.found > 0)
       .map((f) => `${String(f.found)} ${f.unit}`),
   ];
-  return `Found: ${found.join(' · ')}. (understudy discover shows the detail.)`;
+  return `Found: ${found.join(' · ')}. (cue discover shows the detail.)`;
 }

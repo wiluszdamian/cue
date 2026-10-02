@@ -1,7 +1,7 @@
 {
-  "name": "@understudy/engine",
+  "name": "@wiluszdamian/cue-engine",
   "version": "0.8.0",
-  "description": "Understudy core: constitution loader, detectors, analyzer, reporters.",
+  "description": "Cue core: constitution loader, detectors, analyzer, reporters.",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -17,7 +17,7 @@
     "dist"
   ],
   "bin": {
-    "understudy-engine": "./dist/cli.js"
+    "cue-engine": "./dist/cli.js"
   },
   "scripts": {
     "build": "node ../../scripts/tsc7.mjs --build tsconfig.build.json",

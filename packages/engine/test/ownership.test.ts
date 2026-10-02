@@ -59,16 +59,16 @@ describe('the table is internally consistent', () => {
 describe('routing', () => {
   it.each([
     // How to choose a locator is ours; which one exists is the knowledge base's.
-    ['which locator should I use', 'understudy'],
+    ['which locator should I use', 'cue'],
     ['what is the data-testid for the checkout button', 'agent-kb'],
-    ['where should locators live', 'understudy'],
+    ['where should locators live', 'cue'],
 
     ['how do I record a trace', 'playwright-official'],
     ['how do I set up storage state', 'playwright-official'],
     ['how do I test a Svelte component', 'reference-skill'],
     ['how do I do visual regression', 'reference-skill'],
-    ['what tag should this test carry', 'understudy'],
-    ['should this zod schema be strict', 'understudy'],
+    ['what tag should this test carry', 'cue'],
+    ['should this zod schema be strict', 'cue'],
   ])('routes %j to %s', (question, owner) => {
     expect(ownerOf(question)).toBe(owner);
   });

@@ -117,7 +117,7 @@ export class ClaudeAgent implements Agent {
   }
 }
 
-/** `understudy` adds the project's own files verbatim, so this measures what ships. */
+/** `cue` adds the project's own files verbatim, so this measures what ships. */
 export function systemPrompt(request: AgentRequest): string {
   return request.context.trim().length === 0
     ? INSTRUCTIONS

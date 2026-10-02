@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { loadRules } from '@understudy/engine';
+import { loadRules } from '@wiluszdamian/cue-engine';
 import { CONDITIONS, detectRuns, missingRecordings, RecordedAgent } from './agent.js';
 import { ClaudeAgent, DEFAULT_MODEL } from './live-agent.js';
 import { DemoExecutor } from './executor.js';
@@ -17,8 +17,8 @@ import { runBenchmark } from './runner.js';
  * else's run, or their own after a rule changes, without paying again.
  */
 
-const USAGE = `understudy-benchmark <recordings-dir> [options]        score a recorded run
-understudy-benchmark record <recordings-dir> [options]  ask a model, and write the run
+const USAGE = `cue-benchmark <recordings-dir> [options]        score a recorded run
+cue-benchmark record <recordings-dir> [options]  ask a model, and write the run
 
   --project <path>   the project whose AGENTS.md and .agent-kb to use
   --rules <path>     rules directory (default: <project>/rules)
@@ -101,7 +101,7 @@ async function score(recordings: string, projectRoot: string): Promise<number> {
         ),
         '',
         'Record them:',
-        `  understudy-benchmark record ${recordings} --project ${projectRoot}`,
+        `  cue-benchmark record ${recordings} --project ${projectRoot}`,
         '',
         'Or narrow the run deliberately:',
         `  --prompts ${recordable.join(',')}`,
@@ -192,9 +192,7 @@ async function recordCommand(recordings: string, projectRoot: string): Promise<n
     return 1;
   }
 
-  process.stdout.write(
-    `\nScore it:\n  understudy-benchmark ${recordings} --project ${projectRoot}\n`,
-  );
+  process.stdout.write(`\nScore it:\n  cue-benchmark ${recordings} --project ${projectRoot}\n`);
   return 0;
 }
 

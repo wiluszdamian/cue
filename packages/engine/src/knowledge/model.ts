@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * The Knowledge Core: what Understudy knows about an application, why it believes
+ * The Knowledge Core: what Cue knows about an application, why it believes
  * it, and how far to trust it. Plain typed structures with string ids — no graph
  * engine — because the questions asked of it are lookups, not traversals.
  *

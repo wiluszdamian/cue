@@ -1,5 +1,5 @@
 /**
- * A minimal line diff, so `sync` can show what it is about to change. Understudy
+ * A minimal line diff, so `sync` can show what it is about to change. Cue
  * rewrites files in repositories it does not own, where "trust me" is not good
  * enough — and a dependency is not worth it at this size.
  */

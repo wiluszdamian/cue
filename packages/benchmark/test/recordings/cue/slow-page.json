@@ -1,0 +1,6 @@
+{
+  "promptId": "slow-page",
+  "condition": "cue",
+  "model": "fixture (not a real model)",
+  "code": "import { expect, test } from '../../../fixtures/pom/test-options.js';\n\ntest('the dashboard finishes loading', { tag: ['@smoke'] }, async ({ loginPage }) => {\n  await loginPage.goto();\n  await expect(loginPage.welcomeHeading).toBeVisible();\n});"
+}

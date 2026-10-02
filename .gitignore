@@ -23,8 +23,10 @@ Thumbs.db
 # Browser session scratch from playwright-cli
 .playwright-cli/
 
-# Planning documents, kept locally rather than shipped
-understudy-blueprints/
+# Planning notes and local working files: kept on disk, not shipped
+.planning/
+.codex/
+cue-blueprints/
 
 # Scratch workspaces for generated tests run by the benchmark
 .benchmark/

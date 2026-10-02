@@ -176,7 +176,7 @@ describe('through the adapter and a whole extract', () => {
   });
 
   function product(files: Record<string, string>): string {
-    const root = mkdtempSync(join(tmpdir(), 'understudy-openapi-'));
+    const root = mkdtempSync(join(tmpdir(), 'cue-openapi-'));
     roots.push(root);
     for (const [name, text] of Object.entries(files)) {
       mkdirSync(join(root, name, '..'), { recursive: true });
@@ -193,7 +193,7 @@ describe('through the adapter and a whole extract', () => {
   });
 
   it('surfaces a broken document as a gap in the extract result', () => {
-    const suite = mkdtempSync(join(tmpdir(), 'understudy-suite-'));
+    const suite = mkdtempSync(join(tmpdir(), 'cue-suite-'));
     roots.push(suite);
     const root = product({ 'openapi.json': '{ not json' });
     const result = extract({ projectRoot: suite, sourceRoot: root });

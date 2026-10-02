@@ -1,8 +1,8 @@
-# What Understudy has been checked against.
+# What Cue has been checked against.
 #
-# Understudy composes tools it does not own, and their movement is its main risk.
+# Cue composes tools it does not own, and their movement is its main risk.
 # This file says which versions were actually run, so that a version outside the
-# range gives a signal (`understudy doctor`, the weekly `upstream` workflow) rather
+# range gives a signal (`cue doctor`, the weekly `upstream` workflow) rather
 # than a failure nobody can explain.
 #
 #   range     the versions the project claims to work with
@@ -30,7 +30,7 @@ tools:
   '@playwright/mcp':
     range: '>=0.0.83 <0.1.0'
     tested: '0.0.83'
-    role: browser calls from an agent, next to the Understudy server
+    role: browser calls from an agent, next to the Cue server
 
   '@playwright/test':
     range: '>=1.63.0 <2.0.0'

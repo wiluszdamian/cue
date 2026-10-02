@@ -197,7 +197,7 @@ describe('buildTaskContext', () => {
     expect(context.found).toBe(false);
     expect(context.text).toContain('status: unknown');
     expect(context.text).toContain('/login');
-    expect(context.text).toContain('understudy survey --route');
+    expect(context.text).toContain('cue survey --route');
   });
 
   it('lists at most ten known routes when it does not know', () => {

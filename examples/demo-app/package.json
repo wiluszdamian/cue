@@ -1,5 +1,5 @@
 {
-  "name": "@understudy/demo-app",
+  "name": "@wiluszdamian/cue-demo-app",
   "version": "0.8.0",
   "private": true,
   "description": "A small, deterministic web app for end-to-end checks and the benchmark. Not published.",

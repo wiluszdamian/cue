@@ -13,7 +13,7 @@ packages/*/test/fixtures/
 # these stay byte-identical to what `sync:check` expects.
 packages/*/src/generated/
 docs/reference/
-plugins/understudy/
+plugins/cue/
 .claude-plugin/
 .cursor-plugin/
 .grok-plugin/

@@ -103,7 +103,7 @@ You'll see a message explaining what's wrong, why, and what to write instead. Wa
 the longer version?
 
 ```bash
-npx @wiluszdamian/cue-cli explain no-hard-waits
+npx @wiluszdamian/cue explain no-hard-waits
 ```
 
 <Callout>

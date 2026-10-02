@@ -156,7 +156,7 @@ describe('which facts a change reaches', () => {
 describe('the product’s files, as they are now', () => {
   let root: string;
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'understudy-tree-'));
+    root = mkdtempSync(join(tmpdir(), 'cue-tree-'));
   });
   afterEach(() => {
     rmSync(root, { recursive: true, force: true });
@@ -188,7 +188,7 @@ describe('the product’s files, as they are now', () => {
   });
 
   it('agrees with the hashes `extract` writes, so an unchanged file is not reported', () => {
-    const project = mkdtempSync(join(tmpdir(), 'understudy-proj-'));
+    const project = mkdtempSync(join(tmpdir(), 'cue-proj-'));
     try {
       write('app/Login.tsx', '<button data-testid="login-submit">Log in</button>\r\n');
       extract({ projectRoot: project, sourceRoot: root });

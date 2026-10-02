@@ -8,7 +8,7 @@
  * the job rather than opening an issue: a red scheduled run already notifies the people
  * who watch the repository, and it needs no permission beyond reading.
  *
- * `UNDERSTUDY_UPSTREAM_VERSIONS='{"@playwright/cli":"0.2.0"}'` replaces the network
+ * `CUE_UPSTREAM_VERSIONS='{"@playwright/cli":"0.2.0"}'` replaces the network
  * lookup, which is how the comparison is tested.
  */
 import { execFileSync } from 'node:child_process';
@@ -33,7 +33,7 @@ function newestRelease(name) {
   }).trim();
 }
 
-const faked = process.env['UNDERSTUDY_UPSTREAM_VERSIONS'];
+const faked = process.env['CUE_UPSTREAM_VERSIONS'];
 const latest = {};
 for (const tool of Object.keys(compatibility.tools)) {
   try {

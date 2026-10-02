@@ -27,7 +27,7 @@ const SNAPSHOT = readFileSync(join(import.meta.dirname, 'snapshots', 'login.txt'
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-kb-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-kb-'));
 });
 
 afterEach(() => {
@@ -119,7 +119,7 @@ describe('freshness', () => {
   it('tells a stale entry not to speak confidently', () => {
     const advice = freshnessAdvice('stale', '/login');
     expect(advice).toContain('candidate, not a fact');
-    expect(advice).toContain('understudy survey');
+    expect(advice).toContain('cue survey');
     expect(advice).toContain('confident voice');
   });
 });
@@ -274,7 +274,7 @@ describe('resolving a locator', () => {
     const answer = resolveLocator({ projectRoot: root, query: 'delete account button' });
     expect(answer.kind).toBe('unknown');
     expect(formatLocatorAnswer(answer)).toContain('Do not guess a selector');
-    expect(formatLocatorAnswer(answer)).toContain('understudy survey');
+    expect(formatLocatorAnswer(answer)).toContain('cue survey');
   });
 
   it('says what it does know, so the gap is actionable', () => {

@@ -23,7 +23,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @understudy/engine run build
+      - run: pnpm --filter @wiluszdamian/cue-engine run build
       # Fails, naming the tool and what to do, when the newest release of anything in
       # compatibility.yaml is outside the range it was tested against. A red scheduled
       # run already notifies whoever watches the repository, so this does not open issues

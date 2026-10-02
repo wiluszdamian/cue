@@ -29,7 +29,7 @@ rather than deletion, and stay documented for one major cycle.
   a gap and the rest are still read. With several locales the English label is kept and the
   others are named as left out, because a term does not record its locale.
 
-- **`compatibility.yaml`**: the range and the tested version of each tool Understudy composes
+- **`compatibility.yaml`**: the range and the tested version of each tool Cue composes
   (`@playwright/cli`, `@playwright/mcp`, `@playwright/test`, typescript-eslint). The MCP
   configuration `init` writes and the plugin manifests now pin exact versions instead of
   `@latest`; `doctor` warns, with the command to install the tested version, when an installed
@@ -42,7 +42,7 @@ rather than deletion, and stay documented for one major cycle.
   noted twice, and pages known only from the code. A healthy knowledge base is still one line,
   every problem comes with a command that exists, and only an unreadable file fails `--ci`.
 
-- **`get_context`** (MCP) and **`understudy context "<task>"`**: one answer, at the start of a
+- **`get_context`** (MCP) and **`cue context "<task>"`**: one answer, at the start of a
   task, with the page it is about, the matching elements, endpoints, vocabulary, the rules, and
   how fresh each part is, inside a token budget the caller sets (200 to 3000). Retrieval is by
   words, not a model, so the same task over the same notes gives the same answer. Trimming drops
@@ -56,12 +56,12 @@ rather than deletion, and stay documented for one major cycle.
 ### Changed
 
 - Where a message tells you to look at a page again, it now gives the narrowest command that
-  will do (`understudy survey --route /login --base-url <url>`, or `--stale`) instead of a bare
+  will do (`cue survey --route /login --base-url <url>`, or `--stale`) instead of a bare
   `survey <url>`.
 
 - **`selectors-from-agent-kb` is now enforced.** It was a manual rule: stated, never
   checked. It now runs in the linter and in the engine's `analyze` (a new `knowledge`
-  detector) using the same analyzer as `understudy check`, against the `.agent-kb`
+  detector) using the same analyzer as `cue check`, against the `.agent-kb`
   found above the file. It reports invented, wrong-route, ambiguous, stale and
   inferred-only locators, as a **warning** (the `strict` preset makes it an error)
   until the false-positive rate on real suites is known. Without an `.agent-kb` the
@@ -73,7 +73,7 @@ rather than deletion, and stay documented for one major cycle.
   whether `{ exact: true }` was passed, whether it is built from something only known
   at runtime, whether it narrows another locator, and which functions it sits in.
   The existing fields are unchanged. `scanTestSource` additionally returns the
-  `page.goto` calls and an `understudy-route` comment.
+  `page.goto` calls and an `cue-route` comment.
 
 - **Route maps are written as `schemaVersion: 2`.** Every element now carries an
   `id`, a `status` (`inferred`, `observed`, `verified`, `stale`), the `evidence` it
@@ -81,7 +81,7 @@ rather than deletion, and stay documented for one major cycle.
   files it depends on are recorded for elements a test id confirms. Evidence names
   the tool and version that read the page. Version 1 files are still read (migrated
   in memory, left untouched until something saves them), and a version this
-  Understudy does not know is refused with an instruction to upgrade. The product
+  Cue does not know is refused with an instruction to upgrade. The product
   files (`testids`, `surface`, `vocabulary`) are unchanged: they already carry
   `file:line` and a commit.
 - `survey --env <name>` and `verify --env <name>` record the environment's name in
@@ -98,7 +98,7 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Changed
 
-- **`verify-map` is now `understudy verify`, and it no longer claims what it did not
+- **`verify-map` is now `cue verify`, and it no longer claims what it did not
   check.** The old report ended with "The map matches the application." even when
   no environment was given and nothing had been looked at. The verdict is now one
   of `PASS`, `PARTIAL`, `NOT VERIFIED`, `FAIL` or `EMPTY`, and only `PASS` — every
@@ -114,7 +114,7 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
-- **`understudy discover`** looks at a repository without changing it and reports the
+- **`cue discover`** looks at a repository without changing it and reports the
   Playwright config (read as text, never run: test folder and projects), how many spec
   files, how many page objects (classes that hold a `Page`, wherever they live), what the
   product's source could supply (test ids, Next.js routes, OpenAPI endpoints, labels, with
@@ -127,7 +127,7 @@ rather than deletion, and stay documented for one major cycle.
   `--affected-by <git range>` those read from files changed over the range. It prints a plan
   with the reason for each page before opening anything (`--dry-run` stops there), skips pages
   with a parameter and says why, carries on past a page that fails, and reports each as
-  updated, unchanged or failed. The address comes from `--base-url` or `UNDERSTUDY_BASE_URL` and
+  updated, unchanged or failed. The address comes from `--base-url` or `CUE_BASE_URL` and
   is never written to `.agent-kb`.
 
 - **Notes go stale when the code behind them changes, not only with age.** A route whose
@@ -141,7 +141,7 @@ rather than deletion, and stay documented for one major cycle.
   nothing.
 
 - `scripts/prepare-benchmark-project.mjs` builds the project a benchmark is run against
-  (Understudy installed, and a knowledge base of the demo application made with `extract`
+  (Cue installed, and a knowledge base of the demo application made with `extract`
   and `survey`), and `benchmarks/RUNBOOK.md` is the procedure for the first real,
   paid run. The default benchmark model is now `claude-opus-5-5`.
 
@@ -160,10 +160,10 @@ rather than deletion, and stay documented for one major cycle.
   seven tasks on the demo application, several tied to a defect it can be given) and
   `--execute` compile each answer with the project's TypeScript and run it once, with
   no retries, in a real browser, reporting compile success and first-run pass per
-  condition and per answer. Locators are judged by the same analyzer as `understudy
+  condition and per answer. Locators are judged by the same analyzer as `cue
   check` (right element, right page, unique), with those it cannot decide counted
   separately and never as invented. A path in a model's answer that leaves the workspace
-  is refused. `pnpm --filter @understudy/benchmark test:integration` runs the real thing.
+  is refused. `pnpm --filter @wiluszdamian/cue-benchmark test:integration` runs the real thing.
   Nothing has been measured with a model yet.
 
 - `scripts/e2e.mjs` runs the whole user path against a real browser, from `init` to a
@@ -171,30 +171,30 @@ rather than deletion, and stay documented for one major cycle.
   The demo app gained a `login-button-renamed` mutation, so that `verify` has a page
   that needs no session to drift on.
 
-- **`understudy check [files…]`** reports which locators in your tests the knowledge base
+- **`cue check [files…]`** reports which locators in your tests the knowledge base
   does not know, with the nearest real locator and the command to run, using the same
   analyzer the lint rule will. Output is `human`, `agent`, `json`, `sarif` or `github`.
   `--ci` fails on what breaks at runtime (an invented locator, or a real one on the wrong
   page); `--ci=strict` fails on any finding and when nothing could be checked. Locators the
   code alone cannot decide are always counted and listed as not judged.
 
-- **`analyzeLocators`** (`@understudy/engine`): for each locator in a test file, says
+- **`analyzeLocators`** (`@wiluszdamian/cue-engine`): for each locator in a test file, says
   whether the knowledge base knows it — `known`, `ambiguous` (several elements match,
   which Playwright's strict mode refuses), `unknown`, `wrong-route`, `stale`,
   `unverified` or `undecidable` — with the nearest known locators and a sentence on
   what to do. Matching follows Playwright (case-insensitive substring, `exact`),
-  the route comes from the closest earlier `page.goto` or an `understudy-route`
+  the route comes from the closest earlier `page.goto` or an `cue-route`
   comment, and anything that cannot be decided from the code (variables, regular
   expressions, `getByText`, CSS) is reported as undecidable instead of guessed at.
-  Nothing uses it yet; `understudy check` and a lint rule follow.
+  Nothing uses it yet; `cue check` and a lint rule follow.
 
 - **Knowledge Core model** (`packages/engine/src/knowledge`, exported from
-  `@understudy/engine`). A versioned, typed model of what is known about an
+  `@wiluszdamian/cue-engine`). A versioned, typed model of what is known about an
   application: twelve kinds of fact (application, environment, route, component,
   role, state, action, locator, test-id, api, term, data-requirement), each citing
   evidence by id, with a stored status (`inferred`, `observed`, `verified`, `stale`).
   Facts that rest only on an agent's inference cannot be `observed` or `verified`;
-  references must resolve; a model version newer than this Understudy is refused
+  references must resolve; a model version newer than this Cue is refused
   with an instruction to upgrade.
 - **`loadKnowledge(root)`** reads the existing `.agent-kb` files (route maps,
   `testids.yaml`, `surface.yaml`, `vocabulary.yaml`) into that model, and
@@ -213,7 +213,7 @@ rather than deletion, and stay documented for one major cycle.
   answers through the Knowledge Core. Its answers are unchanged, verified against a
   copy of the old algorithm on 120 query/route combinations. One difference: a
   hand-written `code-only` entry with no source reference now reads as `unknown`,
-  because nothing supports the claim. Understudy never writes `code-only`.
+  because nothing supports the claim. Cue never writes `code-only`.
 
 - **Snapshot formats are versioned.** `survey` and `verify-map` read the browser
   tool's output through a named format (`playwright-cli/markdown-yaml@1`). Text no
@@ -247,14 +247,14 @@ rather than deletion, and stay documented for one major cycle.
   `--playwright-cli <path>`; a Windows `.cmd` shim is resolved to the script behind
   it. `doctor` and `extract` no longer use a shell either.
 
-- `@understudy/eslint-plugin` reported `meta.version` `0.1.0`; it now reads the
+- `@wiluszdamian/cue-eslint-plugin` reported `meta.version` `0.1.0`; it now reads the
   version from its own `package.json`.
 
 ## [0.8.0] — 2026-09-12
 
 First public release. Everything below is new.
 
-Understudy composes the Playwright skills other people maintain and adds the two
+Cue composes the Playwright skills other people maintain and adds the two
 things nobody upstream can supply: what this repository's rules are, and what the
 tested application actually looks like.
 
@@ -275,11 +275,11 @@ tested application actually looks like.
 
 ### Enforcement
 
-- **`@understudy/engine`** — constitution loader with positioned error messages,
+- **`@wiluszdamian/cue-engine`** — constitution loader with positioned error messages,
   AST (esquery) and regex detectors, a refinement and fixer registry, the
   `analyze` entry point, and five reporters: `pretty`, `json`, `sarif`, `github`,
   `agent`.
-- **`@understudy/eslint-plugin`** — ESLint rules generated from the constitution,
+- **`@wiluszdamian/cue-eslint-plugin`** — ESLint rules generated from the constitution,
   with `recommended` and `strict` flat presets and an autofix for
   `strict-zod-objects`.
 - The repository lints itself with its own plugin.
@@ -293,11 +293,11 @@ tested application actually looks like.
 - **`rules/ownership.yaml`** — the table that decides which source wins when three
   skill trees disagree: 23 topics across 6 owners, with `precedence: absolute`
   reserved for the two sources nobody upstream can know.
-- **`whoOwns()`** and `understudy-engine who-owns` — deterministic topic
+- **`whoOwns()`** and `cue-engine who-owns` — deterministic topic
   resolution, matching on whole tokens rather than substrings. "Unowned" is an
   explicit answer that names the gap instead of staying silent.
 - Two cross-checks in CI: every `skill` the constitution cites must be claimed by
-  an understudy-owned absolute topic, and every topic must be reachable by its own
+  an cue-owned absolute topic, and every topic must be reachable by its own
   name.
 - The table is generated into `AGENTS.md` — the always-loaded layer, deliberately
   not a skill, because a skill cannot announce that it outranks another skill.
@@ -305,10 +305,10 @@ tested application actually looks like.
 ### The knowledge base
 
 - **`.agent-kb`** — schemas, store, freshness, redaction and correlation, plus
-  `understudy survey <url>`, `verify-map` and `locator`. Exploration is delegated
+  `cue survey <url>`, `verify-map` and `locator`. Exploration is delegated
   to `playwright-cli` behind a one-method driver, so parsing, correlating and
   writing are testable without a browser.
-- **`understudy extract --source <path>`** — the static half, read from the
+- **`cue extract --source <path>`** — the static half, read from the
   product's own source. Four adapters: `data-testid` attributes on any stack,
   Next.js routes from both routers, OpenAPI endpoints, and i18n labels. An
   unrecognised stack degrades to a generic scan; a missing source reports the gap
@@ -323,16 +323,16 @@ tested application actually looks like.
 
 ### The CLI
 
-- **`@understudy/cli`** — `init`, `doctor`, `sync`, `survey`, `extract`,
+- **`@wiluszdamian/cue`** — `init`, `doctor`, `sync`, `survey`, `extract`,
   `explain`, `add`, `remove`, `list` and `uninstall`. `init` detects the agents
   and the package manager, shows a plan, and writes nothing until it is accepted.
-- **`.understudy/install.json`** — an install manifest with a hash per file, so
+- **`.cue/install.json`** — an install manifest with a hash per file, so
   `init` is idempotent, a hand-edited file is never silently overwritten, and
   `remove`/`uninstall` reverse exactly what was installed.
 - **Region-based edits** — shared files like `.gitignore` and `AGENTS.md` keep the
-  user's content; Understudy owns only the block between its markers, which makes
+  user's content; Cue owns only the block between its markers, which makes
   removal an exact reversal rather than a guess.
-- **`understudy sync --check`** reports drift for CI without writing. A
+- **`cue sync --check`** reports drift for CI without writing. A
   hand-edited file is reported, never rewritten, and is not treated as drift;
   `--force` overrides and shows what it discards first.
 - Orphan detection: a file the manifest still lists but no installed target
@@ -349,14 +349,14 @@ tested application actually looks like.
 
 ### The skill catalog
 
-- **`skills/`** — the second distribution channel: `understudy`, `compass`,
+- **`skills/`** — the second distribution channel: `cue`, `compass`,
   `bind`, `survey`, `extract`, `pin`, `compose`, `inspect`, `resolve-owner`,
   `resolve-locator`. Installable with `npx skills add` and no engine at all.
-- **`plugins/understudy/`** — generated plugin package with Agent Plugins
+- **`plugins/cue/`** — generated plugin package with Agent Plugins
   `plugin.json`, Claude / Cursor / Grok / Codex manifests, Gemini
   `gemini-extension.json` and Playwright MCP. Marketplace files live at the
-  repository root so `/plugin marketplace add wiluszdamian/understudy` works.
-- `understudy` is the on-ramp a model may invoke; `compose`, `resolve-owner` and
+  repository root so `/plugin marketplace add wiluszdamian/cue` works.
+- `cue` is the on-ramp a model may invoke; `compose`, `resolve-owner` and
   `resolve-locator` stay model-invocable. Everything else is orchestration a
   person triggers, enforced by a test.
 - `skills/reference/` is generated from `rules/` and joins the drift gate — a
@@ -365,7 +365,7 @@ tested application actually looks like.
 
 ### The MCP server
 
-- **`@understudy/mcp`** — three read-only point lookups over stdio:
+- **`@wiluszdamian/cue-mcp`** — three read-only point lookups over stdio:
   `explain_rule`, `resolve_owner` and `resolve_locator`. It ships beside
   Playwright MCP rather than instead of it: that one drives a browser, this one
   answers questions about the rules and the knowledge base without one.
@@ -375,17 +375,17 @@ tested application actually looks like.
 
 ### Measurement
 
-- **`@understudy/benchmark`** — measures whether the layer changes what an
+- **`@wiluszdamian/cue-benchmark`** — measures whether the layer changes what an
   assistant writes: constitution violations per generated file, and the share of
   written selectors that name something real, both as comparisons of the same
-  prompts with and without Understudy.
+  prompts with and without Cue.
 - Ten fixed, versioned prompts that never hint at the rules being measured, and a
   test asserting they do not.
 - Scoring is deterministic and needs no API key: agents sit behind a one-method
   interface and runs are recorded, so anyone can re-score somebody else's run.
 - **No benchmark has been run.** The harness records and scores; until a real run
   exists, this project makes no claim that assistants write better tests with
-  Understudy.
+  Cue.
 
 ### Documentation
 
@@ -407,4 +407,4 @@ tested application actually looks like.
 - Windows is a first-class target: paths are normalised, `.gitattributes` forces
   LF, and the test matrix covers Linux, Windows and macOS on Node 22 and 24.
 
-[0.8.0]: https://github.com/wiluszdamian/understudy/releases/tag/v0.8.0
+[0.8.0]: https://github.com/wiluszdamian/project-cue/releases/tag/v0.8.0

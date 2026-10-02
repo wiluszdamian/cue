@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
 import type { TSESLint } from '@typescript-eslint/utils';
-import { isEnforceable, type Rule } from '@understudy/engine';
-import { buildRule, type UnderstudyRule } from './create-rule.js';
+import { isEnforceable, type Rule } from '@wiluszdamian/cue-engine';
+import { buildRule, type CueRule } from './create-rule.js';
 import { CANONICAL_TAGS, CONSTITUTION, TAGS } from './generated/constitution.js';
 
 /**
- * The mechanical half of Understudy: every rule generated from
+ * The mechanical half of Cue: every rule generated from
  * rules/constitution.yaml, so this is the same opinion made enforceable rather
  * than a second one. It runs with no agent involved — in CI, in an editor, and in
  * two years.
@@ -13,7 +13,7 @@ import { CANONICAL_TAGS, CONSTITUTION, TAGS } from './generated/constitution.js'
 
 const enforceable = CONSTITUTION.rules.filter(isEnforceable);
 
-export const rules: Record<string, UnderstudyRule> = Object.fromEntries(
+export const rules: Record<string, CueRule> = Object.fromEntries(
   enforceable.map((rule) => [rule.id, buildRule(rule)]),
 );
 
@@ -37,7 +37,7 @@ function packageVersion(): string {
 }
 
 const plugin = {
-  meta: { name: '@understudy/eslint-plugin', version: packageVersion() },
+  meta: { name: '@wiluszdamian/cue-eslint-plugin', version: packageVersion() },
   rules,
 } satisfies TSESLint.FlatConfig.Plugin;
 
@@ -46,7 +46,7 @@ type Severity = 'error' | 'warn';
 function ruleSettings(
   pick: (rule: (typeof enforceable)[number]) => Severity,
 ): TSESLint.FlatConfig.Rules {
-  return Object.fromEntries(enforceable.map((rule) => [`understudy/${rule.id}`, pick(rule)]));
+  return Object.fromEntries(enforceable.map((rule) => [`cue/${rule.id}`, pick(rule)]));
 }
 
 /**
@@ -57,15 +57,15 @@ function ruleSettings(
 export const configs = {
   recommended: [
     {
-      name: 'understudy/recommended',
-      plugins: { understudy: plugin },
+      name: 'cue/recommended',
+      plugins: { cue: plugin },
       rules: ruleSettings((rule) => rule.severity),
     },
   ],
   strict: [
     {
-      name: 'understudy/strict',
-      plugins: { understudy: plugin },
+      name: 'cue/strict',
+      plugins: { cue: plugin },
       rules: ruleSettings(() => 'error'),
     },
   ],

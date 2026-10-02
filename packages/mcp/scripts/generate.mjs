@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'prettier';
-import { formatValidationProblems, loadRules, validateRules } from '@understudy/engine';
+import { formatValidationProblems, loadRules, validateRules } from '@wiluszdamian/cue-engine';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
@@ -30,12 +30,12 @@ if (problems.length > 0) {
 const source = `// GENERATED FILE — do not edit.
 //
 // Source:     rules/constitution.yaml, rules/tags.yaml, rules/ownership.yaml
-// Regenerate: pnpm --filter @understudy/mcp generate
+// Regenerate: pnpm --filter @wiluszdamian/cue-mcp generate
 //
 // The rules travel with the package, since the server runs where rules/ does not
 // exist. Committed so a constitution change is visible here in review.
 
-import type { Constitution, Ownership, TagSet } from '@understudy/engine';
+import type { Constitution, Ownership, TagSet } from '@wiluszdamian/cue-engine';
 
 export const CONSTITUTION = ${JSON.stringify(rules.constitution, null, 2)} as unknown as Constitution;
 
@@ -55,13 +55,13 @@ if (process.argv.includes('--check')) {
     current = readFileSync(target, 'utf8');
   } catch {
     process.stderr.write(
-      'src/generated/rules.ts is missing. Run: pnpm --filter @understudy/mcp generate\n',
+      'src/generated/rules.ts is missing. Run: pnpm --filter @wiluszdamian/cue-mcp generate\n',
     );
     process.exit(1);
   }
   if (current !== formatted) {
     process.stderr.write(
-      'src/generated/rules.ts is out of date with rules/.\nRun: pnpm --filter @understudy/mcp generate\n',
+      'src/generated/rules.ts is out of date with rules/.\nRun: pnpm --filter @wiluszdamian/cue-mcp generate\n',
     );
     process.exit(1);
   }

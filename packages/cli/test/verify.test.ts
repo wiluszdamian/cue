@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { readRouteMap } from '@understudy/engine';
+import { readRouteMap } from '@wiluszdamian/cue-engine';
 import { survey, type CaptureResult, type SnapshotDriver } from '../src/survey.js';
 import {
   computeOverall,
@@ -40,7 +40,7 @@ const page = (name: string): CaptureResult => ({ ok: true, output: real(name) })
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-verify-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-verify-'));
 });
 
 afterEach(() => {
@@ -290,7 +290,7 @@ describe('CI exit codes', () => {
     surveyed('login', '/login');
     switch (overall) {
       case 'EMPTY':
-        return verify({ projectRoot: mkdtempSync(join(tmpdir(), 'understudy-empty-')) });
+        return verify({ projectRoot: mkdtempSync(join(tmpdir(), 'cue-empty-')) });
       case 'NOT_VERIFIED':
         return verify({ projectRoot: root });
       case 'PASS':

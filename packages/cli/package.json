@@ -1,7 +1,7 @@
 {
-  "name": "@understudy/cli",
+  "name": "@wiluszdamian/cue",
   "version": "0.8.0",
-  "description": "Preflight, scaffolding and agent wiring for Understudy.",
+  "description": "Preflight, scaffolding and agent wiring for Cue.",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -14,7 +14,7 @@
     }
   },
   "bin": {
-    "understudy": "./dist/cli.js"
+    "cue": "./dist/cli.js"
   },
   "files": [
     "dist"
@@ -27,7 +27,7 @@
     "generate:check": "node scripts/generate.mjs --check"
   },
   "dependencies": {
-    "@understudy/engine": "workspace:*",
+    "@wiluszdamian/cue-engine": "workspace:*",
     "zod": "^4.5.4"
   },
   "devDependencies": {

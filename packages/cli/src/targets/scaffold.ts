@@ -145,7 +145,7 @@ const LOGIN_PAGE = `import type { Locator, Page } from '@playwright/test';
  *
  * Every selector here should trace to \`.agent-kb\`. This file is a template, so
  * these are placeholders: replace them with the ids your application actually
- * has, from \`understudy survey\` or \`understudy extract\`.
+ * has, from \`cue survey\` or \`cue extract\`.
  */
 export class LoginPage {
   constructor(private readonly page: Page) {}
@@ -357,7 +357,7 @@ ${setup}
 `;
 }
 
-function understudyWorkflow(context: TargetContext): string {
+function cueWorkflow(context: TargetContext): string {
   const pm = context.packageManager;
   const cache = setupNodeCache(pm);
   const setup = cache
@@ -366,7 +366,7 @@ function understudyWorkflow(context: TargetContext): string {
           node-version: 22
           cache: ${cache}`
     : '      - uses: oven-sh/setup-bun@v2';
-  return `name: understudy
+  return `name: cue
 
 on:
   push:
@@ -387,11 +387,11 @@ ${setup}
 
       # Is the wiring still intact? Fails only on errors, never on warnings.
       - name: Environment
-        run: ${execCommand(pm, 'understudy doctor --ci')}
+        run: ${execCommand(pm, 'cue doctor --ci')}
 
       # Did the rules move without this project regenerating?
       - name: Drift
-        run: ${execCommand(pm, 'understudy sync --check')}
+        run: ${execCommand(pm, 'cue sync --check')}
 `;
 }
 
@@ -399,7 +399,7 @@ function testingMd(context: TargetContext): string {
   const pm = context.packageManager;
   return `# Testing
 
-This suite was scaffolded by [Understudy](https://github.com/understudy-dev/understudy).
+This suite was scaffolded by [Cue](https://github.com/wiluszdamian/project-cue).
 It is a starting shape, not a finished suite — the login page and example specs
 are templates to replace.
 
@@ -436,13 +436,13 @@ what makes a markup change one edit instead of a grep across the suite.
 than the review, and the message says what to do instead:
 
 \`\`\`bash
-${execCommand(pm, 'understudy explain no-hard-waits')}
+${execCommand(pm, 'cue explain no-hard-waits')}
 \`\`\`
 
 ## Selectors
 
 Never invent one. Every selector traces to \`.agent-kb/\`, populated by
-\`understudy survey\` (the running app) and \`understudy extract\` (the product
+\`cue survey\` (the running app) and \`cue extract\` (the product
 source). A plausible-but-wrong selector fails at runtime in a way that reads like
 an application bug, which is the most expensive kind of wrong.
 
@@ -527,8 +527,8 @@ export function scaffoldFiles(context: TargetContext): DesiredFile[] {
       'sharded runs, merged into one report',
     ),
     file(
-      '.github/workflows/understudy.yml',
-      understudyWorkflow(context),
+      '.github/workflows/cue.yml',
+      cueWorkflow(context),
       'constitution, environment and drift in CI',
     ),
     file('TESTING.md', testingMd(context), 'how to run the suite, and why it is laid out this way'),

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { COMMANDS, isCommand, NOT_IMPLEMENTED_MARKER } from '../src/commands.js';
 
 /**
- * Every command Understudy tells a user to run must exist. `understudy sync` was
+ * Every command Cue tells a user to run must exist. `cue sync` was
  * advertised as the fix for two checks before it was written, and anyone who
  * followed that advice got "Unknown command" — worse than no advice, because it
  * spends the user's trust to tell them nothing.
@@ -36,11 +36,11 @@ function mentionsIn(file: string): Mention[] {
   const found: Mention[] = [];
 
   source.split('\n').forEach((text, index) => {
-    // Both spellings: `understudy <word>` is the installed bin, `@understudy/cli
+    // Both spellings: `cue <word>` is the installed bin, `@wiluszdamian/cue
     // <word>` the npx form. Matching one lets the other drift unchecked.
-    // Excluded: `.understudy/install.json`, and an `import understudy from ...`.
+    // Excluded: `.cue/install.json`, and an `import cue from ...`.
     for (const match of text.matchAll(
-      /(?<![.\w/])(?<!import )(?:@understudy\/cli|understudy) ([a-z][a-z-]*)/g,
+      /(?<![.\w/])(?<!import )(?:@wiluszdamian\/cue|cue) ([a-z][a-z-]*)/g,
     )) {
       const command = match[1];
       if (command !== undefined) found.push({ file, line: index + 1, command, text });
@@ -62,20 +62,18 @@ describe('advice the CLI gives', () => {
     // matched the bin form, so the npx advice went unchecked and the suite stayed
     // green. Pin both spellings.
     const seen = (source: string): string[] =>
-      [
-        ...source.matchAll(
-          /(?<![.\w/])(?<!import )(?:@understudy\/cli|understudy) ([a-z][a-z-]*)/g,
-        ),
-      ].map((m) => m[1] ?? '');
+      [...source.matchAll(/(?<![.\w/])(?<!import )(?:@wiluszdamian\/cue|cue) ([a-z][a-z-]*)/g)].map(
+        (m) => m[1] ?? '',
+      );
 
-    expect(seen('run `understudy doctor` to check')).toEqual(['doctor']);
-    expect(seen('npx @understudy/cli explain <rule-id>')).toEqual(['explain']);
+    expect(seen('run `cue doctor` to check')).toEqual(['doctor']);
+    expect(seen('npx @wiluszdamian/cue explain <rule-id>')).toEqual(['explain']);
     // The package name inside a path or an import is not an invocation.
-    expect(seen("import understudy from '@understudy/eslint-plugin';")).toEqual([]);
-    expect(seen('.understudy/install.json lists the files')).toEqual([]);
+    expect(seen("import cue from '@wiluszdamian/cue-eslint-plugin';")).toEqual([]);
+    expect(seen('.cue/install.json lists the files')).toEqual([]);
   });
 
-  it.each(mentions.map((m) => [`${m.file}:${m.line} → understudy ${m.command}`, m] as const))(
+  it.each(mentions.map((m) => [`${m.file}:${m.line} → cue ${m.command}`, m] as const))(
     'can honour: %s',
     (_label, mention) => {
       if (isCommand(mention.command)) return;
@@ -83,7 +81,7 @@ describe('advice the CLI gives', () => {
       // Not built yet is acceptable — silently pretending otherwise is not.
       expect(
         mention.text.includes(NOT_IMPLEMENTED_MARKER),
-        `"understudy ${mention.command}" is not a command. Implement it, or say ` +
+        `"cue ${mention.command}" is not a command. Implement it, or say ` +
           `"${NOT_IMPLEMENTED_MARKER}" in the same message. Known: ${COMMANDS.join(', ')}`,
       ).toBe(true);
     },
@@ -96,7 +94,7 @@ describe('advice the CLI gives', () => {
   it('never calls a shipped command unimplemented', () => {
     const stale = mentions
       .filter((m) => isCommand(m.command) && m.text.includes(NOT_IMPLEMENTED_MARKER))
-      .map((m) => `${m.file}:${String(m.line)} → understudy ${m.command}`);
+      .map((m) => `${m.file}:${String(m.line)} → cue ${m.command}`);
 
     expect(
       stale,

@@ -9,7 +9,7 @@ import {
   testIdFactId,
   type FileStateProvider,
   type KnowledgeBase,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { COMMANDS } from '../src/commands.js';
 import { knowledgeChecks, probeKnowledge, type KnowledgeProbe } from '../src/doctor-knowledge.js';
@@ -94,7 +94,7 @@ const ids = (p: KnowledgeProbe): string[] => knowledgeChecks(p).map((result) => 
 
 /** A command named in a fix must be one the CLI has. */
 function commandsIn(text: string): string[] {
-  return [...text.matchAll(/understudy ([a-z][a-z-]*)/g)].map((m) => m[1] ?? '');
+  return [...text.matchAll(/cue ([a-z][a-z-]*)/g)].map((m) => m[1] ?? '');
 }
 
 describe('a healthy knowledge base', () => {
@@ -111,8 +111,8 @@ describe('no knowledge base', () => {
     const results = knowledgeChecks(probe({}, { hasKb: false }));
     expect(results).toHaveLength(1);
     expect(results[0]?.status).toBe('warn');
-    expect(results[0]?.fix).toContain('understudy survey');
-    expect(results[0]?.fix).toContain('understudy extract');
+    expect(results[0]?.fix).toContain('cue survey');
+    expect(results[0]?.fix).toContain('cue extract');
   });
 
   it('warns when the folder is there and empty', () => {
@@ -136,7 +136,7 @@ describe('files that cannot be used', () => {
     const found = results.find((r) => r.id === 'kb:files');
     expect(found?.status).toBe('error');
     expect(found?.detail).toContain('login.yaml');
-    expect(found?.fix).toContain('understudy survey --route');
+    expect(found?.fix).toContain('cue survey --route');
   });
 
   it('separates product files, which extract rewrites', () => {
@@ -149,7 +149,7 @@ describe('files that cannot be used', () => {
     );
     const found = results.find((r) => r.id === 'kb:product-files');
     expect(found?.status).toBe('warn');
-    expect(found?.fix).toContain('understudy extract');
+    expect(found?.fix).toContain('cue extract');
   });
 
   it('is absent when every file reads', () => {
@@ -162,7 +162,7 @@ describe('older route maps', () => {
     const found = knowledgeChecks(probe(HEALTHY, { legacyRoutes: ['/login', '/items'] })).find(
       (r) => r.id === 'kb:legacy',
     );
-    expect(found?.fix).toBe('understudy survey --route /login --base-url <url>');
+    expect(found?.fix).toBe('cue survey --route /login --base-url <url>');
     expect(found?.detail).toContain('2 pages');
   });
 
@@ -182,7 +182,7 @@ describe('what is out of date', () => {
     expect(found?.status).toBe('warn');
     expect(found?.detail).toContain('2 not confirmed for over a month');
     expect(found?.detail).toContain('not confirmed for');
-    expect(found?.fix).toContain('understudy survey --stale');
+    expect(found?.fix).toContain('cue survey --stale');
   });
 
   it('reports facts whose code changed since they were confirmed', () => {
@@ -246,7 +246,7 @@ describe('conflicts', () => {
       ),
     ).find((r) => r.id === 'kb:conflicts');
     expect(found?.detail).toContain('route:/login (title: Sign in vs Log in)');
-    expect(found?.fix).toBe('understudy survey --route /login --base-url <url>');
+    expect(found?.fix).toBe('cue survey --route /login --base-url <url>');
   });
 
   it('is absent without any', () => {
@@ -262,7 +262,7 @@ describe('locators in tests', () => {
       }),
     ).find((r) => r.id === 'kb:tests');
     expect(found?.detail).toContain('tests/a.spec.ts:7');
-    expect(found?.fix).toBe('understudy check');
+    expect(found?.fix).toBe('cue check');
   });
 
   it('is absent when every one is known, or when tests were not looked at', () => {
@@ -277,7 +277,7 @@ describe('test ids that left the source', () => {
       (r) => r.id === 'kb:test-ids',
     );
     expect(found?.detail).toContain('login-submit');
-    expect(found?.fix).toContain('understudy extract');
+    expect(found?.fix).toContain('cue extract');
   });
 });
 
@@ -323,14 +323,14 @@ describe('pages known only from the code', () => {
       }),
     ).find((r) => r.id === 'kb:coverage');
     expect(found?.detail).toContain('2 pages');
-    expect(found?.fix).toBe('understudy survey --route /orders --base-url <url>');
+    expect(found?.fix).toBe('cue survey --route /orders --base-url <url>');
   });
 
   it('cannot name a page with a parameter, and says to use a real address', () => {
     const found = knowledgeChecks(
       probe({ routes: [{ path: '/items/[id]', browser: false }] }),
     ).find((r) => r.id === 'kb:coverage');
-    expect(found?.fix).toBe('understudy survey <url>');
+    expect(found?.fix).toBe('cue survey <url>');
   });
 });
 
@@ -389,7 +389,7 @@ describe('every diagnosis', () => {
 describe('reading the disk', () => {
   let root: string;
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), 'understudy-doctor-kb-'));
+    root = mkdtempSync(join(tmpdir(), 'cue-doctor-kb-'));
   });
   afterEach(() => {
     rmSync(root, { recursive: true, force: true });

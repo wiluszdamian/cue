@@ -13,7 +13,7 @@ import {
   type KnowledgeEvidence,
   type KnowledgeFact,
   type KnowledgeIndex,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import type { ToolContext } from './tools.js';
 
 /**
@@ -144,7 +144,7 @@ export function resolveRoute(context: ToolContext, query: string, now: Date = ne
   if (route === undefined) {
     return unknown(
       `No route matches "${clip(wanted)}".`,
-      'run `understudy survey <url>` for the page, or `understudy extract --source <dir>` if it is in the code.',
+      'run `cue survey <url>` for the page, or `cue extract --source <dir>` if it is in the code.',
       [knownRoutes(index)],
     );
   }
@@ -195,7 +195,7 @@ export function resolveApi(context: ToolContext, path: string, method?: string):
   if (found.length === 0) {
     return unknown(
       `No endpoint matches ${wantedMethod === undefined ? '' : `${clip(wantedMethod, 12)} `}"${clip(wanted)}".`,
-      'run `understudy extract --source <dir>` if the project has an OpenAPI document or route handlers.',
+      'run `cue extract --source <dir>` if the project has an OpenAPI document or route handlers.',
       [`Endpoints known: ${String(index.apis().length)}.`],
     );
   }
@@ -257,7 +257,7 @@ export function getFreshness(
   if (fact === undefined) {
     return unknown(
       `Nothing is known as "${clip(id ?? path ?? '', 80)}", so there is no age to report.`,
-      'run `understudy survey <url>` or `understudy extract --source <dir>`.',
+      'run `cue survey <url>` or `cue extract --source <dir>`.',
     );
   }
 
@@ -271,7 +271,7 @@ export function getFreshness(
     ...verdict.reasons.slice(0, 4).map((reason) => `because ${clip(reason, 100)}`),
     ...(verdict.freshness === 'fresh'
       ? []
-      : ['', 'suggested action: run `understudy verify`, or survey the page again.']),
+      : ['', 'suggested action: run `cue verify`, or survey the page again.']),
   ].join('\n');
 }
 
@@ -304,7 +304,7 @@ export function findKnowledge(context: ToolContext, query: string, kind?: string
   if (hits.length === 0) {
     return unknown(
       `Nothing found for "${clip(query)}"${wantedKind ? ` among ${wantedKind} facts` : ''}.`,
-      'run `understudy survey <url>` for a page, or `understudy extract --source <dir>` for the code.',
+      'run `cue survey <url>` for a page, or `cue extract --source <dir>` for the code.',
     );
   }
 
@@ -360,7 +360,7 @@ export function resolveAction(context: ToolContext, intent: string, route?: stri
   if (found.length === 0) {
     return unknown(
       `No known action matches "${clip(intent)}".`,
-      'actions are read from page objects: run `understudy extract --source <dir>` if the project has them.',
+      'actions are read from page objects: run `cue extract --source <dir>` if the project has them.',
       [`Actions known: ${String(index.actions().length)}.`],
     );
   }

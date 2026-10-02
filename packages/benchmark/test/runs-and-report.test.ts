@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadRules, writeRouteMap } from '@understudy/engine';
+import { loadRules, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   detectRuns,
@@ -26,7 +26,7 @@ const rules = loadRules(join(REPO, 'rules'));
 
 let dir: string;
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'understudy-runs-'));
+  dir = mkdtempSync(join(tmpdir(), 'cue-runs-'));
 });
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
@@ -52,7 +52,7 @@ describe('repeated recordings', () => {
   it('keeps the first repetition’s file name, so earlier recordings still read', () => {
     expect(recordingPath('d', 'p', 'bare')).toBe(join('d', 'bare', 'p.json'));
     expect(recordingPath('d', 'p', 'bare', 1)).toBe(join('d', 'bare', 'p.json'));
-    expect(recordingPath('d', 'p', 'understudy', 3)).toBe(join('d', 'understudy', 'p.run3.json'));
+    expect(recordingPath('d', 'p', 'cue', 3)).toBe(join('d', 'cue', 'p.run3.json'));
   });
 
   it('writes each repetition where the reader will look for it', () => {
@@ -86,7 +86,7 @@ describe('repeated recordings', () => {
 
   it('counts the repetitions every prompt and condition has, and no more', () => {
     const ids = noMutation.map((p) => p.id);
-    const write = (promptId: string, condition: 'bare' | 'understudy', run: number) =>
+    const write = (promptId: string, condition: 'bare' | 'cue', run: number) =>
       record(dir, {
         promptId,
         condition,
@@ -94,15 +94,15 @@ describe('repeated recordings', () => {
         code: 'x',
         run,
       });
-    expect(detectRuns(dir, ids, ['bare', 'understudy'])).toBe(1);
+    expect(detectRuns(dir, ids, ['bare', 'cue'])).toBe(1);
 
-    for (const id of ids) for (const c of ['bare', 'understudy'] as const) write(id, c, 1);
-    expect(detectRuns(dir, ids, ['bare', 'understudy'])).toBe(1);
+    for (const id of ids) for (const c of ['bare', 'cue'] as const) write(id, c, 1);
+    expect(detectRuns(dir, ids, ['bare', 'cue'])).toBe(1);
 
-    for (const id of ids) for (const c of ['bare', 'understudy'] as const) write(id, c, 2);
+    for (const id of ids) for (const c of ['bare', 'cue'] as const) write(id, c, 2);
     // One prompt has a third, the others do not: the sample is still two.
     write(ids[0] ?? '', 'bare', 3);
-    expect(detectRuns(dir, ids, ['bare', 'understudy'])).toBe(2);
+    expect(detectRuns(dir, ids, ['bare', 'cue'])).toBe(2);
   });
 
   it('asks the model for every repetition, keeps what is on disk, and stops where it fails', async () => {
@@ -114,7 +114,7 @@ describe('repeated recordings', () => {
         if (
           request.prompt.id === noMutation[1]?.id &&
           request.run === 2 &&
-          request.condition === 'understudy'
+          request.condition === 'cue'
         ) {
           return Promise.reject(new Error('rate limited'));
         }
@@ -123,8 +123,8 @@ describe('repeated recordings', () => {
     };
 
     const first = await recordRun({ dir, projectRoot: dir, agent, prompts: noMutation, runs: 2 });
-    expect(first.failed).toEqual({ promptId: noMutation[1]?.id, condition: 'understudy' });
-    // 2 prompts × 2 runs for bare, then understudy up to and including the call that fails.
+    expect(first.failed).toEqual({ promptId: noMutation[1]?.id, condition: 'cue' });
+    // 2 prompts × 2 runs for bare, then cue up to and including the call that fails.
     expect(asked).toHaveLength(8);
     // Repetition outermost within a condition: every prompt is answered once before any twice.
     expect(asked.slice(0, 4)).toEqual([
@@ -183,7 +183,7 @@ describe('what a result is a result of', () => {
     expect(metadata.os).toMatch(/\(.+\)$/);
     expect(metadata.commit).toMatch(/^[0-9a-f]{40}$/);
     expect(typeof metadata.dirty).toBe('boolean');
-    expect(metadata.understudyVersion).toMatch(/^\d+\.\d+\.\d+/);
+    expect(metadata.cueVersion).toMatch(/^\d+\.\d+\.\d+/);
     expect(metadata.playwrightVersion).toMatch(/^\d+\.\d+\.\d+/);
     expect(metadata.playwrightCliVersion).toMatch(/^\d+\.\d+\.\d+/);
   });
@@ -192,12 +192,12 @@ describe('what a result is a result of', () => {
     const metadata = collectMetadata({ repoRoot: dir, demoRoot: dir });
     expect(metadata.commit).toBeUndefined();
     expect(metadata.dirty).toBeUndefined();
-    expect(metadata.understudyVersion).toBeUndefined();
+    expect(metadata.cueVersion).toBeUndefined();
   });
 });
 
 describe('several runs of one set', () => {
-  /** Passes in run 1 for the understudy condition only, and varies from there. */
+  /** Passes in run 1 for the cue condition only, and varies from there. */
   class Scripted implements Executor {
     constructor(private readonly passes: (input: ExecutionInput, call: number) => boolean) {}
     calls = 0;
@@ -351,7 +351,7 @@ describe('several runs of one set', () => {
       metadata: {
         commit: 'abcdef0123456789abcdef0123456789abcdef01',
         dirty: true,
-        understudyVersion: '0.8.0',
+        cueVersion: '0.8.0',
         playwrightVersion: '1.63.0',
         node: 'v24.0.0',
         os: 'win32 test (x64)',
@@ -359,9 +359,7 @@ describe('several runs of one set', () => {
     });
     const text = formatReport(result);
     expect(text).toContain('Commit abcdef0123 (uncommitted changes)');
-    expect(text).toContain(
-      'understudy 0.8.0 · @playwright/test 1.63.0 · node v24.0.0 · win32 test (x64)',
-    );
+    expect(text).toContain('cue 0.8.0 · @playwright/test 1.63.0 · node v24.0.0 · win32 test (x64)');
   });
 });
 
@@ -460,7 +458,7 @@ describe('the report as a document', () => {
 
   it('puts the two conditions side by side, with the sample size beside every number', async () => {
     const md = formatMarkdown(await sample());
-    expect(md).toContain('| | without Understudy | with Understudy |');
+    expect(md).toContain('| | without Cue | with Cue |');
     expect(md).toContain('| Answers | 6 | 6 |');
     expect(md).toMatch(/\| Compiled \| 4\/6 \| 4\/6 \|/);
     expect(md).toContain('| Repetitions | 2 per prompt and condition |');
@@ -472,7 +470,7 @@ describe('the report as a document', () => {
     // 1 broken prompt × 2 runs × 2 conditions, plus the missed defects (test passes with it on).
     expect(md).toContain('### bare · ' + String(noMutation[0]?.id) + ' · run 1');
     expect(md).toContain('Recording: `bare/' + String(noMutation[0]?.id) + '.json`');
-    expect(md).toContain('Recording: `understudy/' + String(noMutation[0]?.id) + '.run2.json`');
+    expect(md).toContain('Recording: `cue/' + String(noMutation[0]?.id) + '.run2.json`');
     expect(md).toContain('Did not compile:');
     expect(md).toContain('login: Timeout 2000ms exceeded.');
     expect(md).toContain('Passed even with `');
@@ -488,7 +486,7 @@ describe('the report as a document', () => {
     expect(md).toContain('## Not measured');
     expect(md).toContain('- **browser exploration count**');
     expect(md).toContain('## What this cannot show');
-    expect(md).toContain('The understudy condition is handed everything');
+    expect(md).toContain('The cue condition is handed everything');
     expect(md).toContain('A caught defect is not a verified reason');
   });
 
@@ -524,7 +522,7 @@ const CLI = join(import.meta.dirname, '..', 'dist', 'cli.js');
 describe.skipIf(!existsSync(CLI))('the built command', () => {
   function recordings(runs: number): string {
     const root = join(dir, 'rec');
-    for (const condition of ['bare', 'understudy'] as const) {
+    for (const condition of ['bare', 'cue'] as const) {
       mkdirSync(join(root, condition), { recursive: true });
       for (let run = 1; run <= runs; run += 1) {
         for (const prompt of noMutation) {

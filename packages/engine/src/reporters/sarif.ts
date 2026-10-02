@@ -39,9 +39,9 @@ function ruleDescriptor(rule: Rule): unknown {
       tier: rule.tier,
       skill: rule.skill,
       since: rule.since,
-      tags: ['understudy', rule.skill],
+      tags: ['cue', rule.skill],
     },
-    helpUri: `https://github.com/understudy-dev/understudy/blob/main/docs/constitution.md#${rule.docsAnchor}`,
+    helpUri: `https://github.com/wiluszdamian/project-cue/blob/main/docs/constitution.md#${rule.docsAnchor}`,
   };
 }
 
@@ -57,8 +57,8 @@ export const sarifReporter: Reporter = ({ result, constitution }) => {
         {
           tool: {
             driver: {
-              name: 'Understudy',
-              informationUri: 'https://github.com/understudy-dev/understudy',
+              name: 'Cue',
+              informationUri: 'https://github.com/wiluszdamian/project-cue',
               rules: enforceable.map(ruleDescriptor),
             },
           },

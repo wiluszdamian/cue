@@ -15,14 +15,14 @@ import {
 } from './tools.js';
 
 /**
- * The Understudy MCP server: ten tools, all read-only point lookups.
+ * The Cue MCP server: ten tools, all read-only point lookups.
  *
  * What is not here matters as much — browser exploration goes through
  * `playwright-cli`, never through MCP. This server answers questions cheaply
  * rather than becoming another thing competing for the context window.
  */
 
-export const SERVER_NAME = 'understudy';
+export const SERVER_NAME = 'cue';
 export const SERVER_VERSION = '0.1.0';
 
 /** Every tool here only reads. Nothing in this server writes to the project. */
@@ -42,7 +42,7 @@ export function createServer(context: ToolContext): McpServer {
       // So a model reaches for this when a rule blocks it, rather than
       // restructuring code until the linter goes quiet.
       description:
-        'Why an Understudy rule exists and what to write instead. Use when a lint rule blocks a change, before rewriting code to get around it.',
+        'Why a Cue rule exists and what to write instead. Use when a lint rule blocks a change, before rewriting code to get around it.',
       inputSchema: {
         rule_id: z
           .string()
@@ -58,7 +58,7 @@ export function createServer(context: ToolContext): McpServer {
     {
       title: 'Who decides this',
       description:
-        'Which source of Playwright guidance governs a topic when several disagree. Use before following advice that conflicts with this project, or when unsure whether a topic is Understudy’s at all.',
+        'Which source of Playwright guidance governs a topic when several disagree. Use before following advice that conflicts with this project, or when unsure whether a topic is Cue’s at all.',
       inputSchema: {
         topic: z.string().describe('The topic, in plain words, e.g. "how do I record a trace".'),
       },

@@ -8,7 +8,7 @@ import {
   isEnforceable,
   loadKnowledge,
   loadRules,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { afterAll, describe, expect, it } from 'vitest';
 import { rules } from '../src/index.js';
 
