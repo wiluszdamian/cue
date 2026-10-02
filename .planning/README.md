@@ -44,22 +44,22 @@ Zasady wspólne dla wszystkich ticketów:
 | 06 | [`understudy verify` — rozdzielona semantyka weryfikacji](tickets/06-verify-semantics.md) | P0.3 | 00 | done |
 | 07 | [Knowledge Core v1 — model domenowy](tickets/07-knowledge-core-model.md) | P0.5 | 00 | done |
 | 08 | [Knowledge Core — wczytywanie istniejącego `.agent-kb` + zapytania](tickets/08-knowledge-core-legacy-adapter.md) | P0.5 | 07 | done |
-| 09 | [`.agent-kb` v2 na dysku: evidence, status, migracja](tickets/09-agent-kb-v2-on-disk.md) | P0.5 | 08 | todo |
-| 10 | [Wspólny analizator locatorów vs KB](tickets/10-locator-analyzer.md) | P0.6 | 08 | todo |
-| 11 | [`understudy check <files>`](tickets/11-check-command.md) | P0.6 | 10 | todo |
-| 12 | [Reguła ESLint oparta o KB (`selectors-from-agent-kb` egzekwowana)](tickets/12-eslint-kb-rule.md) | P0.6 | 10 | todo |
-| 13 | [Prawdziwe E2E w CI: extract → survey → locator → check → test → verify](tickets/13-e2e-ci.md) | P0.2 | 02, 03, 04, 06, 11 | todo |
-| 14 | [Benchmark: kompilacja i uruchamianie wygenerowanych testów](tickets/14-benchmark-execution.md) | P0.7 | 03, 10 | todo |
-| 15 | [Benchmark: mutacje, metadane, raport](tickets/15-benchmark-mutation-report.md) | P0.7 | 14 | todo |
-| 16 | [Pierwszy prawdziwy benchmark (ręcznie, płatne API)](tickets/16-benchmark-real-run.md) | P0.7 | 13, 15 | todo — **wymaga Ciebie** |
-| 17 | [Świeżość oparta o git (possibly-stale)](tickets/17-git-aware-freshness.md) | P1.1 | 09 | todo |
-| 18 | [Celowany survey (`--route`, `--stale`, `--affected-by`)](tickets/18-targeted-survey.md) | P1.2 | 06, 17 | todo |
-| 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | todo |
-| 20 | [MCP: rozszerzone resolve_* / get_evidence / get_freshness](tickets/20-mcp-resolution.md) | P1.4 | 09 | todo |
-| 21 | [MCP: `get_context`](tickets/21-mcp-get-context.md) | P1.4 | 20 | todo |
-| 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | todo |
-| 23 | [Macierz kompatybilności i pinowanie wersji](tickets/23-compatibility-matrix.md) | P1.6 | 04 | todo |
-| 24 | [i18n przez prawdziwy parser (zagnieżdżone klucze)](tickets/24-i18n-real-parser.md) | P1 | 05 | todo |
+| 09 | [`.agent-kb` v2 na dysku: evidence, status, migracja](tickets/09-agent-kb-v2-on-disk.md) | P0.5 | 08 | done |
+| 10 | [Wspólny analizator locatorów vs KB](tickets/10-locator-analyzer.md) | P0.6 | 08 | done |
+| 11 | [`understudy check <files>`](tickets/11-check-command.md) | P0.6 | 10 | done |
+| 12 | [Reguła ESLint oparta o KB (`selectors-from-agent-kb` egzekwowana)](tickets/12-eslint-kb-rule.md) | P0.6 | 10 | done |
+| 13 | [Prawdziwe E2E w CI: extract → survey → locator → check → test → verify](tickets/13-e2e-ci.md) | P0.2 | 02, 03, 04, 06, 11 | done |
+| 14 | [Benchmark: kompilacja i uruchamianie wygenerowanych testów](tickets/14-benchmark-execution.md) | P0.7 | 03, 10 | done |
+| 15 | [Benchmark: mutacje, metadane, raport](tickets/15-benchmark-mutation-report.md) | P0.7 | 14 | done |
+| 16 | [Pierwszy prawdziwy benchmark (ręcznie, płatne API)](tickets/16-benchmark-real-run.md) | P0.7 | 13, 15 | runbook gotowy (`benchmarks/RUNBOOK.md`) — **czeka na Ciebie: płatne nagranie** |
+| 17 | [Świeżość oparta o git (possibly-stale)](tickets/17-git-aware-freshness.md) | P1.1 | 09 | done |
+| 18 | [Celowany survey (`--route`, `--stale`, `--affected-by`)](tickets/18-targeted-survey.md) | P1.2 | 06, 17 | done |
+| 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | done |
+| 20 | [MCP: rozszerzone resolve_* / get_evidence / get_freshness](tickets/20-mcp-resolution.md) | P1.4 | 09 | done |
+| 21 | [MCP: `get_context`](tickets/21-mcp-get-context.md) | P1.4 | 20 | done |
+| 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | done |
+| 23 | [Macierz kompatybilności i pinowanie wersji](tickets/23-compatibility-matrix.md) | P1.6 | 04 | done |
+| 24 | [i18n przez prawdziwy parser (zagnieżdżone klucze)](tickets/24-i18n-real-parser.md) | P1 | 05 | done |
 | 25 | [Wiedza z istniejących testów i Page Objects](tickets/25-extract-existing-tests.md) | P1 | 09, 10, 19 | todo |
 
 P2 (bez ticketów, do rozpisania po P1): [backlog-p2.md](backlog-p2.md).

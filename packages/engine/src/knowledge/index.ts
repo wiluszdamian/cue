@@ -50,6 +50,7 @@ export {
 export { KnowledgeBuilder } from './builder.js';
 
 export {
+  coverageFrom,
   indexKnowledge,
   type ApiFact,
   type Coverage,
@@ -59,3 +60,19 @@ export {
   type TermFact,
   type TestIdFact,
 } from './query.js';
+
+export { nameSimilarity, words } from './similarity.js';
+
+export {
+  affectedBy,
+  AGEING_AFTER_DAYS,
+  ageInDays,
+  computeFreshness,
+  dependencyChanges,
+  freshnessOf,
+  STALE_AFTER_DAYS,
+  type FileStateProvider,
+  type FreshnessLevel,
+  type FreshnessVerdict,
+  type FreshnessWithChanges,
+} from './freshness.js';

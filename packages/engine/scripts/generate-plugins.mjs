@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'prettier';
-import { loadSkills, V1_SKILLS } from '../dist/index.js';
+import { loadCompatibility, loadSkills, V1_SKILLS } from '../dist/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
@@ -21,6 +21,7 @@ const pluginSkillsDir = join(pluginDir, 'skills');
 
 const version = readFileSync(join(repoRoot, 'VERSION'), 'utf8').trim();
 const skills = loadSkills(skillsDir);
+const compatibility = loadCompatibility(join(repoRoot, 'compatibility.yaml'));
 const skillIds = V1_SKILLS.map((s) => s.id);
 
 const REPO = 'https://github.com/wiluszdamian/understudy';
@@ -31,16 +32,17 @@ const DESCRIPTION =
 const author = { name: 'Understudy', url: REPO };
 const keywords = ['playwright', 'testing', 'e2e', 'typescript', 'agent-skills'];
 
+// Pinned, not `@latest`: a manifest installed today should run what was tested today.
 const playwrightMcp = {
   command: 'npx',
-  args: ['-y', '@playwright/mcp@latest'],
+  args: ['-y', `@playwright/mcp@${compatibility.tools['@playwright/mcp'].tested}`],
 };
 
 // The three point lookups. Shipped alongside Playwright MCP, not instead of it:
 // that one drives a browser, this one answers questions without one.
 const understudyMcp = {
   command: 'npx',
-  args: ['-y', '@understudy/mcp@latest'],
+  args: ['-y', `@understudy/mcp@${version}`],
 };
 
 const mcpServers = { understudy: understudyMcp, playwright: playwrightMcp };
@@ -260,8 +262,9 @@ The skill catalog, packaged so coding agents can install it as a plugin rather
 than copying markdown by hand. Procedures are the same files as \`skills/\`; this
 directory is the installable unit around them.
 
-Two MCP servers are bundled. \`understudy\` answers three point lookups —
-\`explain_rule\`, \`resolve_owner\` and \`resolve_locator\` — against this
+Two MCP servers are bundled. \`understudy\` answers point lookups —
+\`explain_rule\`, \`resolve_owner\`, \`resolve_locator\`, \`resolve_route\`,
+\`resolve_api\`, \`get_evidence\`, \`get_freshness\` and \`find_knowledge\` — against this
 project's rules and knowledge base, and writes nothing. Playwright MCP handles
 point-in-time browser calls. Exploration still goes through \`playwright-cli\`:
 an accessibility tree costs more context than the question it answers. See the

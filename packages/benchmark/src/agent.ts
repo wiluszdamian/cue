@@ -18,6 +18,8 @@ export interface AgentRequest {
   readonly condition: Condition;
   /** AGENTS.md and the relevant part of the knowledge base. Empty for `bare`. */
   readonly context: string;
+  /** Which repetition of this prompt and condition, from 1. */
+  readonly run?: number;
 }
 
 export interface GeneratedSource {
@@ -35,6 +37,12 @@ export interface AgentResponse {
   readonly model: string;
   /** ISO-8601. Set by a live run; absent on the hand-written fixtures. */
   readonly recordedAt?: string;
+  /** Which repetition this is, from 1. Absent on recordings made before there were any. */
+  readonly run?: number;
+  /** What the model reported using, when it reported anything. */
+  readonly usage?: { readonly inputTokens?: number; readonly outputTokens?: number };
+  /** How long the model took to answer. */
+  readonly durationMs?: number;
 }
 
 export interface Agent {
@@ -49,7 +57,7 @@ export class RecordedAgent implements Agent {
   constructor(private readonly dir: string) {}
 
   run(request: AgentRequest): Promise<AgentResponse> {
-    const path = recordingPath(this.dir, request.prompt.id, request.condition);
+    const path = recordingPath(this.dir, request.prompt.id, request.condition, request.run);
     if (!existsSync(path)) {
       throw new Error(
         `No recording for ${request.prompt.id} / ${request.condition} at ${path}.\n` +
@@ -65,23 +73,55 @@ export function missingRecordings(
   dir: string,
   promptIds: readonly string[],
   conditions: readonly Condition[],
-): { promptId: string; condition: Condition }[] {
-  const missing: { promptId: string; condition: Condition }[] = [];
+  runs = 1,
+): { promptId: string; condition: Condition; run: number }[] {
+  const missing: { promptId: string; condition: Condition; run: number }[] = [];
   for (const promptId of promptIds) {
     for (const condition of conditions) {
-      if (!existsSync(recordingPath(dir, promptId, condition)))
-        missing.push({ promptId, condition });
+      for (let run = 1; run <= runs; run += 1) {
+        if (!existsSync(recordingPath(dir, promptId, condition, run))) {
+          missing.push({ promptId, condition, run });
+        }
+      }
     }
   }
   return missing;
 }
 
-export function recordingPath(dir: string, promptId: string, condition: Condition): string {
-  return join(dir, condition, `${promptId}.json`);
+/**
+ * How many repetitions every prompt and condition has, counted from the first: the
+ * largest N for which all of them have recordings 1..N. At least 1 is assumed, since
+ * "none" is for `missingRecordings` to report.
+ */
+export function detectRuns(
+  dir: string,
+  promptIds: readonly string[],
+  conditions: readonly Condition[],
+): number {
+  let runs = 1;
+  while (missingRecordings(dir, promptIds, conditions, runs + 1).length === 0) runs += 1;
+  return runs;
+}
+
+/**
+ * The first repetition keeps the name it has always had, so earlier recordings still
+ * read; later ones are `<prompt>.run2.json` and so on.
+ */
+export function recordingPath(
+  dir: string,
+  promptId: string,
+  condition: Condition,
+  run = 1,
+): string {
+  return join(
+    dir,
+    condition,
+    run === 1 ? `${promptId}.json` : `${promptId}.run${String(run)}.json`,
+  );
 }
 
 export function record(dir: string, response: AgentResponse): string {
-  const path = recordingPath(dir, response.promptId, response.condition);
+  const path = recordingPath(dir, response.promptId, response.condition, response.run);
   mkdirSync(join(dir, response.condition), { recursive: true });
   writeFileSync(path, `${JSON.stringify(response, null, 2)}\n`, 'utf8');
   return path;

@@ -45,6 +45,7 @@ fail for the intended reason rather than merely pass.
 | `wrong-password-accepted` | Any password logs a known user in                                 |
 | `signup-validation-off`   | The sign-up form accepts any email                                |
 | `button-renamed`          | **Change password** becomes **Update password** (a stale locator) |
+| `login-button-renamed`    | **Log in** becomes **Sign in**, on a page that needs no session   |
 | `route-moved`             | `/admin/settings/security` moves to `/admin/security`             |
 
 The reference tests live in `tests/` and follow the repository's own constitution:

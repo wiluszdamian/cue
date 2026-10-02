@@ -55,10 +55,11 @@ what to consult for each owner, is in docs/reference/ownership.md.
 | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `rules/constitution.yaml`                                                                          | The rules we own. **Source of truth.**                |
 | `rules/tags.yaml`                                                                                  | Canonical test tags.                                  |
+| `compatibility.yaml`                                                                               | Tool versions this release was tested against.        |
 | `packages/engine`                                                                                  | Loader, detectors, analyzer, reporters.               |
 | `packages/engine/src/knowledge`                                                                    | The Knowledge Core model. Pure: no I/O, no CLI.       |
 | `packages/eslint-plugin`                                                                           | ESLint rules **generated** from the constitution.     |
-| `packages/mcp`                                                                                     | Three read-only point lookups, over stdio.            |
+| `packages/mcp`                                                                                     | Read-only point lookups, over stdio.                  |
 | `skills/*/SKILL.md`                                                                                | The skill catalog. Procedures, hand-written.          |
 | `skills/reference/`, `skills/README.md`                                                            | **Generated.** Never hand-edited.                     |
 | `plugins/understudy/`                                                                              | **Generated.** Agent plugin package around `skills/`. |
@@ -169,8 +170,9 @@ advice and the suite stayed green.
 
 ## The MCP server
 
-`packages/mcp` serves three read-only point lookups — `explain_rule`,
-`resolve_owner` and `resolve_locator` — over stdio. It ships in the plugin
+`packages/mcp` serves read-only point lookups over stdio: `explain_rule`,
+`resolve_owner`, `resolve_locator`, and the knowledge lookups `resolve_route`,
+`resolve_api`, `get_evidence`, `get_freshness` and `find_knowledge`. It ships in the plugin
 manifests and in every agent config `understudy init` writes, next to Playwright
 MCP rather than instead of it: that one drives a browser, this one answers
 questions about the rules and the knowledge base without one.
@@ -184,6 +186,10 @@ Two things about it are load-bearing:
   rather than one sample. An MCP answer is paid for out of the window the real
   task needs, so a rule message that grew unboundedly would start costing more
   every release with nobody noticing.
+
+Every unknown answers `status: unknown` plus the command that would find out, never
+a value that was made up. There is no `resolve_action`/`resolve_role`/`resolve_state`
+until acquisition produces such facts: a tool that always says unknown costs context.
 
 Later tools — `list_rules`, `validate_source`, `describe_feature`,
 `list_surface`, `resolve_pattern`, `playwright_docs`, `inspect_suite`,

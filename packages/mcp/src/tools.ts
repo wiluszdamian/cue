@@ -1,20 +1,23 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  estimateTokens,
+  findProductRoot,
   formatLocatorAnswer,
   loadRules,
   resolveLocator,
   whoOwns,
+  workingTreeFiles,
   type Rule,
   type Rules,
 } from '@understudy/engine';
 import { CONSTITUTION, OWNERSHIP, TAGS } from './generated/rules.js';
 
 /**
- * The three tools as plain functions, so behaviour is testable without a transport
+ * The tools as plain functions, so behaviour is testable without a transport
  * and the budgets below can be asserted against every reachable output.
  *
- * All three are point lookups: a tool that returns a wall of text competes with
+ * All of them are point lookups: a tool that returns a wall of text competes with
  * the work. Browser exploration goes through `playwright-cli` instead.
  */
 
@@ -23,12 +26,16 @@ export const TOKEN_BUDGET = {
   explain_rule: 400,
   resolve_owner: 300,
   resolve_locator: 350,
+  resolve_route: 350,
+  resolve_api: 350,
+  get_evidence: 300,
+  get_freshness: 250,
+  find_knowledge: 350,
+  /** The most a caller may ask for; a smaller `maxTokens` is honoured below this. */
+  get_context: 3000,
 } as const;
 
-/** Four characters per token over-estimates here, which is the safe direction. */
-export function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
-}
+export { estimateTokens };
 
 const oneLine = (text: string): string => text.replace(/\s+/g, ' ').trim();
 
@@ -78,6 +85,15 @@ function renderRule(rule: Rule): string {
     // An agent told a rule is enforced will iterate against the linter, and no
     // linter can check this one.
     lines.push('', 'Not mechanically enforced — checked in review, binding all the same.');
+  }
+  if (rule.detector.kind === 'knowledge') {
+    // The linter is silent where there is no .agent-kb, and silent about what the code
+    // cannot decide; an agent should not read that silence as a clean bill.
+    lines.push(
+      '',
+      'Checked against .agent-kb only, and only getByRole/getByTestId/getByLabel with literal',
+      'arguments. Silence means nothing was found, not that everything was checked: run `understudy check`.',
+    );
   }
   return lines.join('\n');
 }
@@ -134,7 +150,22 @@ export function resolveOwner(context: ToolContext, topic: string): string {
 // ---------------------------------------------------------- resolve_locator
 
 export function resolveLocatorTool(context: ToolContext, element: string, route?: string): string {
+  const productRoot = findProductRoot(context.projectRoot);
   return formatLocatorAnswer(
-    resolveLocator({ projectRoot: context.projectRoot, query: element, route }),
+    resolveLocator({
+      projectRoot: context.projectRoot,
+      query: element,
+      route,
+      files: productRoot === undefined ? undefined : workingTreeFiles(productRoot),
+    }),
   );
 }
+
+export {
+  findKnowledge,
+  getContext,
+  getEvidence,
+  getFreshness,
+  resolveApi,
+  resolveRoute,
+} from './knowledge-tools.js';

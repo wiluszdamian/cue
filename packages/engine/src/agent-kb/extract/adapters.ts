@@ -1,4 +1,5 @@
 import type { SurfaceEntry, TermEntryLike, TestIdEntry } from './types.js';
+import { readCatalogue } from './i18n.js';
 import { readOpenApi } from './openapi.js';
 import { reference, type SourceFileRef } from './scan.js';
 
@@ -79,24 +80,47 @@ function routeFromAppPath(segments: string): string {
   return `/${parts.join('/')}`.replace(/\/+$/, '') || '/';
 }
 
+const NEXT_CONFIG = /(^|\/)next\.config\.(js|mjs|cjs|ts)$/;
+const NEXT_DEPENDENCY = /"next"\s*:/;
+
+/**
+ * Directories that are a Next.js project, as shown by a `next.config.*` or a
+ * `package.json` that depends on `next`. A `pages/` folder is Next's Pages Router
+ * only beneath one of these: elsewhere it is as likely to hold page objects for a
+ * test suite, and calling those routes would invent an application that is not there.
+ */
+function nextRoots(files: readonly SourceFileRef[]): string[] {
+  const roots = new Set<string>();
+  for (const file of files) {
+    const directory = file.path.includes('/') ? file.path.slice(0, file.path.lastIndexOf('/')) : '';
+    if (NEXT_CONFIG.test(file.path)) roots.add(directory);
+    else if (
+      (file.path === 'package.json' || file.path.endsWith('/package.json')) &&
+      NEXT_DEPENDENCY.test(file.lines.join('\n'))
+    ) {
+      roots.add(directory);
+    }
+  }
+  return [...roots];
+}
+
+const underAny = (path: string, roots: readonly string[]): boolean =>
+  roots.some((root) => root === '' || path.startsWith(`${root}/`));
+
 export const nextAdapter: Adapter = {
   id: 'nextjs',
   summary: 'Next.js routes, from the App Router and the Pages Router',
 
   detect({ files }) {
-    return files.some(
-      (file) =>
-        NEXT_APP_PAGE.test(file.path) ||
-        NEXT_APP_ROUTE.test(file.path) ||
-        NEXT_PAGES.test(file.path) ||
-        file.path === 'next.config.js' ||
-        file.path === 'next.config.mjs' ||
-        file.path === 'next.config.ts',
+    return (
+      nextRoots(files).length > 0 ||
+      files.some((file) => NEXT_APP_PAGE.test(file.path) || NEXT_APP_ROUTE.test(file.path))
     );
   },
 
   extract({ files }) {
     const surface: SurfaceEntry[] = [];
+    const roots = nextRoots(files);
 
     for (const file of files) {
       const appPage = NEXT_APP_PAGE.exec(file.path);
@@ -134,7 +158,7 @@ export const nextAdapter: Adapter = {
         continue;
       }
 
-      const pagesApi = NEXT_PAGES_API.exec(file.path);
+      const pagesApi = underAny(file.path, roots) ? NEXT_PAGES_API.exec(file.path) : null;
       if (pagesApi) {
         surface.push({
           kind: 'endpoint',
@@ -144,7 +168,7 @@ export const nextAdapter: Adapter = {
         continue;
       }
 
-      const pages = NEXT_PAGES.exec(file.path);
+      const pages = underAny(file.path, roots) ? NEXT_PAGES.exec(file.path) : null;
       if (pages) {
         const name = (pages[1] ?? '').replace(/\/index$/, '').replace(/^index$/, '');
         if (name === '_app' || name === '_document' || name === '_error') continue;
@@ -200,6 +224,9 @@ export const openApiAdapter: Adapter = {
 
 // -------------------------------------------------------------------- i18n
 
+/** A catalogue for English, by the usual names: `en.json`, `locales/en/common.json`, `en-US.yaml`. */
+const ENGLISH = /(?:^|[/._-])en(?:[-_][a-z]{2})?(?:[/._-]|$)/i;
+
 const I18N_FILE = /(?:^|\/)(?:locales?|i18n|lang|translations?)\/.*\.(json|ya?ml)$/i;
 
 /** Translation catalogues: the words a user sees, and so the words a `getByRole` name must match. */
@@ -212,20 +239,35 @@ export const i18nAdapter: Adapter = {
   },
 
   extract({ files }) {
-    const terms: TermEntryLike[] = [];
+    const terms = new Map<string, TermEntryLike>();
+    const gaps: string[] = [];
 
-    for (const file of files.filter((f) => I18N_FILE.test(f.path))) {
-      file.lines.forEach((line, index) => {
-        const entry = /^\s*["']?([\w.-]+)["']?\s*:\s*["'](.+?)["']\s*,?\s*$/.exec(line);
-        const key = entry?.[1];
-        const label = entry?.[2];
-        if (key !== undefined && label !== undefined && label.length > 0) {
-          terms.push({ key, label, source: reference(file, index) });
+    // English first and then by path, so that with several locales the label that is kept
+    // does not depend on the order the disk lists them in.
+    const catalogues = files
+      .filter((f) => I18N_FILE.test(f.path))
+      .sort(
+        (a, b) =>
+          Number(ENGLISH.test(b.path)) - Number(ENGLISH.test(a.path)) ||
+          a.path.localeCompare(b.path),
+      );
+
+    for (const file of catalogues) {
+      const catalogue = readCatalogue(file);
+      gaps.push(...catalogue.gaps);
+      for (const term of catalogue.terms) {
+        const kept = terms.get(term.key);
+        if (kept === undefined) terms.set(term.key, term);
+        else if (kept.label !== term.label) {
+          // The vocabulary does not record a locale, so a second language cannot sit beside the first.
+          gaps.push(
+            `${file.path}: ${term.key} has another label than in ${kept.source.split(':')[0] ?? 'the first catalogue'}; the first is kept (locales are not recorded)`,
+          );
         }
-      });
+      }
     }
 
-    return { terms };
+    return { terms: [...terms.values()], ...(gaps.length > 0 ? { gaps } : {}) };
   },
 };
 

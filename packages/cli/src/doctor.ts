@@ -1,8 +1,9 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Rules } from '@understudy/engine';
-import { readAllRouteMaps } from '@understudy/engine';
+import { judgeVersions, type Rules } from '@understudy/engine';
 import { detectAgents, type TargetId } from './agents.js';
+import { COMPATIBILITY } from './generated/compatibility.js';
+import { knowledgeChecks, probeKnowledge } from './doctor-knowledge.js';
 import { inspect } from './install.js';
 import { MANIFEST_PATH, type Manifest } from './manifest.js';
 import { existsOnPath, resolvePlaywrightCli } from './browser/resolve.js';
@@ -38,6 +39,9 @@ export interface DoctorContext {
   readonly offline?: boolean;
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly home?: string;
+  /** For the knowledge checks: the clock, and where the product source is if not beside the project. */
+  readonly now?: Date;
+  readonly source?: string | undefined;
 }
 
 function readPackageJson(projectRoot: string): Record<string, unknown> | undefined {
@@ -294,55 +298,59 @@ function checkOfficialSkills(ctx: DoctorContext): CheckResult {
   };
 }
 
-function checkKnowledgeBase(ctx: DoctorContext): CheckResult {
-  const kb = join(ctx.projectRoot, '.agent-kb');
-  if (!existsSync(kb)) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      detail: 'No .agent-kb/. Without it, every selector an agent writes is a guess.',
-      fix: 'understudy init',
-    };
+/** The version a package has on disk in this project, or `undefined` when it is not installed. */
+function installedVersion(projectRoot: string, name: string): string | undefined {
+  const file = join(projectRoot, 'node_modules', ...name.split('/'), 'package.json');
+  if (!existsSync(file)) return undefined;
+  try {
+    const version = (JSON.parse(readFileSync(file, 'utf8')) as { version?: unknown }).version;
+    return typeof version === 'string' ? version : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** The tools whose version decides whether survey, verify and the generated tests behave. */
+const VERSIONED_TOOLS = ['@playwright/cli', '@playwright/test'] as const;
+
+/**
+ * Installed versions against the ones this release was tested with. A tool that is not
+ * installed is not this check's business (`playwright-cli available` covers it); one that
+ * is, and sits outside the range, is a warning with the command that installs the
+ * version that was tested, not an error: it may well work.
+ */
+function checkToolVersions(ctx: DoctorContext): CheckResult[] {
+  const installed: Record<string, string> = {};
+  for (const name of VERSIONED_TOOLS) {
+    const version = installedVersion(ctx.projectRoot, name);
+    if (version !== undefined) installed[name] = version;
   }
 
-  const maps = readAllRouteMaps(ctx.projectRoot);
-  if (maps.length === 0) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      detail:
-        '.agent-kb/ exists but no route has been surveyed, so it cannot answer a single question about the application.',
-      fix: 'understudy survey <url>',
-    };
+  const findings = judgeVersions(COMPATIBILITY, installed);
+  if (findings.length === 0) return [];
+
+  const problems = findings.filter((finding) => finding.verdict !== 'inside');
+  if (problems.length === 0) {
+    return [
+      {
+        id: 'tool-versions',
+        title: 'Tool versions',
+        status: 'ok',
+        detail: `${findings.map((f) => `${f.tool} ${f.version}`).join(', ')} — inside the tested ranges.`,
+      },
+    ];
   }
 
-  const stale = maps.filter((m) => m.freshness === 'stale');
-  const ageing = maps.filter((m) => m.freshness === 'ageing');
-
-  if (stale.length > 0) {
-    return {
-      id: 'agent-kb',
-      title: 'Knowledge base',
-      status: 'warn',
-      // A warning, not an error: stale entries are still usable as candidates.
-      detail:
-        `${String(stale.length)} of ${String(maps.length)} surveyed route(s) have not been confirmed in over a month: ` +
-        `${stale.map((m) => m.map.route).join(', ')}. Treat those as candidates, not facts.`,
-      fix: `understudy survey <url>${stale[0]?.map.route ?? ''}`,
-    };
-  }
-
-  return {
-    id: 'agent-kb',
-    title: 'Knowledge base',
-    status: 'ok',
+  return problems.map((finding) => ({
+    id: `tool-version:${finding.tool}`,
+    title: `${finding.tool} version`,
+    status: finding.verdict === 'not-judged' ? ('unchecked' as const) : ('warn' as const),
     detail:
-      `${String(maps.length)} route(s) surveyed` +
-      (ageing.length > 0 ? `, ${String(ageing.length)} ageing` : ', all fresh') +
-      '.',
-  };
+      finding.verdict === 'not-judged'
+        ? `${finding.version} is not a plain release, so it was not compared with the tested range ${finding.range}.`
+        : `${finding.version} is outside ${finding.range}, which is what this release of Understudy was run against (last tested: ${finding.tested}). It may work; nothing here has shown that it does.`,
+    fix: addDevCommand(ctx.detection.manager, [`${finding.tool}@${finding.tested}`]),
+  }));
 }
 
 /** An agent someone uses but nobody wired up silently ignores the conventions. */
@@ -424,8 +432,9 @@ export function runChecks(ctx: DoctorContext): CheckResult[] {
     checkContentFresh(ctx),
     ...checkTargetCoverage(ctx),
     checkPlaywrightCli(ctx),
+    ...checkToolVersions(ctx),
     checkOfficialSkills(ctx),
-    checkKnowledgeBase(ctx),
+    ...knowledgeChecks(probeKnowledge(ctx.projectRoot, ctx.now, ctx.source)),
   ];
 }
 

@@ -24,6 +24,7 @@ import { MUTATIONS } from './mutations.mjs';
  *   wrong-password-accepted  any password logs a known user in
  *   signup-validation-off    the sign-up form accepts any email
  *   button-renamed           "Change password" becomes "Update password"
+ *   login-button-renamed     "Log in" becomes "Sign in" (on a page that needs no session)
  *   route-moved              /admin/settings/security moves to /admin/security
  */
 
@@ -147,7 +148,11 @@ const server = createServer(async (request, response) => {
     case '/':
       return redirect(response, '/login');
     case '/login':
-      return html(response, 200, loginPage());
+      return html(
+        response,
+        200,
+        loginPage(mutations.has('login-button-renamed') ? { submitLabel: 'Sign in' } : {}),
+      );
     case '/forgot':
       return html(response, 200, forgotPage());
     case '/signup':

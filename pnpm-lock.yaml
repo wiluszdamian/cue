@@ -65,13 +65,13 @@ importers:
       '@understudy/engine':
         specifier: workspace:*
         version: link:../engine
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
     devDependencies:
       '@types/node':
         specifier: ^26.5.0
         version: 26.5.0
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
       typescript7:
         specifier: npm:typescript@^7.0.2
         version: typescript@7.0.2

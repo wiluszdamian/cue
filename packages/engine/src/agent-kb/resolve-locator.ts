@@ -1,5 +1,13 @@
 import type { Confidence, Freshness, KbElement } from '../schema/agent-kb.js';
-import { indexKnowledge, type KnowledgeIndex, type LocatorFact } from '../knowledge/index.js';
+import {
+  dependencyChanges,
+  indexKnowledge,
+  nameSimilarity,
+  type FileStateProvider,
+  type KnowledgeIndex,
+  type LocatorFact,
+} from '../knowledge/index.js';
+import { surveyCommand } from './advice.js';
 import { freshnessAdvice } from './freshness.js';
 import { loadKnowledge } from './load-knowledge.js';
 import { routeToFilename } from './snapshot/index.js';
@@ -19,6 +27,11 @@ export interface LocatorFound {
   readonly confidence: Confidence;
   readonly advice: string;
   readonly alternatives: readonly KbElement[];
+  /**
+   * Files this was read from that have changed or gone since it was confirmed, one
+   * sentence each. Empty when nothing changed, or when there was nothing to compare.
+   */
+  readonly changes: readonly string[];
 }
 
 export interface LocatorUnknown {
@@ -32,35 +45,9 @@ export interface LocatorUnknown {
 
 export type LocatorAnswer = LocatorFound | LocatorUnknown;
 
-function normalise(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-/** Scores an element against a description, on whole words rather than fragments. */
+/** Scores an element against a description. */
 function score(element: KbElement, query: string): number {
-  const name = normalise(element.name ?? '');
-  if (name.length === 0) return 0;
-
-  const wanted = normalise(query)
-    .split(' ')
-    .filter((w) => w.length > 0);
-  if (wanted.length === 0) return 0;
-
-  const words = new Set(name.split(' '));
-  let nameHits = 0;
-  for (const word of wanted) {
-    if (words.has(word)) nameHits += 2;
-    else if (word.length > 3 && name.includes(word)) nameHits += 1;
-  }
-
-  // Role alone must never match, or a missing element returns the first button.
-  if (nameHits === 0) return 0;
-
-  // With the name matched, the role separates "submit button" from "submit heading".
-  return wanted.includes(element.role.toLowerCase()) ? nameHits + 1 : nameHits;
+  return nameSimilarity(element.name, element.role, query);
 }
 
 export interface ResolveOptions {
@@ -68,6 +55,8 @@ export interface ResolveOptions {
   readonly route?: string | undefined;
   readonly query: string;
   readonly now?: Date;
+  /** The product's files as they are now, to notice that what an element was read from changed. */
+  readonly files?: FileStateProvider | undefined;
 }
 
 /** The older element shape, for the answer's callers; what it says is read off the fact. */
@@ -88,7 +77,7 @@ function samePath(a: string, b: string): boolean {
 }
 
 export function resolveLocator(options: ResolveOptions): LocatorAnswer {
-  const { projectRoot, route, query, now } = options;
+  const { projectRoot, route, query, now, files } = options;
   const index = indexKnowledge(loadKnowledge(projectRoot, now).kb);
 
   // Routes somebody actually looked at; a route only the source declares is not "surveyed".
@@ -105,6 +94,7 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
   const candidates = inScope.map((fact) => {
     const element = toElement(index, fact);
     return {
+      fact,
       element,
       route: routeOf(fact),
       freshness: index.freshness(fact, now) satisfies Freshness,
@@ -124,10 +114,18 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
       remedy:
         route === undefined
           ? 'understudy survey <url>   # map the route this element is on'
-          : `understudy survey <url>${route}   # this route has not been surveyed`,
+          : `${surveyCommand(route)}   # this route has not been surveyed`,
       knownRoutes,
     };
   }
+
+  // Only for the answer given: looking at every candidate's files would cost for nothing.
+  const changes = dependencyChanges(best.fact, files);
+  const advice =
+    changes.length === 0
+      ? freshnessAdvice(best.freshness, best.route)
+      : `${freshnessAdvice(best.freshness, best.route)} A file it was read from has changed, so it may no longer be right: ` +
+        `run \`${surveyCommand(best.route)}\` before relying on it.`;
 
   return {
     kind: 'found',
@@ -135,8 +133,9 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
     element: best.element,
     freshness: best.freshness,
     confidence: best.element.confidence,
-    advice: freshnessAdvice(best.freshness, best.route),
+    advice,
     alternatives: matches.slice(1, 4).map((m) => m.element),
+    changes,
   };
 }
 
@@ -168,13 +167,19 @@ export function formatLocatorAnswer(answer: LocatorAnswer): string {
     return lines.join('\n');
   }
 
-  const { element, route, freshness, confidence, advice, alternatives } = answer;
+  const { element, route, freshness, confidence, advice, alternatives, changes } = answer;
   const lines = [
     `Route:      ${route}`,
     `Locator:    ${element.locator}`,
     ...(element.testId === undefined ? [] : [`Test id:    ${element.testId}`]),
     `Confidence: ${confidence} — ${CONFIDENCE_NOTE[confidence]}`,
     `Freshness:  ${freshness} — ${advice}`,
+    // The first reason only: an answer is paid for out of the context the task needs.
+    ...(changes.length === 0
+      ? []
+      : [
+          `Changed:    ${changes[0] ?? ''}${changes.length > 1 ? ` (and ${String(changes.length - 1)} more)` : ''}`,
+        ]),
   ];
 
   if (alternatives.length > 0) {

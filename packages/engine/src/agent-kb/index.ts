@@ -57,9 +57,49 @@ export {
   type WriteResult,
 } from './store.js';
 
-export { extractLocators, type LocatorUse } from './extract-locators.js';
+export {
+  parseRouteMapFile,
+  readSourceIndex,
+  recordLiveCheck,
+  serializeRouteMap,
+  UnsupportedSchemaVersionError,
+  type LiveCheck,
+  type ParsedRouteMap,
+  type SourceIndex,
+} from './route-map-file.js';
+
+export {
+  extractLocators,
+  scanTestSource,
+  type LocatorUse,
+  type Navigation,
+  type TestSourceScan,
+} from './extract-locators.js';
 
 export * from './extract/index.js';
+
+export { cachedKnowledgeIndex, clearKnowledgeCache, findKnowledgeRoot } from './knowledge-cache.js';
+
+export {
+  buildTaskContext,
+  DEFAULT_CONTEXT_TOKENS,
+  describeEvidence,
+  estimateTokens,
+  MAX_CONTEXT_TOKENS,
+  MIN_CONTEXT_TOKENS,
+  stemsOf,
+  type TaskContext,
+  type TaskContextInput,
+  type TaskContextOptions,
+} from './task-context.js';
+
+export {
+  changedFiles,
+  findProductRoot,
+  hashContent,
+  workingTreeFiles,
+  type ChangedFiles,
+} from './working-tree.js';
 
 export { loadKnowledge, type LoadedKnowledge, type LoadIssue } from './load-knowledge.js';
 
@@ -71,3 +111,12 @@ export {
   type LocatorUnknown,
   type ResolveOptions,
 } from './resolve-locator.js';
+
+export { SURVEY_STALE_COMMAND, surveyCommand } from './advice.js';
+
+export {
+  normaliseRoute,
+  selectSurveyTargets,
+  type SurveySelectors,
+  type SurveyTarget,
+} from './survey-targets.js';

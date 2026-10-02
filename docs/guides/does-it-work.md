@@ -50,6 +50,57 @@ Then score what was recorded:
 understudy-benchmark ./recordings --project ./my-project
 ```
 
+### Running the answers, not only reading them
+
+Prompt set 2 is a set of tasks on the demo application in this repository
+(`examples/demo-app`). Scored with `--execute`, each answer is also compiled with
+the project's TypeScript and run once, with no retries, in a real browser against
+that application:
+
+```bash
+understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execute
+```
+
+That adds what reading the code cannot tell you: whether it **compiles**, whether it
+**passes the first time**, and which of its locators name the right element on the
+right page (the same judgement `cue check` makes). A locator the checker cannot
+decide, such as one built from a variable, is counted as not judged, never as
+invented. The checker also does not follow a click to a new page, so a real element
+asserted after navigating is reported as being on the wrong route, apart from the
+invented ones. Install the browser once with
+`pnpm --filter @understudy/demo-app exec playwright install chromium`; the whole
+path is covered by `pnpm --filter @understudy/benchmark test:integration`.
+
+### Repeating, breaking, and the report
+
+A single answer says little: a model answers differently each time. Ask for several, and
+score them together:
+
+```bash
+understudy-benchmark record ./recordings --project ./my-project --prompt-set 2 --runs 5
+understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execute --report ./report
+```
+
+`--runs` is a number of paid calls per prompt and condition, so `record` says the total
+before it asks anything, and defaults to one. Scoring finds how many repetitions every prompt
+has on its own. With more than one, the numbers come with their spread across runs
+(least, middle, most), not only a total.
+
+Some prompts name a defect the demo application can be given (`DEMO_MUTATIONS`, see its
+README). For those, a test that passed on the correct application is run again with the
+defect switched on, and **a good test should now fail**. A test that still passes does not
+notice that kind of bug, however green it looked. "Caught" means it failed; whether it
+failed for the intended reason is for a person to read from the recording.
+
+`--report <dir>` writes `report.md` and `report.json`: the commit, tool versions and
+model; both conditions side by side with the sample size beside every number; **every**
+failure, each linked to the recording it came from (unfavourable runs are kept, not
+sampled); what was not measured; and what the numbers cannot show. Browser exploration
+count, knowledge reuse, repair iterations and flaky reruns are listed as not measured, never
+as zero, because the answers are single completions with no tools and no second attempt.
+If any answer carries no `recordedAt`, it was written by hand and the report opens by
+saying that it tests the instrument, not Cue.
+
 Narrow it deliberately while you work:
 
 ```bash

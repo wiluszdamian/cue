@@ -23,6 +23,10 @@ It does not set the repository up, map the app, or invent a selector.
 2. If two Playwright sources disagree (official skills vs this repo vs a
    general best-practices skill) — follow `/resolve-owner`. The table in
    `AGENTS.md` is the answer; an unlisted topic is a gap, not a vote.
+   Starting on a task that touches the application, call `get_context` once
+   (MCP) or run `understudy context "<task>"`: the page, its known elements,
+   endpoints, the rules and how fresh each is, in one answer. `status: unknown`
+   means nothing is known yet; follow its suggested action instead of guessing.
 3. If the task is a selector, a locator, or "how do I click X" — follow
    `/resolve-locator`. No entry means survey that route, not a guessed CSS
    string.

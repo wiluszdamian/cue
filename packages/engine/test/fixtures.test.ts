@@ -1,7 +1,10 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { existsSync } from 'node:fs';
 import { analyze } from '../src/analyze.js';
+import { loadKnowledge } from '../src/agent-kb/load-knowledge.js';
+import { indexKnowledge } from '../src/knowledge/index.js';
 import { loadRules } from '../src/loader.js';
 import { isEnforceable } from '../src/schema/constitution.js';
 
@@ -27,12 +30,32 @@ const VIRTUAL_PATH = 'tests/app/functional/fixture.spec.ts';
 const rules = loadRules(join(import.meta.dirname, '..', '..', '..', 'rules'));
 const enforceable = rules.constitution.rules.filter(isEnforceable);
 
+/**
+ * Fixed, so that a fixture's knowledge base never ages out from under the test: the
+ * ones that exist were written a day before this.
+ */
+const NOW = new Date('2026-10-01T12:00:00Z');
+
+/**
+ * A rule that checks against the knowledge base is given the `.agent-kb` that sits
+ * inside its fixture directory, if it has one. Any rule can use this; none is special.
+ */
+function knowledgeFor(ruleId: string) {
+  const dir = join(FIXTURES, ruleId);
+  return existsSync(join(dir, '.agent-kb'))
+    ? indexKnowledge(loadKnowledge(dir, NOW).kb)
+    : undefined;
+}
+
 function analyzeOnly(ruleId: string, text: string) {
+  const knowledge = knowledgeFor(ruleId);
   return analyze({
     files: [{ path: VIRTUAL_PATH, text }],
     constitution: rules.constitution,
     tags: rules.tags,
     disabled: rules.constitution.rules.filter((r) => r.id !== ruleId).map((r) => r.id),
+    now: NOW,
+    ...(knowledge === undefined ? {} : { knowledge }),
   });
 }
 
@@ -59,8 +82,9 @@ describe('fixture coverage', () => {
 
 describe.each(enforceable.map((r) => [r.id, r] as const))('%s', (ruleId, rule) => {
   it('reports the bad fixture', () => {
-    const { diagnostics, skipped } = analyzeOnly(ruleId, readFixture(ruleId, 'bad'));
+    const { diagnostics, skipped, notChecked } = analyzeOnly(ruleId, readFixture(ruleId, 'bad'));
     expect(skipped).toEqual([]);
+    expect(notChecked).toEqual([]);
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(diagnostics.every((d) => d.ruleId === ruleId)).toBe(true);
     expect(diagnostics.every((d) => d.severity === rule.severity)).toBe(true);

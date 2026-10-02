@@ -8,6 +8,7 @@
 
 export {
   CONDITIONS,
+  detectRuns,
   extractCode,
   missingRecordings,
   record,
@@ -33,14 +34,43 @@ export {
 
 export { recordRun, type RecordOptions, type RecordSummary } from './record-run.js';
 
-export { PROMPTS, PROMPT_SET_VERSION, promptsExercising, type Prompt } from './prompts.js';
+export {
+  PROMPTS,
+  PROMPT_SET_V2_VERSION,
+  PROMPT_SET_VERSION,
+  PROMPT_SETS,
+  PROMPTS_V1,
+  PROMPTS_V2,
+  promptSet,
+  promptsExercising,
+  type Prompt,
+  type PromptSet,
+} from './prompts.js';
+
+export {
+  summariseExecution,
+  type CompileResult,
+  type ExecutionInput,
+  type ExecutionResult,
+  type ExecutionSummary,
+  type Executor,
+  type RunResult,
+  type RunStatus,
+} from './execution.js';
+export { compileFiles } from './compile.js';
+export { DemoExecutor, type DemoExecutorOptions } from './executor.js';
+export { startDemo, type RunningDemo } from './demo-server.js';
+export { summarisePlaywrightReport, type PlaywrightJsonReport } from './playwright-run.js';
+export { safeWorkspacePath, UnsafePathError, writeWorkspace } from './workspace.js';
 
 export {
   scoreCompliance,
   scoreGrounding,
+  scoreLocators,
   type ComplianceScore,
   type GeneratedFile,
   type GroundingScore,
+  type LocatorScore,
 } from './scoring.js';
 
 export {
@@ -50,7 +80,21 @@ export {
   type BenchmarkResult,
   type Comparison,
   type ConditionResult,
+  type MutationCheck,
+  type MutationOutcome,
+  type MutationSummary,
+  type NotMeasured,
   type RunOptions,
+  type RunSummary,
+  type SampleResult,
+  type TokenUsage,
 } from './runner.js';
 
-export { formatReport, toJson } from './report.js';
+export { formatMarkdown, formatReport, toJson } from './report.js';
+export {
+  collectMetadata,
+  spread,
+  type MetadataSources,
+  type RunMetadata,
+  type Spread,
+} from './metadata.js';
