@@ -1,0 +1,57 @@
+name: pages
+
+# Publishes the Astro site (landing page + the repository's /docs) to GitHub Pages.
+#
+# Runs only when the site or the docs it renders change, and by hand. Once, in the
+# repository: Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
+# The site is then at https://wiluszdamian.github.io/project-cue/.
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'docs/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+      # The site is not part of the workspace and has its own lockfile. esbuild's install
+      # script is allowed explicitly: without it pnpm exits non-zero on the ignored build.
+      - run: pnpm install --ignore-workspace --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
+        working-directory: site
+      - run: pnpm build
+        working-directory: site
+        env:
+          # Served under the repository name; for a custom domain, drop this and set SITE_URL.
+          SITE_BASE: /${{ github.event.repository.name }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

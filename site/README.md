@@ -44,6 +44,10 @@ build with the base path set:
 SITE_BASE=/project-cue pnpm build
 ```
 
+`.github/workflows/pages.yml` does this on every push to `main` that touches `site/` or `docs/`.
+Enable it once under Settings -> Pages -> Source: GitHub Actions. The site is then at
+<https://wiluszdamian.github.io/project-cue/>.
+
 For a custom domain, leave `SITE_BASE` unset and set `SITE_URL`.
 
 ## Logo
