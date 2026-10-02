@@ -1,4 +1,5 @@
 import type { SurfaceEntry, TermEntryLike, TestIdEntry } from './types.js';
+import { readCatalogue } from './i18n.js';
 import { readOpenApi } from './openapi.js';
 import { reference, type SourceFileRef } from './scan.js';
 
@@ -223,6 +224,9 @@ export const openApiAdapter: Adapter = {
 
 // -------------------------------------------------------------------- i18n
 
+/** A catalogue for English, by the usual names: `en.json`, `locales/en/common.json`, `en-US.yaml`. */
+const ENGLISH = /(?:^|[/._-])en(?:[-_][a-z]{2})?(?:[/._-]|$)/i;
+
 const I18N_FILE = /(?:^|\/)(?:locales?|i18n|lang|translations?)\/.*\.(json|ya?ml)$/i;
 
 /** Translation catalogues: the words a user sees, and so the words a `getByRole` name must match. */
@@ -235,20 +239,35 @@ export const i18nAdapter: Adapter = {
   },
 
   extract({ files }) {
-    const terms: TermEntryLike[] = [];
+    const terms = new Map<string, TermEntryLike>();
+    const gaps: string[] = [];
 
-    for (const file of files.filter((f) => I18N_FILE.test(f.path))) {
-      file.lines.forEach((line, index) => {
-        const entry = /^\s*["']?([\w.-]+)["']?\s*:\s*["'](.+?)["']\s*,?\s*$/.exec(line);
-        const key = entry?.[1];
-        const label = entry?.[2];
-        if (key !== undefined && label !== undefined && label.length > 0) {
-          terms.push({ key, label, source: reference(file, index) });
+    // English first and then by path, so that with several locales the label that is kept
+    // does not depend on the order the disk lists them in.
+    const catalogues = files
+      .filter((f) => I18N_FILE.test(f.path))
+      .sort(
+        (a, b) =>
+          Number(ENGLISH.test(b.path)) - Number(ENGLISH.test(a.path)) ||
+          a.path.localeCompare(b.path),
+      );
+
+    for (const file of catalogues) {
+      const catalogue = readCatalogue(file);
+      gaps.push(...catalogue.gaps);
+      for (const term of catalogue.terms) {
+        const kept = terms.get(term.key);
+        if (kept === undefined) terms.set(term.key, term);
+        else if (kept.label !== term.label) {
+          // The vocabulary does not record a locale, so a second language cannot sit beside the first.
+          gaps.push(
+            `${file.path}: ${term.key} has another label than in ${kept.source.split(':')[0] ?? 'the first catalogue'}; the first is kept (locales are not recorded)`,
+          );
         }
-      });
+      }
     }
 
-    return { terms };
+    return { terms: [...terms.values()], ...(gaps.length > 0 ? { gaps } : {}) };
   },
 };
 
