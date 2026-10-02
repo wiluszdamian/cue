@@ -51,7 +51,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 13 | [Prawdziwe E2E w CI: extract → survey → locator → check → test → verify](tickets/13-e2e-ci.md) | P0.2 | 02, 03, 04, 06, 11 | done |
 | 14 | [Benchmark: kompilacja i uruchamianie wygenerowanych testów](tickets/14-benchmark-execution.md) | P0.7 | 03, 10 | done |
 | 15 | [Benchmark: mutacje, metadane, raport](tickets/15-benchmark-mutation-report.md) | P0.7 | 14 | done |
-| 16 | [Pierwszy prawdziwy benchmark (ręcznie, płatne API)](tickets/16-benchmark-real-run.md) | P0.7 | 13, 15 | todo — **wymaga Ciebie** |
+| 16 | [Pierwszy prawdziwy benchmark (ręcznie, płatne API)](tickets/16-benchmark-real-run.md) | P0.7 | 13, 15 | runbook gotowy (`benchmarks/RUNBOOK.md`) — **czeka na Ciebie: płatne nagranie** |
 | 17 | [Świeżość oparta o git (possibly-stale)](tickets/17-git-aware-freshness.md) | P1.1 | 09 | todo |
 | 18 | [Celowany survey (`--route`, `--stale`, `--affected-by`)](tickets/18-targeted-survey.md) | P1.2 | 06, 17 | todo |
 | 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | todo |
