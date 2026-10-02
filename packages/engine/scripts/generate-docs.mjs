@@ -117,10 +117,10 @@ function constitutionIndex() {
   const enforced = rules.constitution.rules.filter((r) => r.detector.kind !== 'manual');
   const manual = rules.constitution.rules.filter((r) => r.detector.kind === 'manual');
 
-  return `${heading('All the rules', 'Every rule Understudy checks, why it exists, and what to write instead.')}
+  return `${heading('All the rules', 'Every rule Cue checks, why it exists, and what to write instead.')}
 ${GENERATED}
 
-These are the rules Understudy owns outright. Everything else — how to drive the
+These are the rules Cue owns outright. Everything else — how to drive the
 browser, how to debug a test, how to handle Electron or i18n — belongs to another
 source; see [Who decides what](ownership.md) for who owns what.
 
@@ -226,7 +226,7 @@ ${topic.note ? prose(topic.note) : prose(owner?.consult ?? '')}`;
   return `${heading('Who decides what', 'When two sources of advice disagree, this table settles it.')}
 ${GENERATED}
 
-Understudy is an integrator. It composes sources maintained by other people and
+Cue is an integrator. It composes sources maintained by other people and
 adds the two nobody else can supply — this repo's rules, and this application's
 actual shape. That leaves one problem no other project has: deciding which source
 wins when they disagree.
@@ -245,7 +245,7 @@ owner also covers the question.
 
 Two invariants are checked in CI rather than asserted here:
 
-1. **Every topic the constitution covers is Understudy's, absolutely.** Each
+1. **Every topic the constitution covers is Cue's, absolutely.** Each
    \`skill\` a rule cites must be claimed by an understudy-owned topic at absolute
    precedence, so a rule cannot be added on a topic whose ownership nobody
    decided.

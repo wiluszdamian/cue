@@ -340,9 +340,9 @@ export const OWNERSHIP = {
   owners: [
     {
       id: 'understudy',
-      name: 'Understudy',
+      name: 'Cue',
       kind: 'internal',
-      maintainer: 'The Understudy Authors',
+      maintainer: 'The Cue Authors',
       consult:
         'rules/constitution.yaml and docs/rules/. The ESLint plugin enforces it, so a disagreement here surfaces as a failing build, not as a style debate.\n',
     },
@@ -379,7 +379,7 @@ export const OWNERSHIP = {
       maintainer: 'Currents Software Inc. (MIT)',
       install: 'optional, chosen during `understudy init`',
       consult:
-        'The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.\n',
+        'The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.\n',
     },
     {
       id: 'external-process',
@@ -387,7 +387,7 @@ export const OWNERSHIP = {
       kind: 'external',
       maintainer: 'Whoever runs your product process',
       consult:
-        'Understudy has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Understudy and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.\n',
+        'Cue has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Cue and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.\n',
     },
   ],
   topics: [
@@ -607,7 +607,7 @@ export const OWNERSHIP = {
         'reporter option',
         'webserver',
       ],
-      note: 'How the options work is theirs. Which values this repo uses is Understudy\'s — see "fixtures, dependency injection and environment configuration".\n',
+      note: 'How the options work is theirs. Which values this repo uses is Cue\'s — see "fixtures, dependency injection and environment configuration".\n',
     },
     {
       topic: 'single scripted browser actions from an agent',
@@ -689,7 +689,7 @@ export const OWNERSHIP = {
         'roadmap',
         'review this feature',
       ],
-      note: 'Deliberately not ours. Understudy rules on testability and on the shape of a suite; a tool that also claims the roadmap is a worse version of the general process tools your team already has. Say so and hand it back.\n',
+      note: 'Deliberately not ours. Cue rules on testability and on the shape of a suite; a tool that also claims the roadmap is a worse version of the general process tools your team already has. Say so and hand it back.\n',
     },
   ],
 } as unknown as Ownership;

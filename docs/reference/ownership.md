@@ -4,7 +4,7 @@ _When two sources of advice disagree, this table settles it._
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-Understudy is an integrator. It composes sources maintained by other people and
+Cue is an integrator. It composes sources maintained by other people and
 adds the two nobody else can supply — this repo's rules, and this application's
 actual shape. That leaves one problem no other project has: deciding which source
 wins when they disagree.
@@ -23,7 +23,7 @@ owner also covers the question.
 
 Two invariants are checked in CI rather than asserted here:
 
-1. **Every topic the constitution covers is Understudy's, absolutely.** Each
+1. **Every topic the constitution covers is Cue's, absolutely.** Each
    `skill` a rule cites must be claimed by an understudy-owned topic at absolute
    precedence, so a rule cannot be added on a topic whose ownership nobody
    decided.
@@ -40,10 +40,10 @@ right up until the second person has to guess it too.
 
 ## Owners
 
-### Understudy `understudy`
+### Cue `understudy`
 
 - **Kind:** internal
-- **Maintained by:** The Understudy Authors
+- **Maintained by:** The Cue Authors
 
 rules/constitution.yaml and docs/rules/. The ESLint plugin enforces it, so a disagreement here surfaces as a failing build, not as a style debate.
 
@@ -104,7 +104,7 @@ Decides 1 topic:
 - **Maintained by:** Currents Software Inc. (MIT)
 - **Obtained via:** `optional, chosen during `understudy init``
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 Decides 6 topics:
 
@@ -120,7 +120,7 @@ Decides 6 topics:
 - **Kind:** external
 - **Maintained by:** Whoever runs your product process
 
-Understudy has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Understudy and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.
+Cue has no opinion here and will not grow one. It rules on testability and on the shape of a suite, never on a roadmap. Say the topic is outside Cue and hand it back to however your team already writes specs, splits tickets, and reviews features — duplicating that is how a focused tool turns into a worse version of a general one.
 
 Decides 1 topic:
 
@@ -132,7 +132,7 @@ Decides 1 topic:
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `stage-map`                              |
 
@@ -142,7 +142,7 @@ Locators live in page objects, exposed as getters, in three sections. A spec nam
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `canon`                                  |
 
@@ -152,7 +152,7 @@ Canonical tags come from rules/tags.yaml. Web-first assertions only, no hard wai
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `locator-policy`                         |
 
@@ -162,7 +162,7 @@ Which _kind_ of locator to reach for is ours. Which selector actually exists in 
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `harness`                                |
 
@@ -172,7 +172,7 @@ One import point for the merged test object. baseURL belongs to the config, neve
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `wire-contract`                          |
 
@@ -182,7 +182,7 @@ Strict schemas, complete negative cases. A schema that ignores unknown keys is n
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `strict-types`                           |
 
@@ -192,7 +192,7 @@ A test suite's types are load-bearing for correctness, not convenience.
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `seed-policy`                            |
 
@@ -202,7 +202,7 @@ Not yet backed by a constitution rule — the three-level rule for factories ver
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Understudy)                |
+| Decided by          | `understudy` (Cue)                       |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `cartography`                            |
 
@@ -270,7 +270,7 @@ Through `playwright-cli`, not through MCP. Microsoft's own guidance is that CLI-
 | Decided by | `playwright-official` (Official Playwright skills and CLI) |
 | Precedence | `default`                                                  |
 
-How the options work is theirs. Which values this repo uses is Understudy's — see "fixtures, dependency injection and environment configuration".
+How the options work is theirs. Which values this repo uses is Cue's — see "fixtures, dependency injection and environment configuration".
 
 ### single scripted browser actions from an agent
 
@@ -289,7 +289,7 @@ Only for point-in-time calls with small results. Anything exploratory goes to pl
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 ### canvas, WebGL, service workers and other exotic surfaces
 
@@ -298,7 +298,7 @@ The owner of general Playwright practice — the areas Understudy has no opinion
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 ### internationalisation and accessibility testing
 
@@ -307,7 +307,7 @@ The owner of general Playwright practice — the areas Understudy has no opinion
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 ### GraphQL, security testing and performance auditing
 
@@ -316,7 +316,7 @@ The owner of general Playwright practice — the areas Understudy has no opinion
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 ### visual regression and component testing
 
@@ -325,7 +325,7 @@ The owner of general Playwright practice — the areas Understudy has no opinion
 | Decided by | `reference-skill` (Playwright best-practices reference skill) |
 | Precedence | `default`                                                     |
 
-The owner of general Playwright practice — the areas Understudy has no opinion about because someone else already maintains one.
+The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
 ### framework-specific testing concerns
 
@@ -343,4 +343,4 @@ Framework quirks are theirs. What this repo's application does is agent-kb's, an
 | Decided by | `external-process` (Your team's own engineering process) |
 | Precedence | `default`                                                |
 
-Deliberately not ours. Understudy rules on testability and on the shape of a suite; a tool that also claims the roadmap is a worse version of the general process tools your team already has. Say so and hand it back.
+Deliberately not ours. Cue rules on testability and on the shape of a suite; a tool that also claims the roadmap is a worse version of the general process tools your team already has. Say so and hand it back.

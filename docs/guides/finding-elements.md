@@ -51,10 +51,10 @@ hear about it.
 If you do not know what something is called, look it up.
 
 ```bash
-npx @understudy/cli locator "checkout button"
+npx @wiluszdamian/cue-cli locator "checkout button"
 ```
 
-If Understudy does not know either, it says so and tells you which page to go and
+If Cue does not know either, it says so and tells you which page to go and
 look at. It will not make one up, and neither should you.
 
 An invented locator does not fail with "I guessed". It fails as though your app

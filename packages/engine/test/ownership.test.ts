@@ -111,7 +111,7 @@ describe('an unowned topic is a stated gap, not silence', () => {
 describe('answers are written to be acted on', () => {
   it('states the precedence, the owner, and what to consult', () => {
     const text = formatAnswer(whoOwns(rules.ownership, 'which locator should I use'));
-    expect(text).toContain('Owner: Understudy');
+    expect(text).toContain('Owner: Cue');
     expect(text).toContain('ABSOLUTE');
     expect(text).toContain('rules/constitution.yaml');
   });

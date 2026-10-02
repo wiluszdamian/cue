@@ -1,8 +1,8 @@
-# What Understudy is
+# What Cue is
 
 _Helps you and your AI assistant write browser tests that match how your team already works._
 
-Understudy helps you write browser tests — and helps an AI assistant write them
+Cue helps you write browser tests — and helps an AI assistant write them
 the way your team already writes them.
 
 If you have ever asked an AI to write a test and got back something that looked
@@ -23,14 +23,14 @@ Plausible is the problem. The test doesn't fail with "I made this up." It fails
 like your app is broken. So somebody spends an afternoon debugging a login page
 that works perfectly.
 
-Understudy fixes this by writing down what's really there. When something isn't
+Cue fixes this by writing down what's really there. When something isn't
 written down, it says **"I don't know, go and look"** instead of guessing. That
 refusal is the whole point.
 
 ## Try it
 
 ```bash
-npx @understudy/cli init
+npx @wiluszdamian/cue-cli init
 ```
 
 It looks at your project, shows you exactly what it plans to write, and waits for
@@ -42,7 +42,7 @@ you to say yes. Nothing happens until you agree.
 ## What it isn't
 
 - **Not a Playwright tutorial.** Playwright's own docs are excellent and kept up
-  to date by the people who build it. Understudy points you at them.
+  to date by the people who build it. Cue points you at them.
 - **Not a replacement for your process.** It has opinions about tests. It has
   none about your roadmap, your tickets, or how you plan features.
 - **Not magic.** It won't write good tests for a feature nobody can explain. It
