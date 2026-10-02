@@ -79,24 +79,47 @@ function routeFromAppPath(segments: string): string {
   return `/${parts.join('/')}`.replace(/\/+$/, '') || '/';
 }
 
+const NEXT_CONFIG = /(^|\/)next\.config\.(js|mjs|cjs|ts)$/;
+const NEXT_DEPENDENCY = /"next"\s*:/;
+
+/**
+ * Directories that are a Next.js project, as shown by a `next.config.*` or a
+ * `package.json` that depends on `next`. A `pages/` folder is Next's Pages Router
+ * only beneath one of these: elsewhere it is as likely to hold page objects for a
+ * test suite, and calling those routes would invent an application that is not there.
+ */
+function nextRoots(files: readonly SourceFileRef[]): string[] {
+  const roots = new Set<string>();
+  for (const file of files) {
+    const directory = file.path.includes('/') ? file.path.slice(0, file.path.lastIndexOf('/')) : '';
+    if (NEXT_CONFIG.test(file.path)) roots.add(directory);
+    else if (
+      (file.path === 'package.json' || file.path.endsWith('/package.json')) &&
+      NEXT_DEPENDENCY.test(file.lines.join('\n'))
+    ) {
+      roots.add(directory);
+    }
+  }
+  return [...roots];
+}
+
+const underAny = (path: string, roots: readonly string[]): boolean =>
+  roots.some((root) => root === '' || path.startsWith(`${root}/`));
+
 export const nextAdapter: Adapter = {
   id: 'nextjs',
   summary: 'Next.js routes, from the App Router and the Pages Router',
 
   detect({ files }) {
-    return files.some(
-      (file) =>
-        NEXT_APP_PAGE.test(file.path) ||
-        NEXT_APP_ROUTE.test(file.path) ||
-        NEXT_PAGES.test(file.path) ||
-        file.path === 'next.config.js' ||
-        file.path === 'next.config.mjs' ||
-        file.path === 'next.config.ts',
+    return (
+      nextRoots(files).length > 0 ||
+      files.some((file) => NEXT_APP_PAGE.test(file.path) || NEXT_APP_ROUTE.test(file.path))
     );
   },
 
   extract({ files }) {
     const surface: SurfaceEntry[] = [];
+    const roots = nextRoots(files);
 
     for (const file of files) {
       const appPage = NEXT_APP_PAGE.exec(file.path);
@@ -134,7 +157,7 @@ export const nextAdapter: Adapter = {
         continue;
       }
 
-      const pagesApi = NEXT_PAGES_API.exec(file.path);
+      const pagesApi = underAny(file.path, roots) ? NEXT_PAGES_API.exec(file.path) : null;
       if (pagesApi) {
         surface.push({
           kind: 'endpoint',
@@ -144,7 +167,7 @@ export const nextAdapter: Adapter = {
         continue;
       }
 
-      const pages = NEXT_PAGES.exec(file.path);
+      const pages = underAny(file.path, roots) ? NEXT_PAGES.exec(file.path) : null;
       if (pages) {
         const name = (pages[1] ?? '').replace(/\/index$/, '').replace(/^index$/, '');
         if (name === '_app' || name === '_document' || name === '_error') continue;

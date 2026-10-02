@@ -71,6 +71,14 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **`understudy discover`** looks at a repository without changing it and reports the
+  Playwright config (read as text, never run: test folder and projects), how many spec
+  files, how many page objects (classes that hold a `Page`, wherever they live), what the
+  product's source could supply (test ids, Next.js routes, OpenAPI endpoints, labels, with
+  counts), the coding agents and instruction files it can see, and what is already set up. It
+  ends with the commands that would act on it. `--source` points at the product when it is
+  elsewhere; `--json` prints the report. `init` opens its plan with one line of the same.
+
 - **`survey` can look at some pages again.** `--route /a,/b` surveys the pages you name,
   `--stale` those with something stale or read from code that has changed, and
   `--affected-by <git range>` those read from files changed over the range. It prints a plan
@@ -174,6 +182,12 @@ rather than deletion, and stay documented for one major cycle.
   `@playwright/cli` (pinned in `examples/demo-app`).
 
 ### Fixed
+
+- **`extract` no longer turns a test suite's `pages/` folder into routes.** The Next.js adapter
+  read any `pages/*.ts` as the Pages Router, so a repository whose page objects live in `pages/`
+  got invented routes such as `/login-page`. The Pages Router is now read only under a
+  directory that is a Next.js project (a `next.config.*`, or a `package.json` depending on
+  `next`), which also keeps a monorepo's suite out of the web app's routes.
 
 - **`extract` reads OpenAPI with a real parser.** The line-based reader missed the
   usual JSON shape (`"/users": {`) and everything in a minified file, so most JSON

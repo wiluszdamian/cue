@@ -4,6 +4,23 @@ _The full list, with what each one is for._
 
 ## Setting up
 
+### `understudy discover`
+
+Look at a repository and say what Understudy could learn from it. It only reads: it
+writes nothing, and ends with the commands that would act on what it found.
+
+```bash
+npx @understudy/cli discover
+npx @understudy/cli discover --source ../my-app
+npx @understudy/cli discover --json
+```
+
+It reports the Playwright config (read as text, never run), how many spec files there
+are, how many page objects, what the product's source could tell Understudy (test ids,
+routes, OpenAPI endpoints, labels, each with a count), which coding agents and
+instruction files it can see, and what is already set up here. `--source` points at the
+product when it is not this repository. `init` starts its plan with one line of the same.
+
 ### `understudy init`
 
 Sets up a project. Shows you the plan first and waits for a yes. Without a terminal

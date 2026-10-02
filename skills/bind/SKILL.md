@@ -14,8 +14,9 @@ repository, and again when `doctor` reports an error.
 
 ## Procedure
 
-1. Detect the package manager, the agents in use, and whether Playwright is
-   already installed.
+1. Run `understudy discover` first: it is read-only, and says what is already here
+   (the Playwright config, the specs, the page objects, the agents in use) and what
+   Understudy could learn from the product's source.
 2. Run `understudy init` and **show the plan before accepting it**. The plan
    lists every file, why it is being written, and what will be left alone.
 3. Apply it, or print the commands for the detected package manager so the person

@@ -54,7 +54,7 @@ Zasady wspólne dla wszystkich ticketów:
 | 16 | [Pierwszy prawdziwy benchmark (ręcznie, płatne API)](tickets/16-benchmark-real-run.md) | P0.7 | 13, 15 | runbook gotowy (`benchmarks/RUNBOOK.md`) — **czeka na Ciebie: płatne nagranie** |
 | 17 | [Świeżość oparta o git (possibly-stale)](tickets/17-git-aware-freshness.md) | P1.1 | 09 | done |
 | 18 | [Celowany survey (`--route`, `--stale`, `--affected-by`)](tickets/18-targeted-survey.md) | P1.2 | 06, 17 | done |
-| 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | todo |
+| 19 | [`understudy discover`](tickets/19-discover.md) | P1.3 | 05 | done |
 | 20 | [MCP: rozszerzone resolve_* / get_evidence / get_freshness](tickets/20-mcp-resolution.md) | P1.4 | 09 | todo |
 | 21 | [MCP: `get_context`](tickets/21-mcp-get-context.md) | P1.4 | 20 | todo |
 | 22 | [`doctor` — diagnostyka wiedzy](tickets/22-doctor-knowledge.md) | P1.5 | 09, 10, 17 | todo |

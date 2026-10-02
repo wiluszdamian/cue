@@ -96,6 +96,8 @@ export * from './knowledge/index.js';
 
 export * from './verification/index.js';
 
+export * from './discovery/index.js';
+
 export {
   AGENT_KB_SCHEMA_VERSION,
   ROUTE_MAP_VERSION,

@@ -46,6 +46,7 @@ import {
   type CheckFormat,
 } from './check.js';
 import { decideConfirmation, REFUSED_MESSAGE } from './confirm.js';
+import { discover, formatDiscovery, formatDiscoverySummary } from './discover.js';
 import { formatVerifyReport, verify, verifyExitCode, type CiMode } from './verify.js';
 import {
   extract,
@@ -70,6 +71,7 @@ const USAGE = `understudy <command> [options]
   survey <url>         map a live route into .agent-kb
   survey --route|--stale|--affected-by  look at some pages again, not the whole app
   extract              read the product source into .agent-kb
+  discover             what is in this repository and what Understudy could learn from it
   check [files...]     check the locators in tests against the knowledge base
   verify               check the map against the application (and say what was not checked)
   verify-map           old name for verify
@@ -95,7 +97,8 @@ Options
   --base-url <url>     environment to verify the map against, or to survey routes of
                        (or set UNDERSTUDY_BASE_URL)
   --env <name>         name this environment (staging) in what survey and verify record
-  --source <path>      the product source, to see whether code behind the map changed (verify)
+  --source <path>      the product source: where discover and extract read from, and what verify
+                       compares the map with
   --affected-by <range> check only the routes read from files changed over this git range (verify)
   --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked);
                        with survey, the pages to look at again
@@ -327,6 +330,9 @@ async function main(): Promise<number> {
         ...(flags['force'] === true ? { force: true } : {}),
       });
 
+      // What the plan is being made around, before the plan itself. Read-only.
+      out(formatDiscoverySummary(discover({ root: projectRoot })));
+      out('');
       out(describePlan(prepared));
       out('');
 
@@ -462,6 +468,13 @@ async function main(): Promise<number> {
           extract({ projectRoot, sourceRoot: source, ...(only ? { only } : {}) }),
         ),
       );
+      return 0;
+    }
+
+    case 'discover': {
+      const report = discover({ root: projectRoot, source: asString(flags['source']) });
+      out(flags['json'] === true ? JSON.stringify(report, null, 2) : formatDiscovery(report));
+      // It only looks. What it found is for the person to act on.
       return 0;
     }
 
