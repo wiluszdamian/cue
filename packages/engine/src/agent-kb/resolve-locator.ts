@@ -1,5 +1,10 @@
 import type { Confidence, Freshness, KbElement } from '../schema/agent-kb.js';
-import { indexKnowledge, type KnowledgeIndex, type LocatorFact } from '../knowledge/index.js';
+import {
+  indexKnowledge,
+  nameSimilarity,
+  type KnowledgeIndex,
+  type LocatorFact,
+} from '../knowledge/index.js';
 import { freshnessAdvice } from './freshness.js';
 import { loadKnowledge } from './load-knowledge.js';
 import { routeToFilename } from './snapshot/index.js';
@@ -32,35 +37,9 @@ export interface LocatorUnknown {
 
 export type LocatorAnswer = LocatorFound | LocatorUnknown;
 
-function normalise(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-/** Scores an element against a description, on whole words rather than fragments. */
+/** Scores an element against a description. */
 function score(element: KbElement, query: string): number {
-  const name = normalise(element.name ?? '');
-  if (name.length === 0) return 0;
-
-  const wanted = normalise(query)
-    .split(' ')
-    .filter((w) => w.length > 0);
-  if (wanted.length === 0) return 0;
-
-  const words = new Set(name.split(' '));
-  let nameHits = 0;
-  for (const word of wanted) {
-    if (words.has(word)) nameHits += 2;
-    else if (word.length > 3 && name.includes(word)) nameHits += 1;
-  }
-
-  // Role alone must never match, or a missing element returns the first button.
-  if (nameHits === 0) return 0;
-
-  // With the name matched, the role separates "submit button" from "submit heading".
-  return wanted.includes(element.role.toLowerCase()) ? nameHits + 1 : nameHits;
+  return nameSimilarity(element.name, element.role, query);
 }
 
 export interface ResolveOptions {

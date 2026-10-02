@@ -12,6 +12,12 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Changed
 
+- `extractLocators` also reports where each locator is (column and end position),
+  whether `{ exact: true }` was passed, whether it is built from something only known
+  at runtime, whether it narrows another locator, and which functions it sits in.
+  The existing fields are unchanged. `scanTestSource` additionally returns the
+  `page.goto` calls and an `understudy-route` comment.
+
 - **Route maps are written as `schemaVersion: 2`.** Every element now carries an
   `id`, a `status` (`inferred`, `observed`, `verified`, `stale`), the `evidence` it
   rests on and when it was last confirmed; the product source reference and the
@@ -50,6 +56,16 @@ rather than deletion, and stay documented for one major cycle.
   checked, so the verdict is `PARTIAL`), and `verify --json` prints the report.
 
 ### Added
+
+- **`analyzeLocators`** (`@understudy/engine`): for each locator in a test file, says
+  whether the knowledge base knows it — `known`, `ambiguous` (several elements match,
+  which Playwright's strict mode refuses), `unknown`, `wrong-route`, `stale`,
+  `unverified` or `undecidable` — with the nearest known locators and a sentence on
+  what to do. Matching follows Playwright (case-insensitive substring, `exact`),
+  the route comes from the closest earlier `page.goto` or an `understudy-route`
+  comment, and anything that cannot be decided from the code (variables, regular
+  expressions, `getByText`, CSS) is reported as undecidable instead of guessed at.
+  Nothing uses it yet; `understudy check` and a lint rule follow.
 
 - **Knowledge Core model** (`packages/engine/src/knowledge`, exported from
   `@understudy/engine`). A versioned, typed model of what is known about an
