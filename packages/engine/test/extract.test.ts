@@ -26,8 +26,8 @@ function write(root: string, path: string, content: string): void {
 }
 
 beforeEach(() => {
-  product = mkdtempSync(join(tmpdir(), 'understudy-product-'));
-  project = mkdtempSync(join(tmpdir(), 'understudy-suite-'));
+  product = mkdtempSync(join(tmpdir(), 'cue-product-'));
+  project = mkdtempSync(join(tmpdir(), 'cue-suite-'));
 
   write(product, 'next.config.js', 'module.exports = {};\n');
   write(
@@ -162,7 +162,7 @@ describe('the Next.js adapter, and a folder that is only called pages', () => {
     [];
 
   function repo(files: Record<string, string>): string {
-    const root = mkdtempSync(join(tmpdir(), 'understudy-next-'));
+    const root = mkdtempSync(join(tmpdir(), 'cue-next-'));
     for (const [path, text] of Object.entries(files)) write(root, path, text);
     return root;
   }
@@ -267,7 +267,7 @@ describe('degrading rather than failing', () => {
   });
 
   it('still finds test ids in a stack nobody wrote an adapter for', () => {
-    const plain = mkdtempSync(join(tmpdir(), 'understudy-plain-'));
+    const plain = mkdtempSync(join(tmpdir(), 'cue-plain-'));
     write(plain, 'index.html', '<button data-testid="buy-now">Buy</button>');
 
     const result = extract({ projectRoot: project, sourceRoot: plain });
@@ -276,7 +276,7 @@ describe('degrading rather than failing', () => {
   });
 
   it('warns when nothing can ever be confirmed', () => {
-    const empty = mkdtempSync(join(tmpdir(), 'understudy-empty-'));
+    const empty = mkdtempSync(join(tmpdir(), 'cue-empty-'));
     write(empty, 'index.html', '<button>Buy</button>');
 
     const result = extract({ projectRoot: project, sourceRoot: empty });

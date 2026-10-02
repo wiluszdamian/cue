@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadRules, type Rules } from '@understudy/engine';
+import { loadRules, type Rules } from '@wiluszdamian/cue-engine';
 import { detectAgents, type TargetId } from './agents.js';
 import { CONSTITUTION, OWNERSHIP, TAGS } from './generated/rules.js';
 import { apply, plan, type DesiredFile, type Plan, type PlannedFile } from './install.js';
@@ -41,7 +41,7 @@ export function resolveRules(projectRoot: string): Rules {
 export interface InitOptions {
   readonly projectRoot: string;
   readonly detection: Detection;
-  readonly understudyVersion: string;
+  readonly cueVersion: string;
   /** Explicit `--target` list. When absent, detection decides what to suggest. */
   readonly targets?: readonly string[];
   readonly all?: boolean;
@@ -67,7 +67,7 @@ export function planInit(options: InitOptions): InitPlan {
   const rules = resolveRules(options.projectRoot);
   const manifest =
     readManifest(options.projectRoot) ??
-    emptyManifest(options.understudyVersion, options.detection.manager);
+    emptyManifest(options.cueVersion, options.detection.manager);
 
   const detected = detectAgents({
     cwd: options.projectRoot,
@@ -91,7 +91,7 @@ export function planInit(options: InitOptions): InitPlan {
       projectRoot: options.projectRoot,
       packageManager: options.detection.manager,
       rules,
-      understudyVersion: options.understudyVersion,
+      cueVersion: options.cueVersion,
       scaffold: options.bare !== true,
     }),
   );
@@ -115,13 +115,13 @@ export interface InitResult {
 export function runInit(options: InitOptions, prepared: InitPlan): InitResult {
   const result = apply(prepared.plan, {
     projectRoot: options.projectRoot,
-    understudyVersion: options.understudyVersion,
+    cueVersion: options.cueVersion,
     ...(options.force === true ? { force: true } : {}),
   });
 
   let manifest: Manifest = {
     ...prepared.manifest,
-    understudyVersion: options.understudyVersion,
+    cueVersion: options.cueVersion,
     packageManager: options.detection.manager,
     targets: [...prepared.targets],
   };
@@ -141,14 +141,14 @@ function nextSteps(options: InitOptions, prepared: InitPlan): string[] {
   const { manager } = options.detection;
   const steps: string[] = [];
 
-  steps.push(addDevCommand(manager, ['@understudy/eslint-plugin', '@understudy/cli']));
+  steps.push(addDevCommand(manager, ['@wiluszdamian/cue-eslint-plugin', '@wiluszdamian/cue']));
   steps.push('npx playwright-cli install --skills   # the official Playwright skills');
 
   for (const id of prepared.targets) {
     for (const limitation of getTarget(id).limitations ?? []) steps.push(limitation);
   }
 
-  steps.push('understudy doctor   # confirm everything is wired up');
+  steps.push('cue doctor   # confirm everything is wired up');
   return steps;
 }
 

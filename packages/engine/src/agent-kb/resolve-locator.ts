@@ -113,7 +113,7 @@ export function resolveLocator(options: ResolveOptions): LocatorAnswer {
       // Never a guess. The remedy is the answer.
       remedy:
         route === undefined
-          ? 'understudy survey <url>   # map the route this element is on'
+          ? 'cue survey <url>   # map the route this element is on'
           : `${surveyCommand(route)}   # this route has not been surveyed`,
       knownRoutes,
     };

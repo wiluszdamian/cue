@@ -58,7 +58,7 @@ const prose = (text) => oneLine(text).replace(/(<)/g, String.raw`\$1`);
 const ENFORCEMENT = {
   ast: 'ESLint (AST)',
   regex: 'ESLint (text)',
-  knowledge: 'ESLint, against `.agent-kb` (silent where there is none; `understudy check` says so)',
+  knowledge: 'ESLint, against `.agent-kb` (silent where there is none; `cue check` says so)',
   manual: '**not enforced** — review only',
 };
 
@@ -126,7 +126,7 @@ browser, how to debug a test, how to handle Electron or i18n — belongs to anot
 source; see [Who decides what](ownership.md) for who owns what.
 
 ${enforced.length} of ${rules.constitution.rules.length} rules are mechanically
-enforced by \`@understudy/eslint-plugin\`. The rest are stated here and checked in
+enforced by \`@wiluszdamian/cue-eslint-plugin\`. The rest are stated here and checked in
 review. That split is deliberate and published, because a standard that overstates
 its own teeth stops being believed.
 
@@ -247,7 +247,7 @@ owner also covers the question.
 Two invariants are checked in CI rather than asserted here:
 
 1. **Every topic the constitution covers is Cue's, absolutely.** Each
-   \`skill\` a rule cites must be claimed by an understudy-owned topic at absolute
+   \`skill\` a rule cites must be claimed by an cue-owned topic at absolute
    precedence, so a rule cannot be added on a topic whose ownership nobody
    decided.
 2. **Every topic is reachable.** Asking about a topic by its own name must

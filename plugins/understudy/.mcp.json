@@ -1,6 +1,0 @@
-{
-  "mcpServers": {
-    "understudy": { "command": "npx", "args": ["-y", "@understudy/mcp@0.8.0"] },
-    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@0.0.83"] }
-  }
-}

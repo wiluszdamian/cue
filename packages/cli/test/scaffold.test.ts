@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { analyze, type Diagnostic } from '@understudy/engine';
+import { analyze, type Diagnostic } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { planInit, resolveRules, runInit } from '../src/init.js';
 import { readManifest } from '../src/manifest.js';
@@ -25,7 +25,7 @@ const NPM_COMMAND = new RegExp(String.raw`npx|npm (ci|run|install)`);
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-scaffold-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-scaffold-'));
   writeFileSync(join(root, 'package.json'), '{"name":"demo","private":true}');
 });
 
@@ -36,7 +36,7 @@ afterEach(() => {
 const options = (extra: Record<string, unknown> = {}) => ({
   projectRoot: root,
   detection,
-  understudyVersion: VERSION,
+  cueVersion: VERSION,
   env: {},
   home: root,
   ...extra,
@@ -101,7 +101,7 @@ describe('the layout the scoped rules assume', () => {
     'env/.env.example',
     'TESTING.md',
     '.github/workflows/tests.yml',
-    '.github/workflows/understudy.yml',
+    '.github/workflows/cue.yml',
     '.husky/pre-commit',
   ])('creates %s', (path) => {
     install();
@@ -164,7 +164,7 @@ describe('the scaffold speaks the package manager the project uses', () => {
     const opts = options({ detection: { manager, evidence: 'test', confident: true } });
     runInit(opts, planInit(opts));
 
-    const workflow = readFileSync(join(root, '.github/workflows/understudy.yml'), 'utf8');
+    const workflow = readFileSync(join(root, '.github/workflows/cue.yml'), 'utf8');
     const testing = readFileSync(join(root, 'TESTING.md'), 'utf8');
 
     expect(workflow).toContain(installCommand);
@@ -177,11 +177,7 @@ describe('the scaffold speaks the package manager the project uses', () => {
     const opts = options({ detection: { manager: 'bun', evidence: 'test', confident: true } });
     runInit(opts, planInit(opts));
 
-    const generated = [
-      '.github/workflows/understudy.yml',
-      '.github/workflows/tests.yml',
-      'TESTING.md',
-    ];
+    const generated = ['.github/workflows/cue.yml', '.github/workflows/tests.yml', 'TESTING.md'];
     for (const path of generated) {
       const content = readFileSync(join(root, path), 'utf8');
       expect(content, path).not.toMatch(NPM_COMMAND);

@@ -3,10 +3,7 @@ name: ci
 on:
   push:
     branches: [main]
-    # Planning notes cannot break anything, and every ticket pushes some.
-    paths-ignore: ['.planning/**']
   pull_request:
-    paths-ignore: ['.planning/**']
 
 permissions:
   contents: read
@@ -88,8 +85,8 @@ jobs:
           node packages/cli/dist/cli.js init --cwd "$project" --yes
           test -f "$project/AGENTS.md"
           test -f "$project/eslint.config.mjs"
-          test -f "$project/.understudy/install.json"
-          grep -q "BEGIN UNDERSTUDY" "$project/AGENTS.md"
+          test -f "$project/.cue/install.json"
+          grep -q "BEGIN CUE" "$project/AGENTS.md"
 
           # Running init twice must change nothing.
           node packages/cli/dist/cli.js init --cwd "$project" --yes | tee /tmp/second.txt
@@ -138,5 +135,5 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - run: pnpm --filter @understudy/demo-app exec playwright install --with-deps chromium
+      - run: pnpm --filter @wiluszdamian/cue-demo-app exec playwright install --with-deps chromium
       - run: node scripts/e2e.mjs

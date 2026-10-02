@@ -30,7 +30,7 @@ refusal is the whole point.
 ## Try it
 
 ```bash
-npx @wiluszdamian/cue-cli init
+npx @wiluszdamian/cue init
 ```
 
 It looks at your project, shows you exactly what it plans to write, and waits for

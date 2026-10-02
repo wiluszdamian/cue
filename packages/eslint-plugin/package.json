@@ -1,7 +1,7 @@
 {
-  "name": "@understudy/eslint-plugin",
+  "name": "@wiluszdamian/cue-eslint-plugin",
   "version": "0.8.0",
-  "description": "ESLint rules generated from the Understudy constitution. Works with no agent involved.",
+  "description": "ESLint rules generated from the Cue constitution. Works with no agent involved.",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@typescript-eslint/utils": "^8.70.0",
-    "@understudy/engine": "workspace:*"
+    "@wiluszdamian/cue-engine": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^26.5.0",

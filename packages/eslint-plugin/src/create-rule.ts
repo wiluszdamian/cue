@@ -11,21 +11,21 @@ import {
   scopeMatcher,
   type EnforceableRule,
   type RefineContext,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { CANONICAL_TAGS } from './generated/constitution.js';
 
 /**
  * Turns one constitution entry into one ESLint rule, re-implementing nothing:
  * ESLint takes esquery selectors as listener keys, the same language the engine
  * evaluates, and refinements and fixers are imported rather than rewritten. A
- * rule cannot mean one thing in `understudy inspect` and another in `eslint`.
+ * rule cannot mean one thing in `cue inspect` and another in `eslint`.
  */
 
 const createRule = ESLintUtils.RuleCreator<{ docsAnchor: string }>(
-  (name) => `https://github.com/understudy-dev/understudy/blob/main/docs/rules/${name}.md`,
+  (name) => `https://github.com/wiluszdamian/project-cue/blob/main/docs/rules/${name}.md`,
 );
 
-export type UnderstudyRule = TSESLint.RuleModule<'violation'>;
+export type CueRule = TSESLint.RuleModule<'violation'>;
 
 function buildRefineContext(
   context: Readonly<TSESLint.RuleContext<'violation', []>>,
@@ -97,7 +97,7 @@ function regexListeners(
 /**
  * Checks locators against the knowledge base found above the file being linted.
  * A project with no `.agent-kb` gets silence: ESLint has no way to say "not
- * checked", so `understudy check` and `understudy doctor` are where that is said
+ * checked", so `cue check` and `cue doctor` are where that is said
  * out loud.
  */
 function knowledgeListeners(
@@ -137,7 +137,7 @@ function knowledgeListeners(
  * The engine's matcher is anchored so it applies to ESLint's absolute filenames
  * without a project root — `context.cwd` is routinely not the repo root.
  */
-export function buildRule(rule: EnforceableRule): UnderstudyRule {
+export function buildRule(rule: EnforceableRule): CueRule {
   const inScope = scopeMatcher(rule);
   const message = rule.message.replace(/\s+/g, ' ').trim();
 

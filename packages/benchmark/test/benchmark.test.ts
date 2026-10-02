@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { hashSnapshot, loadRules, parseSnapshot, writeRouteMap } from '@understudy/engine';
+import { hashSnapshot, loadRules, parseSnapshot, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { RecordedAgent, extractCode } from '../src/agent.js';
 import { PROMPTS, PROMPT_SET_VERSION } from '../src/prompts.js';
@@ -12,7 +12,7 @@ import { scoreCompliance, scoreGrounding } from '../src/scoring.js';
 /**
  * Tests for the measuring instrument, not the thing measured. The recordings are
  * hand-written fixtures: they show the scoring counts what it claims to, and
- * nothing about whether Understudy helps, since one person wrote both.
+ * nothing about whether Cue helps, since one person wrote both.
  */
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..', '..');
@@ -34,7 +34,7 @@ const SNAPSHOT = `### Page
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-bench-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-bench-'));
   const parsed = parseSnapshot(SNAPSHOT);
   const now = new Date().toISOString();
   writeRouteMap(root, {
@@ -63,7 +63,7 @@ describe('the prompt set', () => {
     // A prompt saying "remember to tag the test" would measure the prompt.
     for (const prompt of PROMPTS) {
       const text = prompt.text.toLowerCase();
-      for (const giveaway of ['understudy', 'constitution', 'page object', '@smoke', 'tag the']) {
+      for (const giveaway of ['cue', 'constitution', 'page object', '@smoke', 'tag the']) {
         expect(text, `${prompt.id} mentions "${giveaway}"`).not.toContain(giveaway);
       }
     }
@@ -175,8 +175,8 @@ describe('the context handed to the assistant', () => {
     expect(buildContext(root, 'bare')).toBe('');
   });
 
-  it('carries the knowledge base in the understudy condition', () => {
-    const context = buildContext(root, 'understudy');
+  it('carries the knowledge base in the cue condition', () => {
+    const context = buildContext(root, 'cue');
     expect(context).toContain('/login');
     expect(context).toContain("getByRole('button', { name: 'Log in' })");
   });
@@ -199,7 +199,7 @@ describe('a full run over recorded responses', () => {
     const comparison = compare(result);
     // Both numbers produced, NOT a direction: these are fixtures.
     expect(comparison.violationsPerFile.bare).toBeGreaterThanOrEqual(0);
-    expect(comparison.groundedRate.understudy).toBeDefined();
+    expect(comparison.groundedRate.cue).toBeDefined();
   });
 
   it('says plainly when the sample does not support the premise', async () => {

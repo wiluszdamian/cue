@@ -1,6 +1,6 @@
 /**
  * The commands the CLI actually implements, as a list that can be asserted
- * against: `doctor` promises a fix for every problem it reports, and `understudy
+ * against: `doctor` promises a fix for every problem it reports, and `cue
  * sync` was advertised as one for two checks before it was written.
  *
  * A planned command may still be named, provided the text says so.

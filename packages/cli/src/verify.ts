@@ -17,11 +17,11 @@ import {
   type InvalidRouteMap,
   type LoadedRouteMap,
   type ParsedSnapshot,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import type { SnapshotDriver } from './survey.js';
 
 /**
- * `understudy verify` — what do we actually know about the map's accuracy?
+ * `cue verify` — what do we actually know about the map's accuracy?
  *
  * A knowledge base decays silently: nothing breaks the day a selector is removed,
  * and the tests keep passing until somebody writes a new one from a stale entry.
@@ -346,14 +346,14 @@ function resultLines(report: VerifyReport): string[] {
     case 'EMPTY':
       return [
         'Nothing to verify — the knowledge base has no surveyed routes.',
-        'Run: understudy survey <url>',
+        'Run: cue survey <url>',
       ];
   }
 }
 
 export function formatVerifyReport(report: VerifyReport): string {
   const { counts } = report;
-  const lines = ['', 'Understudy verify', ''];
+  const lines = ['', 'Cue verify', ''];
 
   if (report.overall !== 'EMPTY') {
     lines.push(

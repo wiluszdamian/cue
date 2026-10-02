@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
- * Which package manager the user actually uses. Every command Understudy prints is
+ * Which package manager the user actually uses. Every command Cue prints is
  * rendered for it, so a bun user is never handed an `npm` command.
  */
 

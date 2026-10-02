@@ -1,4 +1,8 @@
-import { findProductRoot, workingTreeFiles, type FileStateProvider } from '@understudy/engine';
+import {
+  findProductRoot,
+  workingTreeFiles,
+  type FileStateProvider,
+} from '@wiluszdamian/cue-engine';
 
 /**
  * The product's files as they are now, if the product can be found: where `extract`

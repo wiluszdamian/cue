@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { writeRouteMap, type KbElement, type RouteMap } from '@understudy/engine';
+import { writeRouteMap, type KbElement, type RouteMap } from '@wiluszdamian/cue-engine';
 import {
   check,
   discoverFiles,
@@ -22,7 +22,7 @@ const ago = (days: number): string => new Date(NOW.getTime() - days * DAY).toISO
 
 let root: string;
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-check-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-check-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -82,7 +82,7 @@ describe('discovering files', () => {
     write('tests/a.spec.ts', 'export {};');
     write('tests/b.test.tsx', 'export {};');
     write('tests/helper.ts', 'export {};');
-    write('pages/login-page.ts', '// understudy-route: /login\nexport {};');
+    write('pages/login-page.ts', '// cue-route: /login\nexport {};');
     write('pages/plain-page.ts', 'export {};');
     write('node_modules/x/c.spec.ts', 'export {};');
     write('dist/d.spec.ts', 'export {};');
@@ -145,7 +145,7 @@ describe('what it reports', () => {
     expect(text).toContain("Unknown locator: getByRole('button', { name: 'Sign in' })");
     expect(text).toContain('Route: /login');
     expect(text).toContain("getByRole('button', { name: 'Log in' })  (/login)");
-    expect(text).toContain('understudy survey --route /login --base-url <url>');
+    expect(text).toContain('cue survey --route /login --base-url <url>');
   });
 
   it('says when the match was last confirmed', () => {
@@ -210,8 +210,8 @@ describe('with nothing known', () => {
   it('says to extract and survey instead of listing every locator as unknown', () => {
     const text = formatHuman(run(), NOW);
     expect(text).toContain('Nothing is known about this application yet');
-    expect(text).toContain('understudy extract --source <path>');
-    expect(text).toContain('understudy survey <url>');
+    expect(text).toContain('cue extract --source <path>');
+    expect(text).toContain('cue survey <url>');
     expect(text).not.toContain('Unknown locator');
   });
 });
@@ -279,7 +279,7 @@ describe('formats', () => {
   it('github gives an annotation an editor can place', () => {
     const text = formatCheck(run(), 'github', constitution(), root);
     expect(text).toMatch(/^::error file=tests\/login\.spec\.ts,line=4,/);
-    expect(text).toContain('understudy survey');
+    expect(text).toContain('cue survey');
   });
 
   it('sarif names the rule and the place', () => {
@@ -299,7 +299,7 @@ describe('formats', () => {
 const CLI = join(import.meta.dirname, '..', 'dist', 'cli.js');
 
 describe.skipIf(!existsSync(CLI))('the built command', () => {
-  const understudy = (...args: string[]) =>
+  const cue = (...args: string[]) =>
     spawnSync(process.execPath, [CLI, 'check', '--cwd', root, ...args], {
       encoding: 'utf8',
       input: '',
@@ -311,24 +311,24 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
   });
 
   it('informs and exits 0 without --ci', () => {
-    const result = understudy();
+    const result = cue();
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('Unknown locator');
   });
 
   it('fails the build on an invented locator with --ci', () => {
-    expect(understudy('--ci').status).toBe(1);
-    expect(understudy('--ci=advisory').status).toBe(1);
+    expect(cue('--ci').status).toBe(1);
+    expect(cue('--ci=advisory').status).toBe(1);
   });
 
   it('rejects a mode or a format it does not know', () => {
-    expect(understudy('--ci=lenient').status).toBe(2);
-    expect(understudy('--format=xml').status).toBe(2);
+    expect(cue('--ci=lenient').status).toBe(2);
+    expect(cue('--format=xml').status).toBe(2);
   });
 
   it('checks the file it is given', () => {
     write('other/ok.spec.ts', test(["page.getByRole('textbox', { name: 'Email' });"]));
-    const result = understudy('other/ok.spec.ts', '--ci');
+    const result = cue('other/ok.spec.ts', '--ci');
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('1 known');
   });
@@ -337,7 +337,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
 describe('one analyzer for the command and the lint rule', () => {
   it('finds the same places as the engine does for the rule’s own fixture', async () => {
     const { analyze, indexKnowledge, loadKnowledge, loadRules } =
-      await import('@understudy/engine');
+      await import('@wiluszdamian/cue-engine');
     const fixture = join(
       import.meta.dirname,
       '..',

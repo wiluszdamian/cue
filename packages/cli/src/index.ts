@@ -1,5 +1,5 @@
 /**
- * `understudy` — the operational CLI.
+ * `cue` — the operational CLI.
  *
  * Exported so the commands can be driven from tests and, later, from the MCP
  * server, without shelling out to the binary.

@@ -48,7 +48,7 @@ export interface Navigation {
 export interface TestSourceScan {
   readonly locators: LocatorUse[];
   readonly navigations: Navigation[];
-  /** From a `// understudy-route: /login` comment near the top of the file. */
+  /** From a `// cue-route: /login` comment near the top of the file. */
   readonly routeAnnotation: string | undefined;
 }
 
@@ -63,7 +63,7 @@ const LOCATOR_METHODS = new Set([
   'locator',
 ]);
 
-const ANNOTATION = /^\s*(?:\/\/|\/?\*+)\s*understudy-route:\s*(\S+?)\s*(?:\*\/)?\s*$/m;
+const ANNOTATION = /^\s*(?:\/\/|\/?\*+)\s*cue-route:\s*(\S+?)\s*(?:\*\/)?\s*$/m;
 
 function literal(node: TSESTree.Node | undefined): string | undefined {
   if (node?.type === AST_NODE_TYPES.Literal && typeof node.value === 'string') return node.value;

@@ -1,4 +1,4 @@
-# Understudy constitution — the rules Understudy owns unconditionally.
+# Cue constitution — the rules Cue owns unconditionally.
 #
 # This file is the single source of truth. The ESLint plugin, its generated
 # docs, and the `explain_rule` MCP tool all derive from here. Nothing in this
@@ -323,7 +323,7 @@ rules:
       alone cannot decide is not judged — a variable, a regular expression,
       getByText, getByPlaceholder, a CSS locator — so a clean run does not mean
       those were checked. With no .agent-kb the rule stays silent in the linter;
-      understudy check says so out loud. It is a warning, not an error, until the
+      cue check says so out loud. It is a warning, not an error, until the
       false-positive rate on real suites is known.
     detector:
       kind: knowledge
@@ -334,7 +334,7 @@ rules:
     message: >
       This selector does not trace to .agent-kb/app-map/ or to an exploration run
       in this session. Use the nearest known locator suggested here, or run
-      understudy survey <url> for the page and use what it finds — do not guess.
+      cue survey <url> for the page and use what it finds — do not guess.
       An entry marked stale is a lead to verify, not a fact to use.
     skill: locator-policy
     docsAnchor: selectors-from-agent-kb

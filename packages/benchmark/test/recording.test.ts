@@ -18,7 +18,7 @@ import { recordRun } from '../src/record-run.js';
 const prompt = PROMPTS[0];
 if (prompt === undefined) throw new Error('the prompt set is empty');
 
-const request = (condition: 'bare' | 'understudy', context: string): AgentRequest => ({
+const request = (condition: 'bare' | 'cue', context: string): AgentRequest => ({
   prompt,
   condition,
   context,
@@ -27,7 +27,7 @@ const request = (condition: 'bare' | 'understudy', context: string): AgentReques
 let dir: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'understudy-record-'));
+  dir = mkdtempSync(join(tmpdir(), 'cue-record-'));
 });
 
 afterEach(() => {
@@ -40,7 +40,7 @@ describe('what is asked of the model', () => {
     // entire job. The prompt set is checked for the same giveaways elsewhere.
     const text = INSTRUCTIONS.toLowerCase();
     for (const giveaway of [
-      'understudy',
+      'cue',
       'constitution',
       'page object',
       'tag',
@@ -55,7 +55,7 @@ describe('what is asked of the model', () => {
 
   it('is word for word the same in both conditions', () => {
     const bare = systemPrompt(request('bare', ''));
-    const withLayer = systemPrompt(request('understudy', '# AGENTS.md\n\nrules here'));
+    const withLayer = systemPrompt(request('cue', '# AGENTS.md\n\nrules here'));
     expect(bare).toBe(INSTRUCTIONS);
     expect(withLayer).toContain(INSTRUCTIONS);
     // The only difference is the project's own files, verbatim.
@@ -129,10 +129,10 @@ describe('one call to the agent', () => {
       },
     });
 
-    const response = await agent.run(request('understudy', 'AGENTS.md says things'));
+    const response = await agent.run(request('cue', 'AGENTS.md says things'));
 
     expect(response.promptId).toBe(prompt.id);
-    expect(response.condition).toBe('understudy');
+    expect(response.condition).toBe('cue');
     expect(response.model).toBe('claude-opus-5');
     expect(response.files).toEqual([{ path: 'tests/a.spec.ts', source: 'const a = 1;' }]);
     // A real run is dated; the hand-written fixtures are not.

@@ -120,7 +120,7 @@ export function plan(
 
 export interface ApplyOptions {
   readonly projectRoot: string;
-  readonly understudyVersion: string;
+  readonly cueVersion: string;
   /** Overwrite conflicts. Only ever set from an explicit user instruction. */
   readonly force?: boolean;
 }
@@ -168,7 +168,7 @@ export function apply(plan: Plan, options: ApplyOptions): ApplyResult {
       target: file.target,
       kind: file.region ? 'region' : 'created',
       ...(file.region ? { region: file.region } : {}),
-      generatedBy: options.understudyVersion,
+      generatedBy: options.cueVersion,
       writtenAt: now,
     });
   }

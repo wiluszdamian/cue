@@ -31,7 +31,7 @@ credentials and costs money. Scoring does not — it reads recorded answers, so
 anyone can re-score somebody else's run and get the same result.
 
 ```bash
-understudy-benchmark record ./recordings --project ./my-project
+cue-benchmark record ./recordings --project ./my-project
 ```
 
 That asks every prompt twice, once with the project's `AGENTS.md` and knowledge
@@ -47,7 +47,7 @@ them deliberately.
 Then score what was recorded:
 
 ```bash
-understudy-benchmark ./recordings --project ./my-project
+cue-benchmark ./recordings --project ./my-project
 ```
 
 ### Running the answers, not only reading them
@@ -58,7 +58,7 @@ the project's TypeScript and run once, with no retries, in a real browser agains
 that application:
 
 ```bash
-understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execute
+cue-benchmark ./recordings --project ./my-project --prompt-set 2 --execute
 ```
 
 That adds what reading the code cannot tell you: whether it **compiles**, whether it
@@ -68,8 +68,8 @@ decide, such as one built from a variable, is counted as not judged, never as
 invented. The checker also does not follow a click to a new page, so a real element
 asserted after navigating is reported as being on the wrong route, apart from the
 invented ones. Install the browser once with
-`pnpm --filter @understudy/demo-app exec playwright install chromium`; the whole
-path is covered by `pnpm --filter @understudy/benchmark test:integration`.
+`pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium`; the whole
+path is covered by `pnpm --filter @wiluszdamian/cue-benchmark test:integration`.
 
 ### Repeating, breaking, and the report
 
@@ -77,8 +77,8 @@ A single answer says little: a model answers differently each time. Ask for seve
 score them together:
 
 ```bash
-understudy-benchmark record ./recordings --project ./my-project --prompt-set 2 --runs 5
-understudy-benchmark ./recordings --project ./my-project --prompt-set 2 --execute --report ./report
+cue-benchmark record ./recordings --project ./my-project --prompt-set 2 --runs 5
+cue-benchmark ./recordings --project ./my-project --prompt-set 2 --execute --report ./report
 ```
 
 `--runs` is a number of paid calls per prompt and condition, so `record` says the total
@@ -104,7 +104,7 @@ saying that it tests the instrument, not Cue.
 Narrow it deliberately while you work:
 
 ```bash
-understudy-benchmark ./recordings --project ./my-project --prompts login-success,slow-page
+cue-benchmark ./recordings --project ./my-project --prompts login-success,slow-page
 ```
 
 If recordings are missing, it lists **all** of them rather than stopping at the

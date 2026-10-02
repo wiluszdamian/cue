@@ -15,7 +15,7 @@ import { getTarget, TARGETS } from '../src/targets/index.js';
 
 let root: string;
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-compat-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-compat-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -34,23 +34,23 @@ describe('the MCP configuration init writes', () => {
           rules: planInit({
             projectRoot: root,
             detection,
-            understudyVersion: RELEASE,
+            cueVersion: RELEASE,
             env: {},
             home: root,
           }).rules,
-          understudyVersion: RELEASE,
+          cueVersion: RELEASE,
         })
         .map((file) => file.content),
     );
 
   it.each(['npm', 'pnpm', 'yarn', 'bun'] as const)('never says @latest (%s)', (manager) => {
     const everything = written(manager).join('\n');
-    expect(everything).toContain('@understudy/mcp');
+    expect(everything).toContain('@wiluszdamian/cue-mcp');
     expect(everything).not.toContain('@latest');
   });
 
   it('pins our server to the release that wrote the file', () => {
-    expect(written('npm').join('\n')).toContain(`@understudy/mcp@${RELEASE}`);
+    expect(written('npm').join('\n')).toContain(`@wiluszdamian/cue-mcp@${RELEASE}`);
   });
 
   it('pins the browser server to the version that was tested', () => {
@@ -74,7 +74,7 @@ describe('doctor and the versions installed here', () => {
         manifest: undefined,
         rules: undefined,
         detection,
-        understudyVersion: RELEASE,
+        cueVersion: RELEASE,
         env: {},
         home: root,
       }),

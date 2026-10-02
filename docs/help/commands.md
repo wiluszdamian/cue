@@ -10,9 +10,9 @@ Look at a repository and say what Cue could learn from it. It only reads: it
 writes nothing, and ends with the commands that would act on what it found.
 
 ```bash
-npx @wiluszdamian/cue-cli discover
-npx @wiluszdamian/cue-cli discover --source ../my-app
-npx @wiluszdamian/cue-cli discover --json
+npx @wiluszdamian/cue discover
+npx @wiluszdamian/cue discover --source ../my-app
+npx @wiluszdamian/cue discover --json
 ```
 
 It reports the Playwright config (read as text, never run), how many spec files there
@@ -27,9 +27,9 @@ Sets up a project. Shows you the plan first and waits for a yes. Without a termi
 it applies nothing unless you pass `--yes`.
 
 ```bash
-npx @wiluszdamian/cue-cli init
-npx @wiluszdamian/cue-cli init --bare
-npx @wiluszdamian/cue-cli init --yes
+npx @wiluszdamian/cue init
+npx @wiluszdamian/cue init --bare
+npx @wiluszdamian/cue init --yes
 ```
 
 | Option            | Does                                            |
@@ -46,9 +46,9 @@ npx @wiluszdamian/cue-cli init --yes
 Checks everything is wired up. Every problem comes with the command that fixes it.
 
 ```bash
-npx @wiluszdamian/cue-cli doctor
-npx @wiluszdamian/cue-cli doctor --ci
-npx @wiluszdamian/cue-cli doctor --offline
+npx @wiluszdamian/cue doctor
+npx @wiluszdamian/cue doctor --ci
+npx @wiluszdamian/cue doctor --offline
 ```
 
 `--ci` fails the build when there are errors. `--offline` skips anything that
@@ -77,9 +77,9 @@ warnings to ship stops reading them.
 Manage which assistants are set up.
 
 ```bash
-npx @wiluszdamian/cue-cli add cursor
-npx @wiluszdamian/cue-cli remove cursor
-npx @wiluszdamian/cue-cli list
+npx @wiluszdamian/cue add cursor
+npx @wiluszdamian/cue remove cursor
+npx @wiluszdamian/cue list
 ```
 
 ## Learning your app
@@ -89,8 +89,8 @@ npx @wiluszdamian/cue-cli list
 Visit a page and write down what is on it.
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://localhost:3000/login
-npx @wiluszdamian/cue-cli survey http://localhost:3000/login --from snapshot.txt
+npx @wiluszdamian/cue survey http://localhost:3000/login
+npx @wiluszdamian/cue survey http://localhost:3000/login --from snapshot.txt
 ```
 
 `--from` reads a snapshot captured elsewhere — useful when the environment needs
@@ -105,10 +105,10 @@ It is never run through a shell, so URLs with `&` or `%` arrive intact.
 You rarely need the whole app again. Name the pages, or let Cue pick them:
 
 ```bash
-npx @wiluszdamian/cue-cli survey --route /login,/admin/settings/security --base-url http://localhost:3000
-npx @wiluszdamian/cue-cli survey --stale --base-url http://localhost:3000
-npx @wiluszdamian/cue-cli survey --affected-by main..HEAD --base-url http://localhost:3000 --source ../my-app
-npx @wiluszdamian/cue-cli survey --stale --base-url http://localhost:3000 --dry-run
+npx @wiluszdamian/cue survey --route /login,/admin/settings/security --base-url http://localhost:3000
+npx @wiluszdamian/cue survey --stale --base-url http://localhost:3000
+npx @wiluszdamian/cue survey --affected-by main..HEAD --base-url http://localhost:3000 --source ../my-app
+npx @wiluszdamian/cue survey --stale --base-url http://localhost:3000 --dry-run
 ```
 
 | Option                  | Chooses                                                                                                                     |
@@ -116,14 +116,14 @@ npx @wiluszdamian/cue-cli survey --stale --base-url http://localhost:3000 --dry-
 | `--route <a,b>`         | The pages you name. They need not have been surveyed before.                                                                |
 | `--stale`               | Pages not confirmed for over a month, with an element that failed its last check, or read from code that has since changed. |
 | `--affected-by <range>` | Pages read from files that changed over this git range (needs `--source`).                                                  |
-| `--base-url <url>`      | Where the environment is (or set `UNDERSTUDY_BASE_URL`). Used to open pages; never saved.                                   |
+| `--base-url <url>`      | Where the environment is (or set `CUE_BASE_URL`). Used to open pages; never saved.                                          |
 | `--dry-run`             | Show the plan and stop.                                                                                                     |
 
 It shows the plan first, with the reason for each page. A page with a parameter
 (`/items/[id]`) is skipped and says why: survey a real URL for it. One page failing does
 not stop the others; the run fails if any did. `--action` is not implemented yet.
 
-### `understudy extract --source <path>`
+### `cue extract --source <path>`
 
 Reads the product source into `.agent-kb/product`: test ids, routes, endpoints from an OpenAPI
 document, and the labels in translation catalogues (nested JSON and YAML keep their full dotted
@@ -136,16 +136,16 @@ recorded as **inferred**, citing the file and line: a test can be dead or failin
 evidence and not proof. A survey that sees the same element raises it; the tests alone never can.
 
 ```bash
-npx @understudy/cli extract --source .
+npx @wiluszdamian/cue extract --source .
 ```
 
-### `understudy locator <description>`
+### `cue locator <description>`
 
 Look up how to point at something.
 
 ```bash
-npx @wiluszdamian/cue-cli locator "log in button"
-npx @wiluszdamian/cue-cli locator "submit" --route /checkout
+npx @wiluszdamian/cue locator "log in button"
+npx @wiluszdamian/cue locator "submit" --route /checkout
 ```
 
 ### `cue context <task>`
@@ -155,8 +155,8 @@ answer the `get_context` tool gives an agent, which is what makes it useful for 
 an agent was told.
 
 ```bash
-npx @wiluszdamian/cue-cli context "test changing the password"
-npx @wiluszdamian/cue-cli context "add an item" --route /items --max-tokens 600
+npx @wiluszdamian/cue context "test changing the password"
+npx @wiluszdamian/cue context "add an item" --route /items --max-tokens 600
 ```
 
 It picks the page the task is about, the elements on it that match, the endpoints and
@@ -171,14 +171,14 @@ run to find out. `--max-tokens` takes 200 to 3000 (default 1200).
 Check that the locators in your tests name things the notes know about.
 
 ```bash
-npx @wiluszdamian/cue-cli check
-npx @wiluszdamian/cue-cli check tests/login.spec.ts
-npx @wiluszdamian/cue-cli check tests --ci
-npx @wiluszdamian/cue-cli check --ci=strict --format github
+npx @wiluszdamian/cue check
+npx @wiluszdamian/cue check tests/login.spec.ts
+npx @wiluszdamian/cue check tests --ci
+npx @wiluszdamian/cue check --ci=strict --format github
 ```
 
 With no arguments it looks at test files (`*.spec.ts`, `*.test.ts`) and any file with an
-`// understudy-route: /login` comment, which is how a page object says which page it is
+`// cue-route: /login` comment, which is how a page object says which page it is
 on. Given a directory it takes everything TypeScript in it; given a pattern, whatever matches.
 
 Each locator comes back as one of:
@@ -211,11 +211,11 @@ Check the notes still match the real app, and say plainly what was not checked.
 (`verify-map` is the old name and still works, with a warning.)
 
 ```bash
-npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000
-npx @wiluszdamian/cue-cli verify --base-url $STAGING_URL --route /login,/signup
-npx @wiluszdamian/cue-cli verify --base-url $STAGING_URL --ci=strict
-npx @wiluszdamian/cue-cli verify --base-url $STAGING_URL --refresh
-npx @wiluszdamian/cue-cli verify --json
+npx @wiluszdamian/cue verify --base-url http://localhost:3000
+npx @wiluszdamian/cue verify --base-url $STAGING_URL --route /login,/signup
+npx @wiluszdamian/cue verify --base-url $STAGING_URL --ci=strict
+npx @wiluszdamian/cue verify --base-url $STAGING_URL --refresh
+npx @wiluszdamian/cue verify --json
 ```
 
 The verdict is one of `PASS`, `PARTIAL`, `NOT VERIFIED`, `FAIL` or `EMPTY`. Only
@@ -241,8 +241,8 @@ Without `--ci` the exit code is always 0.
 Bring your project's copy of the rules up to date. Shows a diff first.
 
 ```bash
-npx @wiluszdamian/cue-cli sync
-npx @wiluszdamian/cue-cli sync --check
+npx @wiluszdamian/cue sync
+npx @wiluszdamian/cue sync --check
 ```
 
 `--check` reports and changes nothing, which is what you want in CI.
@@ -254,8 +254,8 @@ npx @wiluszdamian/cue-cli sync --check
 Why a rule exists and what to write instead.
 
 ```bash
-npx @wiluszdamian/cue-cli explain
-npx @wiluszdamian/cue-cli explain no-hard-waits
+npx @wiluszdamian/cue explain
+npx @wiluszdamian/cue explain no-hard-waits
 ```
 
 With no rule name, it lists them all.
@@ -268,7 +268,7 @@ Takes out everything `init` put in, using a record of exactly what that was.
 Anything you edited is kept and reported.
 
 ```bash
-npx @wiluszdamian/cue-cli uninstall
+npx @wiluszdamian/cue uninstall
 ```
 
 ## Not built yet

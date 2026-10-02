@@ -33,7 +33,7 @@ const ago = (days: number): string => new Date(NOW.getTime() - days * DAY).toISO
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-load-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-load-'));
 });
 
 afterEach(() => {
@@ -439,8 +439,8 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
       query,
       remedy:
         route === undefined
-          ? 'understudy survey <url>   # map the route this element is on'
-          : `understudy survey --route ${route} --base-url <url>   # this route has not been surveyed`,
+          ? 'cue survey <url>   # map the route this element is on'
+          : `cue survey --route ${route} --base-url <url>   # this route has not been surveyed`,
       knownRoutes,
     };
   }
@@ -460,7 +460,7 @@ function legacyResolve(query: string, route?: string, now?: Date): LocatorAnswer
 /**
  * The one deliberate difference. A hand-written `code-only` entry says "this is in
  * the product source" without saying where; the model has no evidence to rest that
- * on, so it reads as `unknown`. Nothing in Understudy writes `code-only`.
+ * on, so it reads as `unknown`. Nothing in Cue writes `code-only`.
  */
 function withoutUnsupportedClaims(answer: LocatorAnswer): LocatorAnswer {
   if (answer.kind === 'unknown') return answer;

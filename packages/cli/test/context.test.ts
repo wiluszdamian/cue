@@ -10,7 +10,7 @@ const CLI = join(import.meta.dirname, '..', 'dist', 'cli.js');
 
 let root: string;
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-context-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-context-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -57,7 +57,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
     const result = run('context', 'reconcile the ledger');
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('status: unknown');
-    expect(result.stdout).toContain('understudy survey --route');
+    expect(result.stdout).toContain('cue survey --route');
   });
 
   it('holds to --max-tokens', () => {

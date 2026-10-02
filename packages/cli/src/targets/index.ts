@@ -11,7 +11,7 @@ import { baselineTarget } from './baseline.js';
 import type { Target } from './types.js';
 
 export type { Target, TargetContext } from './types.js';
-export { UNDERSTUDY_BEGIN, UNDERSTUDY_END } from './baseline.js';
+export { CUE_BEGIN, CUE_END } from './baseline.js';
 export { mcpJson } from './agent-targets.js';
 
 const ALL: readonly Target[] = [

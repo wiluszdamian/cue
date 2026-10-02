@@ -198,8 +198,8 @@ describe('several reasons at once', () => {
 
 describe('what to run', () => {
   it('names the page when it is known, and falls back to the plain form when it is not', () => {
-    expect(surveyCommand('/login')).toBe('understudy survey --route /login --base-url <url>');
-    expect(surveyCommand()).toBe('understudy survey <url>');
-    expect(SURVEY_STALE_COMMAND).toBe('understudy survey --stale --base-url <url>');
+    expect(surveyCommand('/login')).toBe('cue survey --route /login --base-url <url>');
+    expect(surveyCommand()).toBe('cue survey <url>');
+    expect(SURVEY_STALE_COMMAND).toBe('cue survey --stale --base-url <url>');
   });
 });

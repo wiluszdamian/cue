@@ -16,7 +16,7 @@ export const githubReporter: Reporter = ({ result }) =>
         `line=${d.line}`,
         `col=${d.column}`,
         `endLine=${d.endLine}`,
-        `title=${escape(`understudy/${d.ruleId}`)}`,
+        `title=${escape(`cue/${d.ruleId}`)}`,
       ].join(',');
       return `::${level} ${props}::${escape(`${d.message.replace(/\s+/g, ' ').trim()} (${d.docsUrl})`)}`;
     })

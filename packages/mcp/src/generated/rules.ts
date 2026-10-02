@@ -1,12 +1,12 @@
 // GENERATED FILE — do not edit.
 //
 // Source:     rules/constitution.yaml, rules/tags.yaml, rules/ownership.yaml
-// Regenerate: pnpm --filter @understudy/mcp generate
+// Regenerate: pnpm --filter @wiluszdamian/cue-mcp generate
 //
 // The rules travel with the package, since the server runs where rules/ does not
 // exist. Committed so a constitution change is visible here in review.
 
-import type { Constitution, Ownership, TagSet } from '@understudy/engine';
+import type { Constitution, Ownership, TagSet } from '@wiluszdamian/cue-engine';
 
 export const CONSTITUTION = {
   schemaVersion: 1,
@@ -275,7 +275,7 @@ export const CONSTITUTION = {
       severity: 'warn',
       title: 'Selectors come from .agent-kb or from fresh exploration',
       rationale:
-        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; understudy check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.\n',
+        'This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; cue check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.\n',
       detector: {
         kind: 'knowledge',
         check: 'locators',
@@ -284,7 +284,7 @@ export const CONSTITUTION = {
       exclude: [],
       autofix: false,
       message:
-        'This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run understudy survey <url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n',
+        'This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run cue survey <url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.\n',
       skill: 'locator-policy',
       docsAnchor: 'selectors-from-agent-kb',
       examples: {
@@ -340,7 +340,7 @@ export const OWNERSHIP = {
   schemaVersion: 1,
   owners: [
     {
-      id: 'understudy',
+      id: 'cue',
       name: 'Cue',
       kind: 'internal',
       maintainer: 'The Cue Authors',
@@ -378,7 +378,7 @@ export const OWNERSHIP = {
       name: 'Playwright best-practices reference skill',
       kind: 'external',
       maintainer: 'Currents Software Inc. (MIT)',
-      install: 'optional, chosen during `understudy init`',
+      install: 'optional, chosen during `cue init`',
       consult:
         'The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.\n',
     },
@@ -394,7 +394,7 @@ export const OWNERSHIP = {
   topics: [
     {
       topic: 'page object model and locator organisation',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['stage-map'],
       keywords: [
@@ -411,7 +411,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'test structure, tagging and assertions',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['canon'],
       keywords: [
@@ -428,7 +428,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'locator strategy and selector priority',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['locator-policy'],
       keywords: [
@@ -445,7 +445,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'fixtures, dependency injection and environment configuration',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['harness'],
       keywords: [
@@ -460,7 +460,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'API testing and response schemas',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['wire-contract'],
       keywords: [
@@ -476,7 +476,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'type safety in the suite',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['strict-types'],
       keywords: ['type safety', 'any', 'unknown', 'strict mode', 'generics', 'typescript config'],
@@ -484,7 +484,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'test data strategy',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['seed-policy'],
       keywords: ['test data', 'factory', 'fixture data', 'seed', 'static data', 'invalid values'],
@@ -492,7 +492,7 @@ export const OWNERSHIP = {
     },
     {
       topic: 'how the knowledge base gets populated',
-      owner: 'understudy',
+      owner: 'cue',
       precedence: 'absolute',
       skills: ['cartography'],
       keywords: [
@@ -520,7 +520,7 @@ export const OWNERSHIP = {
         'element on page',
         'does this element exist',
       ],
-      note: 'No model has ever seen this application. A plausible selector fails at runtime in a way that reads like an application bug. If it is not in .agent-kb, run `understudy survey` — do not guess.\n',
+      note: 'No model has ever seen this application. A plausible selector fails at runtime in a way that reads like an application bug. If it is not in .agent-kb, run `cue survey` — do not guess.\n',
     },
     {
       topic: 'application behaviour, routes and domain vocabulary',

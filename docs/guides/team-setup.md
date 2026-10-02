@@ -20,20 +20,20 @@ not the ESLint guarantee — both can be installed.
 If a teammate uses something that needs its own small config:
 
 ```bash
-npx @wiluszdamian/cue-cli add cursor
-npx @wiluszdamian/cue-cli add claude-code
+npx @wiluszdamian/cue add cursor
+npx @wiluszdamian/cue add claude-code
 ```
 
 To see what is set up right now:
 
 ```bash
-npx @wiluszdamian/cue-cli list
+npx @wiluszdamian/cue list
 ```
 
 To take one out again:
 
 ```bash
-npx @wiluszdamian/cue-cli remove cursor
+npx @wiluszdamian/cue remove cursor
 ```
 
 `remove` uses a record of exactly what was installed, so it takes out what it put
@@ -60,7 +60,7 @@ left over from an experiment is not consent to write files.
 - `AGENTS.md` and any assistant config
 - `.agent-kb/` — what is known about your app
 - `eslint.config.mjs`, `playwright.config.ts`
-- `.understudy/install.json` — the record of what was installed
+- `.cue/install.json` — the record of what was installed
 
 **Ignore these.** Handled for you:
 
@@ -87,10 +87,10 @@ summary of a UI change anybody will get.
   run: npx eslint . # the rules
 
 - name: Environment
-  run: npx @wiluszdamian/cue-cli doctor --ci # is everything wired up
+  run: npx @wiluszdamian/cue doctor --ci # is everything wired up
 
 - name: Drift
-  run: npx @wiluszdamian/cue-cli sync --check # have the rules moved
+  run: npx @wiluszdamian/cue sync --check # have the rules moved
 ```
 
 Only genuine errors fail the build. Warnings never do — a team that has to

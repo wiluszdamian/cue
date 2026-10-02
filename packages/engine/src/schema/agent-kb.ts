@@ -13,7 +13,7 @@ export const AGENT_KB_SCHEMA_VERSION = 1;
  * Route maps are written as version 2: every element says what it rests on
  * (evidence), where it stands (status) and when it was confirmed. Version 1 is
  * still read — migrated in memory, never rewritten until something saves it — and
- * a version this Understudy does not know is refused rather than half-read.
+ * a version this Cue does not know is refused rather than half-read.
  * The product files (`testids`, `surface`, `vocabulary`) stay at version 1: each of
  * their entries already carries its `file:line` and each file its `commit`, which
  * is exactly their evidence.

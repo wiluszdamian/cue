@@ -10,7 +10,7 @@ import {
   workingTreeFiles,
   type Rule,
   type Rules,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { CONSTITUTION, OWNERSHIP, TAGS } from './generated/rules.js';
 
 /**
@@ -93,7 +93,7 @@ function renderRule(rule: Rule): string {
     lines.push(
       '',
       'Checked against .agent-kb only, and only getByRole/getByTestId/getByLabel with literal',
-      'arguments. Silence means nothing was found, not that everything was checked: run `understudy check`.',
+      'arguments. Silence means nothing was found, not that everything was checked: run `cue check`.',
     );
   }
   return lines.join('\n');

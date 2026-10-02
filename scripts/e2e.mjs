@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
  *   extract → survey → locator → check → reference tests → verify → a broken app → verify
  *
  * Run it after `pnpm build`, with Chromium installed for the demo app
- * (`pnpm --filter @understudy/demo-app exec playwright install chromium`):
+ * (`pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium`):
  *
  *   node scripts/e2e.mjs
  *
@@ -36,7 +36,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const demo = join(root, 'examples', 'demo-app');
-const understudy = join(root, 'packages', 'cli', 'dist', 'cli.js');
+const cue = join(root, 'packages', 'cli', 'dist', 'cli.js');
 
 const demoRequire = createRequire(join(demo, 'package.json'));
 const cliManifestPath = demoRequire.resolve('@playwright/cli/package.json');
@@ -92,7 +92,7 @@ function run(args, options = {}) {
 }
 
 function cli(project, args, extra = []) {
-  return run([understudy, ...args, '--cwd', project, ...extra]);
+  return run([cue, ...args, '--cwd', project, ...extra]);
 }
 
 async function freePort() {
@@ -142,13 +142,13 @@ async function startDemo(port, mutations = '') {
 
 const keep = process.argv.includes('--keep');
 // A space in the path is the point.
-const project = join(mkdtempSync(join(tmpdir(), 'understudy e2e ')), 'my project');
+const project = join(mkdtempSync(join(tmpdir(), 'cue e2e ')), 'my project');
 mkdirSync(project, { recursive: true });
 writeFileSync(join(project, 'package.json'), JSON.stringify({ name: 'e2e', private: true }));
 
 let server;
 try {
-  if (!existsSync(understudy)) fail('packages/cli/dist is missing: run `pnpm build` first.');
+  if (!existsSync(cue)) fail('packages/cli/dist is missing: run `pnpm build` first.');
 
   const port = await freePort();
   const base = `http://127.0.0.1:${String(port)}`;
@@ -224,8 +224,8 @@ try {
     again.out,
   );
   expect(again.out.includes('/login') === false, 'the other pages are left alone', again.out);
-  const noAddress = run([understudy, 'survey', '--route', '/signup', '--cwd', project], {
-    env: { UNDERSTUDY_BASE_URL: '' },
+  const noAddress = run([cue, 'survey', '--route', '/signup', '--cwd', project], {
+    env: { CUE_BASE_URL: '' },
   });
   expect(
     noAddress.status === 2 && noAddress.out.includes('--base-url'),

@@ -6,7 +6,7 @@ import { join } from 'node:path';
  * Which coding agents this repository is set up for. Detection suggests what to
  * tick and never decides: a directory left by an old experiment is not consent to
  * write files, and an undetected agent is no reason to refuse — the baseline
- * installs either way and `understudy add <target>` covers the rest.
+ * installs either way and `cue add <target>` covers the rest.
  */
 
 export const TARGET_IDS = [

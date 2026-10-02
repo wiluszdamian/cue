@@ -9,7 +9,7 @@ import {
 /**
  * Written for a sceptical reader: the sample size sits next to every number, a
  * percentage it cannot support is never printed, a metric that was not measured
- * says so instead of showing zero, and a result that does not favour Understudy
+ * says so instead of showing zero, and a result that does not favour Cue
  * says so plainly.
  */
 
@@ -28,7 +28,7 @@ function handWrittenBanner(result: BenchmarkResult): string | undefined {
   if (result.handWrittenAnswers === 0) return undefined;
   return (
     `NOTE: ${String(result.handWrittenAnswers)} answer(s) here are hand-written fixtures, not model output. ` +
-    'This exercises the instrument; it is not a result and says nothing about whether Understudy helps.'
+    'This exercises the instrument; it is not a result and says nothing about whether Cue helps.'
   );
 }
 
@@ -36,7 +36,7 @@ function metadataLines(result: BenchmarkResult): string[] {
   const m = result.metadata;
   if (m === undefined) return [];
   const tools = [
-    m.understudyVersion === undefined ? undefined : `understudy ${m.understudyVersion}`,
+    m.cueVersion === undefined ? undefined : `cue ${m.cueVersion}`,
     m.playwrightVersion === undefined ? undefined : `@playwright/test ${m.playwrightVersion}`,
     m.playwrightCliVersion === undefined ? undefined : `@playwright/cli ${m.playwrightCliVersion}`,
     `node ${m.node}`,
@@ -81,13 +81,13 @@ export function formatReport(result: BenchmarkResult): string {
   lines.push('');
 
   lines.push('Constitution violations per generated file');
-  lines.push(`  without Understudy   ${rounded(comparison.violationsPerFile.bare)}`);
-  lines.push(`  with Understudy      ${rounded(comparison.violationsPerFile.understudy)}`);
+  lines.push(`  without Cue   ${rounded(comparison.violationsPerFile.bare)}`);
+  lines.push(`  with Cue      ${rounded(comparison.violationsPerFile.cue)}`);
   lines.push('');
 
   lines.push('Selectors naming something that actually exists');
-  lines.push(`  without Understudy   ${percent(comparison.groundedRate.bare)}`);
-  lines.push(`  with Understudy      ${percent(comparison.groundedRate.understudy)}`);
+  lines.push(`  without Cue   ${percent(comparison.groundedRate.bare)}`);
+  lines.push(`  with Cue      ${percent(comparison.groundedRate.cue)}`);
   lines.push('');
 
   if (result.conditions.some((condition) => condition.execution !== undefined)) {
@@ -183,8 +183,8 @@ export function formatReport(result: BenchmarkResult): string {
   // A benchmark that only ever confirms its author is not a benchmark.
   lines.push(
     comparison.supportsPremise
-      ? 'Both metrics moved in Understudy’s favour on this sample.'
-      : 'This sample does NOT show Understudy helping on both metrics. Before explaining it away: the blueprint is explicit that no measurable difference means the premise is false.',
+      ? 'Both metrics moved in Cue’s favour on this sample.'
+      : 'This sample does NOT show Cue helping on both metrics. Before explaining it away: the blueprint is explicit that no measurable difference means the premise is false.',
   );
   lines.push(
     `Sample of ${String(result.prompts)} prompts${result.runs > 1 ? ` × ${String(result.runs)} runs` : ''} on ${result.model}. Enough to notice a large effect, not enough to publish.`,
@@ -221,7 +221,7 @@ function fraction(count: number, of: number): string {
  */
 export function formatMarkdown(result: BenchmarkResult): string {
   const bare = result.conditions.find((c) => c.condition === 'bare');
-  const understudy = result.conditions.find((c) => c.condition === 'understudy');
+  const cue = result.conditions.find((c) => c.condition === 'cue');
   const out: string[] = ['# Benchmark report', ''];
 
   const banner = handWrittenBanner(result);
@@ -240,7 +240,7 @@ export function formatMarkdown(result: BenchmarkResult): string {
         `| Commit | \`${m.commit.slice(0, 10)}\`${m.dirty === true ? ' (uncommitted changes)' : ''} |`,
       );
     }
-    if (m.understudyVersion !== undefined) out.push(`| Understudy | ${m.understudyVersion} |`);
+    if (m.cueVersion !== undefined) out.push(`| Cue | ${m.cueVersion} |`);
     if (m.playwrightVersion !== undefined)
       out.push(`| @playwright/test | ${m.playwrightVersion} |`);
     if (m.playwrightCliVersion !== undefined) {
@@ -255,11 +255,9 @@ export function formatMarkdown(result: BenchmarkResult): string {
     '',
   );
 
-  out.push('## Summary', '', '| | without Understudy | with Understudy |', '| --- | --- | --- |');
+  out.push('## Summary', '', '| | without Cue | with Cue |', '| --- | --- | --- |');
   const both = (label: string, pick: (c: ConditionResult) => string): void => {
-    out.push(
-      `| ${label} | ${bare ? pick(bare) : 'n/a'} | ${understudy ? pick(understudy) : 'n/a'} |`,
-    );
+    out.push(`| ${label} | ${bare ? pick(bare) : 'n/a'} | ${cue ? pick(cue) : 'n/a'} |`);
   };
   both('Answers', (c) => String(c.samples.length));
   if (result.conditions.some((c) => c.execution !== undefined)) {
@@ -379,7 +377,7 @@ export function formatMarkdown(result: BenchmarkResult): string {
   out.push(
     '## What this cannot show',
     '',
-    '- **The understudy condition is handed everything.** The whole of `AGENTS.md` and every surveyed route are put in the prompt. That is not how an agent meets Understudy in use (it asks for what it needs through MCP or `understudy locator`), so this is a lower bound on neither the benefit nor the cost.',
+    '- **The cue condition is handed everything.** The whole of `AGENTS.md` and every surveyed route are put in the prompt. That is not how an agent meets Cue in use (it asks for what it needs through MCP or `cue locator`), so this is a lower bound on neither the benefit nor the cost.',
     '- **The application is small and written by the authors of the tool.** Results here say nothing about a real brownfield suite.',
     '- **A caught defect is not a verified reason.** `detected` means the test failed with the defect on; whether it failed for the intended reason is for a person to read from the recording.',
     '- **The checker does not follow clicks.** A real element asserted after navigating is reported as being on the wrong route.',
@@ -392,8 +390,8 @@ export function formatMarkdown(result: BenchmarkResult): string {
     '## Reading it',
     '',
     comparison.supportsPremise
-      ? 'Both static metrics moved in Understudy’s favour on this sample.'
-      : 'This sample does **not** show Understudy helping on both static metrics. No measurable difference means the premise is false, and this is not to be explained away.',
+      ? 'Both static metrics moved in Cue’s favour on this sample.'
+      : 'This sample does **not** show Cue helping on both static metrics. No measurable difference means the premise is false, and this is not to be explained away.',
     '',
   );
 

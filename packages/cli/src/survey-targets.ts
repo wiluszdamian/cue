@@ -1,4 +1,4 @@
-import { readRouteMap, type SurveyTarget } from '@understudy/engine';
+import { readRouteMap, type SurveyTarget } from '@wiluszdamian/cue-engine';
 import { survey, type SnapshotDriver } from './survey.js';
 
 /**

@@ -31,7 +31,7 @@ describe.skipIf(!existsSync(CLI))('init without a terminal', () => {
   let project: string;
 
   beforeEach(() => {
-    project = mkdtempSync(join(tmpdir(), 'understudy-confirm-'));
+    project = mkdtempSync(join(tmpdir(), 'cue-confirm-'));
     writeFileSync(join(project, 'package.json'), '{"name":"p","private":true}');
   });
 

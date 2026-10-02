@@ -14,14 +14,14 @@ up](./install.md) with `cue init`.
 
 ```bash
 /plugin marketplace add wiluszdamian/project-cue
-/plugin install understudy@understudy
+/plugin install cue@cue
 ```
 
 ## Cursor
 
-Add `wiluszdamian/project-cue` as a plugin marketplace, then install **understudy**.
+Add `wiluszdamian/project-cue` as a plugin marketplace, then install **cue**.
 Cursor also loads the same package as an [Agent Plugin](https://agent-plugins.org)
-from `plugins/understudy/plugin.json`.
+from `plugins/cue/plugin.json`.
 
 ## Codex
 
@@ -29,14 +29,14 @@ from `plugins/understudy/plugin.json`.
 codex plugin marketplace add wiluszdamian/project-cue
 ```
 
-Then `/plugins` and install **understudy**. Codex also reads the repo marketplace
+Then `/plugins` and install **cue**. Codex also reads the repo marketplace
 at `.agents/plugins/marketplace.json`.
 
 ## Grok
 
 ```bash
 grok plugin marketplace add wiluszdamian/project-cue
-grok plugin install understudy --trust
+grok plugin install cue --trust
 ```
 
 ## Gemini CLI
@@ -67,11 +67,11 @@ read it from there.
 
 ## What the plugin gives the assistant
 
-`/understudy` is the on-ramp. A model may invoke it when you ask for tests. It
+`/cue` is the on-ramp. A model may invoke it when you ask for tests. It
 routes to the rest of the catalog: `/compose` to write a test, `/resolve-locator`
 for a selector, `/bind` if the repo is not wired up yet.
 
-The plugin starts two MCP servers. `understudy` answers read-only point
+The plugin starts two MCP servers. `cue` answers read-only point
 lookups — `explain_rule` for why a rule blocked a change and what to write
 instead, `resolve_owner` for which source of guidance governs a topic,
 `resolve_locator` for a real selector from the knowledge base rather than a

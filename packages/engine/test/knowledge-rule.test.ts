@@ -57,7 +57,7 @@ describe(RULE, () => {
       snippet: "getByTestId('invented-id')",
     });
     expect(diagnostic?.message).toContain('does not trace to .agent-kb');
-    expect(diagnostic?.message).toContain('understudy survey');
+    expect(diagnostic?.message).toContain('cue survey');
   });
 
   it('does not mention the rule at all for a file outside its scope', () => {

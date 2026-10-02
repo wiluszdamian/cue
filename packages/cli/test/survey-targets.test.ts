@@ -11,7 +11,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { extract, readRouteMap } from '@understudy/engine';
+import { extract, readRouteMap } from '@wiluszdamian/cue-engine';
 import { survey, type CaptureResult, type SnapshotDriver } from '../src/survey.js';
 import {
   formatPlan,
@@ -47,7 +47,7 @@ const app = (pages: Record<string, string>): SnapshotDriver & { opened: string[]
 
 let project: string;
 beforeEach(() => {
-  project = mkdtempSync(join(tmpdir(), 'understudy-targets-'));
+  project = mkdtempSync(join(tmpdir(), 'cue-targets-'));
 });
 afterEach(() => {
   rmSync(project, { recursive: true, force: true });
@@ -222,7 +222,7 @@ const CLI = join(import.meta.dirname, '..', 'dist', 'cli.js');
 describe.skipIf(!existsSync(CLI))('the built command', () => {
   /** A project with one old page and, behind it, a product repository. */
   function seeded(): { product: string } {
-    const product = mkdtempSync(join(tmpdir(), 'understudy-targets-product-'));
+    const product = mkdtempSync(join(tmpdir(), 'cue-targets-product-'));
     mkdirSync(join(product, 'app'), { recursive: true });
     writeFileSync(
       join(product, 'app', 'Login.tsx'),
@@ -242,7 +242,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
     spawnSync(process.execPath, [CLI, 'survey', '--cwd', project, ...args], {
       encoding: 'utf8',
       input: '',
-      env: { ...process.env, UNDERSTUDY_BASE_URL: '' },
+      env: { ...process.env, CUE_BASE_URL: '' },
     });
 
   it('shows the plan and opens nothing with --dry-run', () => {
@@ -264,7 +264,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
     const result = run('--stale');
     expect(result.status).toBe(2);
     expect(result.stderr).toContain('--base-url <url>');
-    expect(result.stderr).toContain('UNDERSTUDY_BASE_URL');
+    expect(result.stderr).toContain('CUE_BASE_URL');
   });
 
   it('takes the address from the environment', () => {
@@ -274,7 +274,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
       [CLI, 'survey', '--cwd', project, '--stale', '--dry-run'],
       {
         encoding: 'utf8',
-        env: { ...process.env, UNDERSTUDY_BASE_URL: BASE },
+        env: { ...process.env, CUE_BASE_URL: BASE },
       },
     );
     expect(result.status).toBe(0);

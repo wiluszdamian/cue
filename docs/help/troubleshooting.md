@@ -5,7 +5,7 @@ _The problems people actually hit, and what to do about them._
 ## Start here
 
 ```bash
-npx @wiluszdamian/cue-cli doctor
+npx @wiluszdamian/cue doctor
 ```
 
 It checks everything and gives you the exact command for each problem. Most of
@@ -16,7 +16,7 @@ this page is just the longer explanation behind those lines.
 First, read the full reasoning:
 
 ```bash
-npx @wiluszdamian/cue-cli explain no-hard-waits
+npx @wiluszdamian/cue explain no-hard-waits
 ```
 
 The message tells you what to write instead. If it genuinely does not fit your
@@ -33,7 +33,7 @@ rule, and the fix belongs in the rule rather than in a workaround.
 Cue has not seen that page yet.
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://localhost:3000/the-page
+npx @wiluszdamian/cue survey http://localhost:3000/the-page
 ```
 
 This is working as intended. It would rather tell you it does not know than
@@ -44,7 +44,7 @@ invent something that fails later and looks like a broken app.
 That page has not been confirmed in over a month.
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://localhost:3000/that-page
+npx @wiluszdamian/cue survey http://localhost:3000/that-page
 ```
 
 The old note is not wrong, necessarily — but it has stopped being something to
@@ -62,7 +62,7 @@ If the environment needs a VPN or credentials this machine does not have, captur
 a snapshot somewhere that does and pass it in:
 
 ```bash
-npx @wiluszdamian/cue-cli survey http://internal/login --from snapshot.txt
+npx @wiluszdamian/cue survey http://internal/login --from snapshot.txt
 ```
 
 ## `survey` says the output is not a snapshot format it understands
@@ -110,7 +110,7 @@ tells you.
 To deliberately take the new version and lose your changes:
 
 ```bash
-npx @wiluszdamian/cue-cli init --force
+npx @wiluszdamian/cue init --force
 ```
 
 It will show you what it is about to discard first.
@@ -131,7 +131,7 @@ Start with the trace from the failed run, which the workflow uploads for you.
 The rules moved and this project has not caught up.
 
 ```bash
-npx @wiluszdamian/cue-cli sync
+npx @wiluszdamian/cue sync
 ```
 
 It shows a diff before changing anything.

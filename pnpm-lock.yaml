@@ -14,7 +14,7 @@ importers:
       '@types/node':
         specifier: ^26.5.0
         version: 26.5.0
-      '@understudy/eslint-plugin':
+      '@wiluszdamian/cue-eslint-plugin':
         specifier: workspace:*
         version: link:packages/eslint-plugin
       eslint:
@@ -62,7 +62,7 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.125.0
         version: 0.125.0(zod@4.5.4)
-      '@understudy/engine':
+      '@wiluszdamian/cue-engine':
         specifier: workspace:*
         version: link:../engine
       typescript:
@@ -81,7 +81,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@understudy/engine':
+      '@wiluszdamian/cue-engine':
         specifier: workspace:*
         version: link:../engine
       zod:
@@ -152,7 +152,7 @@ importers:
       '@typescript-eslint/utils':
         specifier: ^8.70.0
         version: 8.70.0(eslint@10.10.0(jiti@2.7.0))(typescript@6.0.3)
-      '@understudy/engine':
+      '@wiluszdamian/cue-engine':
         specifier: workspace:*
         version: link:../engine
     devDependencies:
@@ -186,7 +186,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(zod@4.5.4)
-      '@understudy/engine':
+      '@wiluszdamian/cue-engine':
         specifier: workspace:*
         version: link:../engine
       zod:

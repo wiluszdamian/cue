@@ -3,10 +3,10 @@
 Deliberately small. Everything below this directory is generated from it; nothing
 here is generated.
 
-| File                | What it holds                               |
-| ------------------- | ------------------------------------------- |
-| `constitution.yaml` | The rules Understudy owns. Source of truth. |
-| `tags.yaml`         | Canonical test tags and their CI meaning.   |
+| File                | What it holds                             |
+| ------------------- | ----------------------------------------- |
+| `constitution.yaml` | The rules Cue owns. Source of truth.      |
+| `tags.yaml`         | Canonical test tags and their CI meaning. |
 
 ## What regenerates from this directory
 
@@ -38,4 +38,4 @@ steps that need them:
   skill cannot announce that it outranks another skill.
 - `version-delta.md` — ~30 hand-maintained lines on what changed in recent
   Playwright releases that models do not know yet.
-- `skills/*.md` and `workflows/*.md` — the prescriptive skills Understudy owns.
+- `skills/*.md` and `workflows/*.md` — the prescriptive skills Cue owns.

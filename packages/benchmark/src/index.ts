@@ -1,5 +1,5 @@
 /**
- * @understudy/benchmark — does the layer change what an assistant writes?
+ * @wiluszdamian/cue-benchmark — does the layer change what an assistant writes?
  *
  * Two comparisons, never absolutes: constitution violations per generated file,
  * and the share of selectors naming something real. Same prompts, same model,

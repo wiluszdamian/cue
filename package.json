@@ -1,5 +1,5 @@
 {
-  "name": "understudy-monorepo",
+  "name": "cue-monorepo",
   "version": "0.8.0",
   "private": true,
   "type": "module",
@@ -21,8 +21,8 @@
     "verify": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run sync:check",
     "docs:generate": "node packages/engine/scripts/generate-docs.mjs",
     "docs:check": "node packages/engine/scripts/generate-docs.mjs --check",
-    "generate": "pnpm --filter @understudy/engine run build && pnpm --filter @understudy/eslint-plugin run generate && pnpm --filter @understudy/cli run generate && pnpm --filter @understudy/mcp run generate && pnpm run build && pnpm run docs:generate && pnpm run skills:generate",
-    "sync:check": "pnpm --filter @understudy/eslint-plugin run generate:check && pnpm --filter @understudy/cli run generate:check && pnpm --filter @understudy/mcp run generate:check && pnpm run docs:check && pnpm run skills:check",
+    "generate": "pnpm --filter @wiluszdamian/cue-engine run build && pnpm --filter @wiluszdamian/cue-eslint-plugin run generate && pnpm --filter @wiluszdamian/cue run generate && pnpm --filter @wiluszdamian/cue-mcp run generate && pnpm run build && pnpm run docs:generate && pnpm run skills:generate",
+    "sync:check": "pnpm --filter @wiluszdamian/cue-eslint-plugin run generate:check && pnpm --filter @wiluszdamian/cue run generate:check && pnpm --filter @wiluszdamian/cue-mcp run generate:check && pnpm run docs:check && pnpm run skills:check",
     "tsc": "node scripts/tsc7.mjs",
     "skills:generate": "node packages/engine/scripts/generate-skills.mjs && node packages/engine/scripts/generate-plugins.mjs",
     "skills:check": "node packages/engine/scripts/generate-skills.mjs --check && node packages/engine/scripts/generate-plugins.mjs --check",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.5.0",
-    "@understudy/eslint-plugin": "workspace:*",
+    "@wiluszdamian/cue-eslint-plugin": "workspace:*",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "jiti": "^2.7.0",

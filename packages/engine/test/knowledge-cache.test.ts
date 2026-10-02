@@ -12,7 +12,7 @@ import { writeRouteMap } from '../src/agent-kb/store.js';
 let root: string;
 beforeEach(() => {
   clearKnowledgeCache();
-  root = mkdtempSync(join(tmpdir(), 'understudy-cache-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-cache-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });

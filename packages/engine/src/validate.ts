@@ -43,7 +43,7 @@ function validateConstitutionIsOwned(rules: Rules): ValidationProblem[] {
         field: 'skill',
         message:
           `cites skill "${rule.skill}", which no topic in rules/ownership.yaml claims. ` +
-          `Add it to the skills list of an understudy-owned topic — a constitution rule ` +
+          `Add it to the skills list of an cue-owned topic — a constitution rule ` +
           `on a topic nobody owns is the ambiguity the table exists to remove.`,
       });
       continue;
@@ -52,14 +52,14 @@ function validateConstitutionIsOwned(rules: Rules): ValidationProblem[] {
     for (const name of topics) {
       const topic = rules.ownership.topics.find((t) => t.topic === name);
       if (!topic) continue;
-      if (topic.owner !== 'understudy' || topic.precedence !== 'absolute') {
+      if (topic.owner !== 'cue' || topic.precedence !== 'absolute') {
         problems.push({
           ruleId: rule.id,
           field: 'skill',
           message:
             `cites skill "${rule.skill}", claimed by topic "${name}" which is owned by ` +
             `"${topic.owner}" at precedence "${topic.precedence}". Every topic the ` +
-            `constitution covers must be understudy-owned with absolute precedence.`,
+            `constitution covers must be cue-owned with absolute precedence.`,
         });
       }
     }

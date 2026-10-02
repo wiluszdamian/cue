@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Rules } from '@understudy/engine';
+import type { Rules } from '@wiluszdamian/cue-engine';
 import { countChanges, renderDiff } from './diff.js';
 import { apply, plan, trackedContent, type DesiredFile, type Plan } from './install.js';
 import { resolveRules } from './init.js';
@@ -15,7 +15,7 @@ import type { Detection } from './package-manager.js';
 import { getTarget, resolveTargets } from './targets/index.js';
 
 /**
- * `sync` — bring the files Understudy manages back in line with `rules/`. It
+ * `sync` — bring the files Cue manages back in line with `rules/`. It
  * regenerates what the installed targets produce and never changes which targets
  * those are. Same protection as `init`: an edited file is reported, not rewritten.
  */
@@ -23,7 +23,7 @@ import { getTarget, resolveTargets } from './targets/index.js';
 export interface SyncOptions {
   readonly projectRoot: string;
   readonly detection: Detection;
-  readonly understudyVersion: string;
+  readonly cueVersion: string;
   readonly force?: boolean;
 }
 
@@ -37,9 +37,7 @@ function hasScaffold(manifest: Manifest): boolean {
 
 export class NotInstalledError extends Error {
   constructor() {
-    super(
-      'Understudy is not installed in this project, so there is nothing to sync.\nRun: understudy init',
-    );
+    super('Cue is not installed in this project, so there is nothing to sync.\nRun: cue init');
     this.name = 'NotInstalledError';
   }
 }
@@ -89,7 +87,7 @@ export function planSync(options: SyncOptions): SyncReport {
       projectRoot: options.projectRoot,
       packageManager: options.detection.manager,
       rules,
-      understudyVersion: options.understudyVersion,
+      cueVersion: options.cueVersion,
       scaffold: hasScaffold(manifest),
     }),
   );
@@ -174,13 +172,13 @@ export interface SyncResult {
 export function runSync(options: SyncOptions, report: SyncReport): SyncResult {
   const result = apply(report.plan, {
     projectRoot: options.projectRoot,
-    understudyVersion: options.understudyVersion,
+    cueVersion: options.cueVersion,
     ...(options.force === true ? { force: true } : {}),
   });
 
   let manifest: Manifest = {
     ...report.manifest,
-    understudyVersion: options.understudyVersion,
+    cueVersion: options.cueVersion,
   };
   for (const entry of result.entries) manifest = recordFile(manifest, entry);
   writeManifest(options.projectRoot, manifest);
@@ -223,7 +221,7 @@ export function formatSyncReport(report: SyncReport, targets: readonly string[])
 
   if (report.orphans.length > 0) {
     lines.push(`  Orphans are not deleted automatically. Remove them by hand, or reinstall the`);
-    lines.push(`  target with \`understudy remove <target> && understudy add <target>\`.`);
+    lines.push(`  target with \`cue remove <target> && cue add <target>\`.`);
     lines.push('');
   }
 

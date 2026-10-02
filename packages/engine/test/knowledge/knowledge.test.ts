@@ -347,7 +347,7 @@ describe('the data on disk', () => {
   it('refuses a newer model version with an instruction to upgrade', () => {
     const data = { ...everyKind(), modelVersion: KNOWLEDGE_MODEL_VERSION + 1 };
     expect(() => parseKnowledge(data)).toThrow(UnsupportedKnowledgeVersionError);
-    expect(() => parseKnowledge(data)).toThrow(/Upgrade @understudy\/cli/);
+    expect(() => parseKnowledge(data)).toThrow(/Upgrade @wiluszdamian\/cue/);
   });
 
   it('does not mistake a newer version for a schema error', () => {

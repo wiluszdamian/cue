@@ -24,7 +24,7 @@ owner also covers the question.
 Two invariants are checked in CI rather than asserted here:
 
 1. **Every topic the constitution covers is Cue's, absolutely.** Each
-   `skill` a rule cites must be claimed by an understudy-owned topic at absolute
+   `skill` a rule cites must be claimed by an cue-owned topic at absolute
    precedence, so a rule cannot be added on a topic whose ownership nobody
    decided.
 2. **Every topic is reachable.** Asking about a topic by its own name must
@@ -40,7 +40,7 @@ right up until the second person has to guess it too.
 
 ## Owners
 
-### Cue `understudy`
+### Cue `cue`
 
 - **Kind:** internal
 - **Maintained by:** The Cue Authors
@@ -102,7 +102,7 @@ Decides 1 topic:
 
 - **Kind:** external
 - **Maintained by:** Currents Software Inc. (MIT)
-- **Obtained via:** `optional, chosen during `understudy init``
+- **Obtained via:** `optional, chosen during `cue init``
 
 The owner of general Playwright practice — the areas Cue has no opinion about because someone else already maintains one.
 
@@ -132,7 +132,7 @@ Decides 1 topic:
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `stage-map`                              |
 
@@ -142,7 +142,7 @@ Locators live in page objects, exposed as getters, in three sections. A spec nam
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `canon`                                  |
 
@@ -152,7 +152,7 @@ Canonical tags come from rules/tags.yaml. Web-first assertions only, no hard wai
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `locator-policy`                         |
 
@@ -162,7 +162,7 @@ Which _kind_ of locator to reach for is ours. Which selector actually exists in 
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `harness`                                |
 
@@ -172,7 +172,7 @@ One import point for the merged test object. baseURL belongs to the config, neve
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `wire-contract`                          |
 
@@ -182,7 +182,7 @@ Strict schemas, complete negative cases. A schema that ignores unknown keys is n
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `strict-types`                           |
 
@@ -192,7 +192,7 @@ A test suite's types are load-bearing for correctness, not convenience.
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `seed-policy`                            |
 
@@ -202,7 +202,7 @@ Not yet backed by a constitution rule — the three-level rule for factories ver
 
 |                     |                                          |
 | ------------------- | ---------------------------------------- |
-| Decided by          | `understudy` (Cue)                       |
+| Decided by          | `cue` (Cue)                              |
 | Precedence          | `absolute` — outranks every other source |
 | Constitution skills | `cartography`                            |
 
@@ -215,7 +215,7 @@ Which command feeds which part of .agent-kb, and what a freshness marker obliges
 | Decided by | `agent-kb` (The project knowledge base)  |
 | Precedence | `absolute` — outranks every other source |
 
-No model has ever seen this application. A plausible selector fails at runtime in a way that reads like an application bug. If it is not in .agent-kb, run `understudy survey` — do not guess.
+No model has ever seen this application. A plausible selector fails at runtime in a way that reads like an application bug. If it is not in .agent-kb, run `cue survey` — do not guess.
 
 ### application behaviour, routes and domain vocabulary
 

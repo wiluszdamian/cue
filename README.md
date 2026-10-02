@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli"><img src="https://img.shields.io/badge/npm-@wiluszdamian%2Fcue--cli-121b24" alt="npm package"></a>
+  <a href="https://www.npmjs.com/package/@wiluszdamian/cue"><img src="https://img.shields.io/badge/npm-@wiluszdamian%2Fcue--cli-121b24" alt="npm package"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-121b24" alt="MIT licence"></a>
   <img src="https://img.shields.io/badge/node-%5E22.13%20%7C%7C%20%3E%3D24-121b24" alt="Node ^22.13 || >=24">
 </p>
@@ -22,18 +22,18 @@ conventions your team agreed on. **Cue gives it its cues:**
 ## Quick start
 
 ```bash
-npx @wiluszdamian/cue-cli init
+npx @wiluszdamian/cue init
 ```
 
 It detects your agents, shows a plan, and writes nothing until you say yes. Or
 hand your agent this line:
 
-> Set up Cue in this Playwright project: run `npx @wiluszdamian/cue-cli init`,
+> Set up Cue in this Playwright project: run `npx @wiluszdamian/cue init`,
 > show me the plan before writing anything, then run
-> `npx @wiluszdamian/cue-cli doctor` and fix what it reports.
+> `npx @wiluszdamian/cue doctor` and fix what it reports.
 
 <p align="center">
-  <img src="assets/readme/terminal.png" alt="Terminal: cue-cli init writes AGENTS.md, eslint.config.mjs and .agent-kb/, cue survey records the Log in button, and ESLint blocks a waitForTimeout" width="760">
+  <img src="assets/readme/terminal.png" alt="Terminal: cue init writes AGENTS.md, eslint.config.mjs and .agent-kb/, cue survey records the Log in button, and ESLint blocks a waitForTimeout" width="760">
 </p>
 
 ## How it works

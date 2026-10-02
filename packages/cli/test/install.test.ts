@@ -12,13 +12,13 @@ import { runChecks, summarise } from '../src/doctor.js';
 /**
  * The CLI writes into other people's repositories, so the properties under test
  * here are the ones that decide whether it is safe to run twice: idempotence,
- * and never destroying work Understudy did not write.
+ * and never destroying work Cue did not write.
  */
 
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-test-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-test-'));
 });
 
 afterEach(() => {
@@ -32,7 +32,7 @@ function initOptions(extra: Record<string, unknown> = {}) {
   return {
     projectRoot: root,
     detection,
-    understudyVersion: VERSION,
+    cueVersion: VERSION,
     // Otherwise ~/.claude/ and $CLAUDE_CODE_ENTRYPOINT make the result depend on
     // who runs the suite.
     env: {},
@@ -99,7 +99,7 @@ describe('regions', () => {
 
   it('appends to a file it does not own without disturbing the rest', () => {
     writeFileSync(join(root, '.gitignore'), 'node_modules/\n');
-    apply(plan(root, [file], undefined), { projectRoot: root, understudyVersion: VERSION });
+    apply(plan(root, [file], undefined), { projectRoot: root, cueVersion: VERSION });
 
     const content = readFileSync(join(root, '.gitignore'), 'utf8');
     expect(content).toContain('node_modules/');
@@ -111,7 +111,7 @@ describe('regions', () => {
     let manifest = emptyManifest(VERSION, 'pnpm');
     const first = apply(plan(root, [file], manifest), {
       projectRoot: root,
-      understudyVersion: VERSION,
+      cueVersion: VERSION,
     });
     for (const entry of first.entries) manifest = recordFile(manifest, entry);
 
@@ -121,7 +121,7 @@ describe('regions', () => {
     );
 
     const updated: DesiredFile = { ...file, content: '\nours-v2\n' };
-    apply(plan(root, [updated], manifest), { projectRoot: root, understudyVersion: VERSION });
+    apply(plan(root, [updated], manifest), { projectRoot: root, cueVersion: VERSION });
 
     const content = readFileSync(join(root, '.gitignore'), 'utf8');
     // Outside our markers: it survives, and is not tampering with our region.
@@ -146,7 +146,7 @@ describe('init', () => {
     runInit(initOptions(), planInit(initOptions()));
     const agents = readFileSync(join(root, 'AGENTS.md'), 'utf8');
     expect(agents).toContain('Who decides what');
-    expect(agents).toContain('understudy` **(wins)**');
+    expect(agents).toContain('cue` **(wins)**');
     expect(agents).toContain('not an invitation to improvise');
   });
 
@@ -185,7 +185,7 @@ describe('init', () => {
 
     const options = initOptions({ force: true });
     runInit(options, planInit(options));
-    expect(readFileSync(path, 'utf8')).toContain('@understudy/eslint-plugin');
+    expect(readFileSync(path, 'utf8')).toContain('@wiluszdamian/cue-eslint-plugin');
   });
 
   it('leaves a foreign file at a path it wanted alone', () => {
@@ -240,8 +240,8 @@ describe('init', () => {
 
     // With only the browser server an agent guesses selectors instead of asking,
     // so the point lookups have to ship alongside it.
-    expect(Object.keys(config.mcpServers).sort()).toEqual(['playwright', 'understudy']);
-    expect(config.mcpServers.understudy?.args.join(' ')).toContain('@understudy/mcp');
+    expect(Object.keys(config.mcpServers).sort()).toEqual(['cue', 'playwright']);
+    expect(config.mcpServers.cue?.args.join(' ')).toContain('@wiluszdamian/cue-mcp');
   });
 
   it('gives Codex both servers as removable TOML blocks', () => {
@@ -249,11 +249,11 @@ describe('init', () => {
     runInit(options, planInit(options));
 
     const toml = readFileSync(join(root, '.codex/config.toml'), 'utf8');
-    expect(toml).toContain('[mcp_servers.understudy]');
+    expect(toml).toContain('[mcp_servers.cue]');
     expect(toml).toContain('[mcp_servers.playwright]');
     // The marked region is what makes removal an exact reversal.
-    expect(toml).toContain('# BEGIN UNDERSTUDY');
-    expect(toml).toContain('# END UNDERSTUDY');
+    expect(toml).toContain('# BEGIN CUE');
+    expect(toml).toContain('# END CUE');
   });
 });
 
@@ -309,7 +309,7 @@ describe('removal', () => {
 
     const content = readFileSync(join(root, '.gitignore'), 'utf8');
     expect(content).toContain('my-own-entry');
-    expect(content).not.toContain('BEGIN UNDERSTUDY');
+    expect(content).not.toContain('BEGIN CUE');
   });
 });
 
@@ -322,7 +322,7 @@ describe('doctor', () => {
         manifest: readManifest(root),
         rules: planInit(initOptions()).rules,
         detection,
-        understudyVersion: VERSION,
+        cueVersion: VERSION,
         env: {},
         home: root,
       }),
@@ -351,7 +351,7 @@ describe('doctor', () => {
   it('marks unverifiable things as unchecked rather than passing them', () => {
     writeFileSync(
       join(root, 'package.json'),
-      '{"devDependencies":{"@understudy/eslint-plugin":"*"}}',
+      '{"devDependencies":{"@wiluszdamian/cue-eslint-plugin":"*"}}',
     );
     runInit(initOptions(), planInit(initOptions()));
     const summary = summarise(
@@ -360,7 +360,7 @@ describe('doctor', () => {
         manifest: readManifest(root),
         rules: planInit(initOptions()).rules,
         detection,
-        understudyVersion: VERSION,
+        cueVersion: VERSION,
         offline: true,
         env: {},
         home: root,

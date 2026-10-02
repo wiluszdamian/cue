@@ -1,4 +1,4 @@
-// understudy-route: /signup
+// cue-route: /signup
 import type { Locator, Page } from '@playwright/test';
 
 export class SignupPage {

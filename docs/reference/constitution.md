@@ -9,7 +9,7 @@ browser, how to debug a test, how to handle Electron or i18n — belongs to anot
 source; see [Who decides what](ownership.md) for who owns what.
 
 11 of 11 rules are mechanically
-enforced by `@understudy/eslint-plugin`. The rest are stated here and checked in
+enforced by `@wiluszdamian/cue-eslint-plugin`. The rest are stated here and checked in
 review. That split is deliberate and published, because a standard that overstates
 its own teeth stops being believed.
 
@@ -133,6 +133,6 @@ Use a relative path and let baseURL resolve it: await page.goto('/login'). Set b
 
 **Selectors come from .agent-kb or from fresh exploration** · `MUST` · [full page](rules/selectors-from-agent-kb.md)
 
-This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; understudy check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.
+This is the rule the whole knowledge-base layer exists to serve. A model asked for a selector it has never seen produces a plausible one, and a plausible selector fails at runtime in a way that reads like an application bug. A selector is a fact about the application, and facts have sources. It is checked against the .agent-kb found above the file, for getByRole, getByTestId and getByLabel with literal arguments: whether the locator is known, ambiguous, on the wrong route, stale or only inferred. What the code alone cannot decide is not judged — a variable, a regular expression, getByText, getByPlaceholder, a CSS locator — so a clean run does not mean those were checked. With no .agent-kb the rule stays silent in the linter; cue check says so out loud. It is a warning, not an error, until the false-positive rate on real suites is known.
 
-This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run understudy survey \<url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.
+This selector does not trace to .agent-kb/app-map/ or to an exploration run in this session. Use the nearest known locator suggested here, or run cue survey \<url> for the page and use what it finds — do not guess. An entry marked stale is a lead to verify, not a fact to use.

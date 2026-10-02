@@ -92,7 +92,7 @@ export const agentReporter: Reporter = ({ result, constitution }) => {
   }
 
   return [
-    `Understudy checked ${result.filesAnalyzed} files against the project constitution.`,
+    `Cue checked ${result.filesAnalyzed} files against the project constitution.`,
     'Fix these before continuing. Do not disable the rule or work around it — each entry names the correct alternative.',
     '',
     ...sections,

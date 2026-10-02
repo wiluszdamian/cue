@@ -7,7 +7,7 @@ import {
   type Constitution,
   type LocatorUse,
   type TagSet,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 
 /**
  * Scoring a piece of generated test code. Deterministic, and both metrics are

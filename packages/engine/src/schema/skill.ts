@@ -35,7 +35,7 @@ export type Skill = z.infer<typeof SkillSchema>;
 
 /** Fixed here, not read from disk, so a missing folder errors instead of shortening the catalog. */
 export const V1_SKILLS: readonly { id: string; kind: SkillKind; group: string }[] = [
-  { id: 'understudy', kind: 'model', group: 'Getting started' },
+  { id: 'cue', kind: 'model', group: 'Getting started' },
   { id: 'compass', kind: 'user', group: 'Getting started' },
   { id: 'bind', kind: 'user', group: 'Getting started' },
   { id: 'survey', kind: 'user', group: 'Main flow' },
@@ -48,15 +48,10 @@ export const V1_SKILLS: readonly { id: string; kind: SkillKind; group: string }[
 ];
 
 /**
- * `understudy` is the on-ramp and `compose` the one flow skill a model may invoke.
+ * `cue` is the on-ramp and `compose` the one flow skill a model may invoke.
  * "Write a test here" is worth picking up unprompted; "set this repository up" is not.
  */
-export const MODEL_INVOCABLE = new Set([
-  'understudy',
-  'compose',
-  'resolve-owner',
-  'resolve-locator',
-]);
+export const MODEL_INVOCABLE = new Set(['cue', 'compose', 'resolve-owner', 'resolve-locator']);
 
 export function expectedInvocationFlag(id: string): boolean {
   return !MODEL_INVOCABLE.has(id);

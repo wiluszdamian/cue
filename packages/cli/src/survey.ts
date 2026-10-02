@@ -11,12 +11,12 @@ import {
   type ParsedSnapshot,
   type RouteMap,
   type WriteResult,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { nodeRunner, type ProcessRunner } from './browser/process.js';
 import { NOT_FOUND_ADVICE, resolvePlaywrightCli, type ResolvedCommand } from './browser/resolve.js';
 
 /**
- * `understudy survey <url>` — map the running application into `.agent-kb`.
+ * `cue survey <url>` — map the running application into `.agent-kb`.
  *
  * Exploration goes through `playwright-cli`, not MCP: an accessibility tree
  * through MCP costs more context than the task it serves. It sits behind a
@@ -170,7 +170,7 @@ export function survey(options: SurveyOptions): SurveyResult {
   const gaps: string[] = [];
   if (readTestIds(options.projectRoot) === undefined) {
     gaps.push(
-      'No product/testids.yaml, so nothing here is confirmed against the source. Run `understudy extract`.',
+      'No product/testids.yaml, so nothing here is confirmed against the source. Run `cue extract`.',
     );
   }
   for (const warning of parsed.warnings) gaps.push(`Snapshot parser: ${warning}`);

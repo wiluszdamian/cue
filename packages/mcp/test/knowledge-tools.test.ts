@@ -9,7 +9,7 @@ import {
   parseSnapshot,
   routeId,
   writeRouteMap,
-} from '@understudy/engine';
+} from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   estimateTokens,
@@ -85,7 +85,7 @@ function withEndpoints(count: number): void {
 
 beforeEach(() => {
   clearKnowledgeCache();
-  root = mkdtempSync(join(tmpdir(), 'understudy-mcp-kb-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-mcp-kb-'));
   surveyed(new Date());
   context = { rules: loadContext(root).rules, projectRoot: root };
 });
@@ -132,7 +132,7 @@ describe('resolve_route', () => {
     const answer = resolveRoute(context, '/checkout');
     expect(answer).toContain('status: unknown');
     expect(answer).toContain('suggested action:');
-    expect(answer).toContain('understudy survey');
+    expect(answer).toContain('cue survey');
     expect(answer).toContain('/login');
   });
 
@@ -141,7 +141,7 @@ describe('resolve_route', () => {
   });
 
   it('says unknown when there is no knowledge base at all', () => {
-    const bare = mkdtempSync(join(tmpdir(), 'understudy-mcp-bare-'));
+    const bare = mkdtempSync(join(tmpdir(), 'cue-mcp-bare-'));
     try {
       expect(resolveRoute({ ...context, projectRoot: bare }, '/login')).toContain(
         'status: unknown',
@@ -176,7 +176,7 @@ describe('resolve_api', () => {
   it('says unknown, with the command that would find out', () => {
     const answer = resolveApi(context, '/api/unheard-of');
     expect(answer).toContain('status: unknown');
-    expect(answer).toContain('understudy extract');
+    expect(answer).toContain('cue extract');
   });
 });
 
@@ -320,7 +320,7 @@ describe('get_context', () => {
   it('says unknown for a task nothing matches, and how to find out', () => {
     const answer = getContext(context, 'reconcile the ledger');
     expect(answer).toContain('status: unknown');
-    expect(answer).toContain('understudy survey --route');
+    expect(answer).toContain('cue survey --route');
   });
 
   it.each([300, 1200, 3000])('stays inside %i tokens, found or not', (maxTokens) => {
@@ -386,7 +386,7 @@ describe('resolve_action', () => {
   it('says unknown, with the command that would find out', () => {
     const answer = resolveAction(context, 'export the ledger');
     expect(answer).toContain('status: unknown');
-    expect(answer).toContain('understudy extract');
+    expect(answer).toContain('cue extract');
   });
 
   it('stays inside budget, found or not', () => {

@@ -158,7 +158,7 @@ describe('unknown', () => {
     expect(finding?.verdict).toBe('unknown');
     expect(finding?.nearest[0]?.expression).toContain('Log in');
     expect(finding?.suggestion).toContain('Nearest known');
-    expect(finding?.suggestion).toContain('understudy survey --route /login --base-url <url>');
+    expect(finding?.suggestion).toContain('cue survey --route /login --base-url <url>');
   });
 
   it('flags an invented test id', () => {
@@ -179,8 +179,8 @@ describe('unknown', () => {
       indexKnowledge({ modelVersion: 1, facts: [], evidence: [] }),
     );
     expect(finding?.verdict).toBe('unknown');
-    expect(finding?.suggestion).toContain('understudy extract');
-    expect(finding?.suggestion).toContain('understudy survey');
+    expect(finding?.suggestion).toContain('cue extract');
+    expect(finding?.suggestion).toContain('cue survey');
   });
 
   it('puts the route the test is on first among the nearest', () => {
@@ -238,9 +238,9 @@ describe('wrong-route', () => {
 });
 
 describe('route from a page object', () => {
-  it('uses an understudy-route comment when there is no goto', () => {
+  it('uses an cue-route comment when there is no goto', () => {
     const source = [
-      '// understudy-route: /signup',
+      '// cue-route: /signup',
       'export class SignupPage {',
       "  create() { return this.page.getByRole('button', { name: 'Create account' }); }",
       "  login() { return this.page.getByRole('button', { name: 'Log in with SSO' }); }",
@@ -253,7 +253,7 @@ describe('route from a page object', () => {
 
   it('accepts the annotation in a block comment', () => {
     const [finding] = analyze(
-      "/* understudy-route: /signup */\nthis.page.getByRole('button', { name: 'Create account' });",
+      "/* cue-route: /signup */\nthis.page.getByRole('button', { name: 'Create account' });",
     );
     expect(finding?.routeContext).toBe('/signup');
   });

@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadRules, validateRules, formatValidationProblems } from '@understudy/engine';
+import { loadRules, validateRules, formatValidationProblems } from '@wiluszdamian/cue-engine';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
@@ -29,14 +29,14 @@ if (problems.length > 0) {
 const banner = `// GENERATED FILE — do not edit.
 //
 // Source:    rules/constitution.yaml, rules/tags.yaml
-// Regenerate: pnpm --filter @understudy/eslint-plugin generate
+// Regenerate: pnpm --filter @wiluszdamian/cue-eslint-plugin generate
 //
 // Committed on purpose: a constitution change shows up as a diff here in review,
 // and the published package works without rules/.
 `;
 
 const body = `${banner}
-import type { Constitution, TagSet } from '@understudy/engine';
+import type { Constitution, TagSet } from '@wiluszdamian/cue-engine';
 
 export const CONSTITUTION = ${JSON.stringify(rules.constitution, null, 2)} as unknown as Constitution;
 
@@ -53,14 +53,14 @@ if (process.argv.includes('--check')) {
     current = readFileSync(target, 'utf8');
   } catch {
     process.stderr.write(
-      `${target} is missing. Run: pnpm --filter @understudy/eslint-plugin generate\n`,
+      `${target} is missing. Run: pnpm --filter @wiluszdamian/cue-eslint-plugin generate\n`,
     );
     process.exit(1);
   }
   if (current !== body) {
     process.stderr.write(
       'src/generated/constitution.ts is out of date with rules/.\n' +
-        'Run: pnpm --filter @understudy/eslint-plugin generate\n',
+        'Run: pnpm --filter @wiluszdamian/cue-eslint-plugin generate\n',
     );
     process.exit(1);
   }

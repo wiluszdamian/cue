@@ -1,13 +1,13 @@
 # demo-app
 
-A small web application with no runtime dependencies, used to check Understudy
+A small web application with no runtime dependencies, used to check Cue
 end to end and as the target of the benchmark. It is private and never published.
 
 ```bash
-pnpm --filter @understudy/demo-app start                 # http://127.0.0.1:4310
-pnpm --filter @understudy/demo-app exec playwright install chromium
-pnpm --filter @understudy/demo-app test:e2e              # reference tests, real browser
-pnpm --filter @understudy/demo-app test:mutations       # every mutation must be caught
+pnpm --filter @wiluszdamian/cue-demo-app start                 # http://127.0.0.1:4310
+pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium
+pnpm --filter @wiluszdamian/cue-demo-app test:e2e              # reference tests, real browser
+pnpm --filter @wiluszdamian/cue-demo-app test:mutations       # every mutation must be caught
 ```
 
 `PORT` changes the server port; `DEMO_PORT` does the same for the test run.

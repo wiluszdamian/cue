@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadRules, writeRouteMap } from '@understudy/engine';
+import { loadRules, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Agent, AgentResponse } from '../../src/agent.js';
 import { DemoExecutor } from '../../src/executor.js';
@@ -12,8 +12,8 @@ import { runBenchmark } from '../../src/runner.js';
 /**
  * The real thing: generated tests compiled with the project's compiler and run by
  * Playwright in a browser against the demo application. Needs Chromium
- * (`pnpm --filter @understudy/demo-app exec playwright install chromium`), so it
- * is not part of `pnpm test`; run it with `pnpm --filter @understudy/benchmark test:integration`.
+ * (`pnpm --filter @wiluszdamian/cue-demo-app exec playwright install chromium`), so it
+ * is not part of `pnpm test`; run it with `pnpm --filter @wiluszdamian/cue-benchmark test:integration`.
  *
  * The answers below are hand-written fixtures, not model output: they show the
  * harness tells a test that works from one that does not, and nothing more.
@@ -50,7 +50,7 @@ let knowledge: string;
 const executor = new DemoExecutor({ demoRoot: DEMO });
 
 beforeAll(() => {
-  knowledge = mkdtempSync(join(tmpdir(), 'understudy-bench-int-'));
+  knowledge = mkdtempSync(join(tmpdir(), 'cue-bench-int-'));
   const at = new Date().toISOString();
   writeRouteMap(knowledge, {
     schemaVersion: 2,
@@ -170,7 +170,7 @@ describe('a generated test, run for real', () => {
 describe('a whole run', () => {
   const answers: Record<string, string> = {
     'bare/demo-login': INVENTED_SPEC,
-    'understudy/demo-login': LOGIN_SPEC,
+    'cue/demo-login': LOGIN_SPEC,
   };
   const agent: Agent = {
     name: 'fixture',
@@ -193,10 +193,10 @@ describe('a whole run', () => {
       promptSetVersion: 2,
       executor,
     });
-    const [bare, understudy] = result.conditions;
+    const [bare, cue] = result.conditions;
 
     expect(bare?.execution).toMatchObject({ samples: 1, passedFirstRun: 0, failedRun: 1 });
-    expect(understudy?.execution).toMatchObject({ samples: 1, passedFirstRun: 1, failedRun: 0 });
+    expect(cue?.execution).toMatchObject({ samples: 1, passedFirstRun: 1, failedRun: 0 });
     // The invented button is also caught before anything runs.
     expect(bare?.locators).toMatchObject({ unknown: 1, known: 2 });
     expect(bare?.locators?.invalidLocators[0]).toContain('Sign in now');
@@ -204,13 +204,13 @@ describe('a whole run', () => {
     // went to /login, since it does not follow the click that leads to /dashboard, so
     // it calls the heading a wrong-route locator. That is a limit of the checker, and
     // it is why "wrong route" is reported apart from "invented".
-    expect(understudy?.locators).toMatchObject({ unknown: 0, wrongRoute: 1, known: 3 });
+    expect(cue?.locators).toMatchObject({ unknown: 0, wrongRoute: 1, known: 3 });
 
     // demo-login names the defect auth-silent-fail. The answer that failed on the correct
     // application has nothing to break; the one that passed stops passing once login
     // silently does nothing, which is what a good test of login should do.
     expect(bare?.mutations).toEqual({ eligible: 1, detected: 0, missed: 0, notApplicable: 1 });
-    expect(understudy?.mutations).toEqual({
+    expect(cue?.mutations).toEqual({
       eligible: 1,
       detected: 1,
       missed: 0,

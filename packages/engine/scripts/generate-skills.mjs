@@ -97,7 +97,7 @@ ${rule.examples.good.trimEnd()}
 
 ${
   topics.length > 0
-    ? `Owns: ${topics.map((t) => t.topic).join('; ')}.\n\nThis is Understudy's topic outright — it outranks any other source that says otherwise.`
+    ? `Owns: ${topics.map((t) => t.topic).join('; ')}.\n\nThis is Cue's topic outright — it outranks any other source that says otherwise.`
     : 'Reference material, cited by `compose` and `pin`.'
 }
 
@@ -134,7 +134,7 @@ const TABLE = `## What you have → what to reach for
 
 | You have | Reach for |
 | --- | --- |
-| The Understudy plugin, and a testing task | \`/understudy\` |
+| The Cue plugin, and a testing task | \`/cue\` |
 | No idea where to start | \`/compass\` |
 | A fresh repo, nothing wired up | \`/bind\` |
 | No knowledge of the live UI | \`/survey\` |
@@ -144,7 +144,7 @@ const TABLE = `## What you have → what to reach for
 | An existing suite you want assessed | \`/inspect\` |
 | Two sources giving conflicting advice | \`/resolve-owner\` |
 | An uncertain selector | \`/resolve-locator\` |
-| A product spec or ticket breakdown | outside Understudy — your team's process |`;
+| A product spec or ticket breakdown | outside Cue — your team's process |`;
 
 function ownershipRegion() {
   const rows = rules.ownership.topics.map((topic) => {
@@ -174,26 +174,26 @@ function readme() {
 
   return `${GENERATED}
 
-# Understudy skills
+# Cue skills
 
-The light half of Understudy: procedures an agent can follow, with no engine, no
+The light half of Cue: procedures an agent can follow, with no engine, no
 ESLint and no manifest.
 
 \`\`\`bash
-npx skills add wiluszdamian/understudy
-npx skills add wiluszdamian/understudy --skill=compass
+npx skills add wiluszdamian/cue
+npx skills add wiluszdamian/cue --skill=compass
 \`\`\`
 
 Or install the same catalog as a plugin for Claude Code, Cursor, Codex, Grok,
-Gemini, OpenCode, or \`.agents\` — see \`plugins/understudy/README.md\`.
+Gemini, OpenCode, or \`.agents\` — see \`plugins/cue/README.md\`.
 
 That gets you the conventions. It does not get you the **guarantee** — the ESLint
 preset that fails a build when a rule is broken, whether or not an agent was
 involved. For that, install the product:
 
 \`\`\`bash
-npm create understudy
-understudy init
+npm create cue
+cue init
 \`\`\`
 
 | Skill | Group | Type | What it does |
@@ -213,7 +213,7 @@ ${referenceSkillIds()
 
 ## Credits
 
-Understudy composes work maintained by others — the official Playwright skills
+Cue composes work maintained by others — the official Playwright skills
 and CLI, and Playwright MCP (Microsoft, Apache-2.0), and a Playwright
 best-practices reference skill (Currents Software Inc., MIT). It is not
 affiliated with Microsoft, Anthropic, OpenAI, Google, xAI, or Currents.

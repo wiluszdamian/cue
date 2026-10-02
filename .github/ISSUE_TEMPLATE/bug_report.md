@@ -19,7 +19,7 @@ labels: bug
 
 ## Environment
 
-- Cue version (`npx @wiluszdamian/cue-cli --version`):
+- Cue version (`npx @wiluszdamian/cue --version`):
 - Node version (`node --version`):
 - Package manager:
 - OS:

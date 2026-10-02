@@ -1,5 +1,5 @@
 /**
- * @understudy/mcp — three point lookups over the rules and the knowledge base.
+ * @wiluszdamian/cue-mcp — three point lookups over the rules and the knowledge base.
  *
  * Exported so the tools can be driven from tests and from other packages without
  * standing up a transport.

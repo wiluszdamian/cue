@@ -26,7 +26,7 @@ async function main(): Promise<void> {
   const context = loadContext(projectRoot, flag('rules'));
   await createServer(context).connect(new StdioServerTransport());
 
-  process.stderr.write(`understudy mcp ready — project ${projectRoot}\n`);
+  process.stderr.write(`cue mcp ready — project ${projectRoot}\n`);
 }
 
 main().catch((error: unknown) => {

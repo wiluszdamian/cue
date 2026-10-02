@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { extract, writeRouteMap } from '@understudy/engine';
+import { extract, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { estimateTokens, loadContext, resolveLocatorTool, TOKEN_BUDGET } from '../src/tools.js';
 
@@ -20,8 +20,8 @@ const write = (root: string, path: string, text: string): void => {
 };
 
 beforeEach(() => {
-  product = mkdtempSync(join(tmpdir(), 'understudy-mcp-product-'));
-  project = mkdtempSync(join(tmpdir(), 'understudy-mcp-project-'));
+  product = mkdtempSync(join(tmpdir(), 'cue-mcp-product-'));
+  project = mkdtempSync(join(tmpdir(), 'cue-mcp-project-'));
   write(product, 'app/Login.tsx', '<button data-testid="login-submit">Log in</button>\n');
   extract({ projectRoot: project, sourceRoot: product });
 

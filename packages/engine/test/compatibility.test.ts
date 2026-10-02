@@ -51,7 +51,7 @@ describe('ranges', () => {
 });
 
 describe('compatibility.yaml', () => {
-  it('is valid, and lists the tools Understudy composes', () => {
+  it('is valid, and lists the tools Cue composes', () => {
     expect(Object.keys(compatibility.tools)).toEqual(
       expect.arrayContaining(['@playwright/cli', '@playwright/mcp', '@playwright/test']),
     );
@@ -115,7 +115,7 @@ describe.skipIf(!existsSync(join(REPO, 'packages', 'engine', 'dist', 'index.js')
     const run = (versions: Record<string, string>) =>
       spawnSync(process.execPath, [join(REPO, 'scripts', 'check-upstream.mjs')], {
         encoding: 'utf8',
-        env: { ...process.env, UNDERSTUDY_UPSTREAM_VERSIONS: JSON.stringify(versions) },
+        env: { ...process.env, CUE_UPSTREAM_VERSIONS: JSON.stringify(versions) },
       });
 
     const current = Object.fromEntries(

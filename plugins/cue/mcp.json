@@ -1,0 +1,7 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "cue": { "type": "stdio", "command": "npx", "args": ["-y", "@wiluszdamian/cue-mcp@0.8.0"] },
+    "playwright": { "type": "stdio", "command": "npx", "args": ["-y", "@playwright/mcp@0.0.83"] }
+  }
+}

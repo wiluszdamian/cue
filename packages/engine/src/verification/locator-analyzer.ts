@@ -12,7 +12,7 @@ import {
 
 /**
  * Does each locator in a test name something the knowledge base knows? One pure
- * function, used by `understudy check`, the lint rule, the benchmark and `doctor`,
+ * function, used by `cue check`, the lint rule, the benchmark and `doctor`,
  * so "known" means the same thing to all of them and the matching is written once.
  *
  * It judges only what it can. A locator built from a variable, a text or CSS
@@ -221,7 +221,7 @@ export function analyzeLocators(input: AnalyzeLocatorsInput): LocatorFinding[] {
         suggestion:
           `${use.locator} exists on ${pathOf(found)}, not on ${routeContext ?? 'this route'}. ` +
           `Either this test is on the wrong page, or it has moved on since its last page.goto ` +
-          `(the checker does not follow clicks and redirects; add // understudy-route: or a goto if so), ` +
+          `(the checker does not follow clicks and redirects; add // cue-route: or a goto if so), ` +
           `or run \`${surveyCommand(routeContext)}\` to see what is really there.`,
       };
     }
@@ -393,7 +393,7 @@ function unknownAdvice(
   if (nothingKnown) {
     return (
       `Nothing is known about this application yet, so ${expression} cannot be checked. ` +
-      'Run `understudy extract --source <path>` and `understudy survey <url>` first.'
+      'Run `cue extract --source <path>` and `cue survey <url>` first.'
     );
   }
   const closest = near[0];

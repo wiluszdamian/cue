@@ -1,0 +1,12 @@
+{
+  "name": "cue",
+  "version": "0.8.0",
+  "description": "Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.",
+  "author": { "name": "Cue" },
+  "homepage": "https://github.com/wiluszdamian/project-cue",
+  "repository": "https://github.com/wiluszdamian/project-cue",
+  "license": "MIT",
+  "keywords": ["playwright", "testing", "e2e", "typescript", "agent-skills"],
+  "skills": "./skills",
+  "mcpServers": "./.mcp.json"
+}

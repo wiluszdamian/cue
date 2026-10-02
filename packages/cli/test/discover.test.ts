@@ -21,8 +21,8 @@ import { emptyManifest, writeManifest } from '../src/manifest.js';
 let root: string;
 let home: string;
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), 'understudy-discover-'));
-  home = mkdtempSync(join(tmpdir(), 'understudy-home-'));
+  root = mkdtempSync(join(tmpdir(), 'cue-discover-'));
+  home = mkdtempSync(join(tmpdir(), 'cue-home-'));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -101,12 +101,8 @@ describe('an empty repository', () => {
     expect(report.tests.specFiles).toBe(0);
     expect(report.pageObjects.classes).toBe(0);
     expect(report.sources.findings.every((f) => f.found === 0)).toBe(true);
-    expect(report.understudy).toMatchObject({ installed: false, elements: 0 });
-    expect(report.nextSteps).toEqual([
-      'understudy init',
-      'understudy survey <url>',
-      'understudy doctor',
-    ]);
+    expect(report.cue).toMatchObject({ installed: false, elements: 0 });
+    expect(report.nextSteps).toEqual(['cue init', 'cue survey <url>', 'cue doctor']);
 
     const text = formatDiscovery(report);
     expect(text).toContain('- no playwright.config found');
@@ -142,10 +138,10 @@ describe('an existing Playwright repository', () => {
 
   it('suggests initialising, extracting, and looking at the pages', () => {
     expect(look().nextSteps).toEqual([
-      'understudy init',
-      'understudy extract --source .',
-      'understudy survey <url>',
-      'understudy doctor',
+      'cue init',
+      'cue extract --source .',
+      'cue survey <url>',
+      'cue doctor',
     ]);
   });
 
@@ -162,7 +158,7 @@ describe('an existing Playwright repository', () => {
 
   it('sums itself up in a line for the top of init’s plan', () => {
     expect(formatDiscoverySummary(look())).toBe(
-      'Found: Playwright (playwright.config.ts) · 3 spec file(s) · 3 page object(s) · 1 test id(s) · 2 endpoint(s) · 1 label(s). (understudy discover shows the detail.)',
+      'Found: Playwright (playwright.config.ts) · 3 spec file(s) · 3 page object(s) · 1 test id(s) · 2 endpoint(s) · 1 label(s). (cue discover shows the detail.)',
     );
   });
 });
@@ -181,11 +177,11 @@ describe('only looking', () => {
     expect(after).toEqual(before);
   });
 
-  it('does not create .agent-kb, .understudy or anything else', () => {
+  it('does not create .agent-kb, .cue or anything else', () => {
     brownfield();
     look();
     expect(existsSync(join(root, '.agent-kb'))).toBe(false);
-    expect(existsSync(join(root, '.understudy'))).toBe(false);
+    expect(existsSync(join(root, '.cue'))).toBe(false);
   });
 
   it('never runs the Playwright config', () => {
@@ -213,7 +209,7 @@ describe('agents and what is already set up', () => {
     ]);
   });
 
-  it('notices a project that already has Understudy and a knowledge base, and suggests checking', () => {
+  it('notices a project that already has Cue and a knowledge base, and suggests checking', () => {
     brownfield();
     writeManifest(root, emptyManifest('0.8.0', 'pnpm'));
     const snapshot = readFileSync(
@@ -233,18 +229,18 @@ describe('agents and what is already set up', () => {
     survey({ projectRoot: root, url: 'http://app.test/login', driver });
 
     const report = look();
-    expect(report.understudy.surveyedRoutes).toEqual(['/login']);
-    expect(report.understudy.elements).toBeGreaterThan(0);
-    expect(report.nextSteps).not.toContain('understudy init');
-    expect(report.nextSteps).not.toContain('understudy extract --source .');
-    expect(report.nextSteps).toContain('understudy check');
+    expect(report.cue.surveyedRoutes).toEqual(['/login']);
+    expect(report.cue.elements).toBeGreaterThan(0);
+    expect(report.nextSteps).not.toContain('cue init');
+    expect(report.nextSteps).not.toContain('cue extract --source .');
+    expect(report.nextSteps).toContain('cue check');
     expect(formatDiscovery(report)).toContain('.agent-kb knows 1 surveyed route(s)');
   });
 });
 
 describe('a product that lives somewhere else', () => {
   it('reads the source from --source and the tests from here', () => {
-    const product = mkdtempSync(join(tmpdir(), 'understudy-product-'));
+    const product = mkdtempSync(join(tmpdir(), 'cue-product-'));
     try {
       write('playwright.config.ts', CONFIG);
       write('e2e/a.spec.ts', 'export {};\n');
@@ -260,11 +256,11 @@ describe('a product that lives somewhere else', () => {
       expect(report.sources.routes).toEqual(['/billing', '/items/[id]', '/login']);
       // A route with a parameter is not offered: there is no page for it until it has a value.
       expect(report.nextSteps).toEqual([
-        'understudy init',
-        `understudy extract --source ${product}`,
-        'understudy survey --route /billing --base-url <url>',
-        'understudy survey --route /login --base-url <url>',
-        'understudy doctor',
+        'cue init',
+        `cue extract --source ${product}`,
+        'cue survey --route /billing --base-url <url>',
+        'cue survey --route /login --base-url <url>',
+        'cue doctor',
       ]);
     } finally {
       rmSync(product, { recursive: true, force: true });
@@ -275,7 +271,7 @@ describe('a product that lives somewhere else', () => {
     write('next.config.js', 'module.exports = {};\n');
     for (const name of ['a', 'b', 'c', 'd', 'e']) write(`app/${name}/page.tsx`, 'x');
     const steps = look().nextSteps;
-    expect(steps.filter((s) => s.startsWith('understudy survey --route'))).toHaveLength(3);
+    expect(steps.filter((s) => s.startsWith('cue survey --route'))).toHaveLength(3);
     expect(steps).toContain('…and 2 more route(s) the source declares');
   });
 });
@@ -322,7 +318,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
     const before = snapshotOf(root);
     const result = run('discover');
     expect(result.status).toBe(0);
-    expect(result.stdout).toContain('Understudy discover');
+    expect(result.stdout).toContain('Cue discover');
     expect(result.stdout).toContain('Suggested next steps');
     expect(snapshotOf(root)).toEqual(before);
   });
@@ -334,7 +330,7 @@ describe.skipIf(!existsSync(CLI))('the built command', () => {
       nextSteps: string[];
     };
     expect(report.tests.specFiles).toBe(3);
-    expect(report.nextSteps[0]).toBe('understudy init');
+    expect(report.nextSteps[0]).toBe('cue init');
   });
 
   it('starts init’s plan with a line about what was found, before anything is written', () => {

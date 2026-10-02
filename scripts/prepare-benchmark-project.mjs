@@ -7,7 +7,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Builds the project a benchmark is run against: Understudy installed, and a
+ * Builds the project a benchmark is run against: Cue installed, and a
  * knowledge base of the demo application made the way a user would make one.
  *
  *   node scripts/prepare-benchmark-project.mjs [dir]        (default: benchmarks/project)
@@ -17,16 +17,16 @@ import { fileURLToPath } from 'node:url';
  * the snapshots captured for the parser's fixtures (`survey --from`), because
  * `survey` cannot sign in. Nothing here calls a model.
  *
- * The result is the same for the bare and the understudy condition's *scoring*; only
- * the understudy condition is shown it in the prompt.
+ * The result is the same for the bare and the cue condition's *scoring*; only
+ * the cue condition is shown it in the prompt.
  */
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const demo = join(root, 'examples', 'demo-app');
-const understudy = join(root, 'packages', 'cli', 'dist', 'cli.js');
+const cue = join(root, 'packages', 'cli', 'dist', 'cli.js');
 const target = resolve(process.argv[2] ?? join(root, 'benchmarks', 'project'));
 
-if (!existsSync(understudy)) {
+if (!existsSync(cue)) {
   process.stderr.write('packages/cli/dist is missing: run `pnpm build` first.\n');
   process.exit(1);
 }
@@ -48,13 +48,13 @@ const snapshots = join(
 );
 
 function run(args) {
-  const result = spawnSync(process.execPath, [understudy, ...args, '--cwd', target], {
+  const result = spawnSync(process.execPath, [cue, ...args, '--cwd', target], {
     encoding: 'utf8',
     shell: false,
     env: { ...process.env, NO_COLOR: '1' },
   });
   if (result.status !== 0) {
-    throw new Error(`understudy ${args.join(' ')} failed:\n${result.stdout}${result.stderr}`);
+    throw new Error(`cue ${args.join(' ')} failed:\n${result.stdout}${result.stderr}`);
   }
   return result.stdout;
 }

@@ -1,4 +1,4 @@
-// understudy-route: /dashboard
+// cue-route: /dashboard
 import type { Locator, Page } from '@playwright/test';
 
 export class DashboardPage {

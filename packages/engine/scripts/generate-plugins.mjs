@@ -3,7 +3,7 @@
  * Packages the skill catalog as native plugins for each supported agent.
  *
  * `skills/` stays the source of truth; this copies it into
- * `plugins/understudy/skills/` and writes the per-agent manifests around that
+ * `plugins/cue/skills/` and writes the per-agent manifests around that
  * copy, so a marketplace install does not ship the rest of the monorepo as
  * plugin context. `--check` fails on drift.
  */
@@ -16,7 +16,7 @@ import { loadCompatibility, loadSkills, V1_SKILLS } from '../dist/index.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
 const skillsDir = join(repoRoot, 'skills');
-const pluginDir = join(repoRoot, 'plugins', 'understudy');
+const pluginDir = join(repoRoot, 'plugins', 'cue');
 const pluginSkillsDir = join(pluginDir, 'skills');
 
 const version = readFileSync(join(repoRoot, 'VERSION'), 'utf8').trim();
@@ -24,12 +24,12 @@ const skills = loadSkills(skillsDir);
 const compatibility = loadCompatibility(join(repoRoot, 'compatibility.yaml'));
 const skillIds = V1_SKILLS.map((s) => s.id);
 
-const REPO = 'https://github.com/wiluszdamian/understudy';
-const PLUGIN_ID = 'understudy';
+const REPO = 'https://github.com/wiluszdamian/project-cue';
+const PLUGIN_ID = 'cue';
 const DESCRIPTION =
   'Playwright testing conventions for this repository: constitution, locators from .agent-kb, and the skill catalog that writes tests the way this team already writes them.';
 
-const author = { name: 'Understudy', url: REPO };
+const author = { name: 'Cue', url: REPO };
 const keywords = ['playwright', 'testing', 'e2e', 'typescript', 'agent-skills'];
 
 // Pinned, not `@latest`: a manifest installed today should run what was tested today.
@@ -40,12 +40,12 @@ const playwrightMcp = {
 
 // The three point lookups. Shipped alongside Playwright MCP, not instead of it:
 // that one drives a browser, this one answers questions without one.
-const understudyMcp = {
+const cueMcp = {
   command: 'npx',
-  args: ['-y', `@understudy/mcp@${version}`],
+  args: ['-y', `@wiluszdamian/cue-mcp@${version}`],
 };
 
-const mcpServers = { understudy: understudyMcp, playwright: playwrightMcp };
+const mcpServers = { cue: cueMcp, playwright: playwrightMcp };
 
 const prettierOpts = (await prettier.resolveConfig(join(repoRoot, 'package.json'))) ?? {};
 
@@ -158,7 +158,7 @@ files.set(
   await json({
     $schema: 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',
     mcpServers: {
-      understudy: { type: 'stdio', ...understudyMcp },
+      cue: { type: 'stdio', ...cueMcp },
       playwright: { type: 'stdio', ...playwrightMcp },
     },
   }),
@@ -168,7 +168,7 @@ files.set(join(pluginDir, '.mcp.json'), await json({ mcpServers }));
 
 const marketplacePlugin = {
   name: PLUGIN_ID,
-  source: './plugins/understudy',
+  source: './plugins/cue',
   description: DESCRIPTION,
   version,
   author: { name: author.name },
@@ -180,7 +180,7 @@ files.set(
   join(repoRoot, '.claude-plugin', 'marketplace.json'),
   await json({
     name: PLUGIN_ID,
-    owner: { name: 'Understudy' },
+    owner: { name: 'Cue' },
     metadata: { description: DESCRIPTION, version },
     plugins: [
       {
@@ -197,12 +197,12 @@ files.set(
   join(repoRoot, '.cursor-plugin', 'marketplace.json'),
   await json({
     name: PLUGIN_ID,
-    owner: { name: 'Understudy' },
+    owner: { name: 'Cue' },
     metadata: { description: DESCRIPTION, version, pluginRoot: 'plugins' },
     plugins: [
       {
         name: PLUGIN_ID,
-        source: 'understudy',
+        source: 'cue',
         description: DESCRIPTION,
         version,
         skills: './skills',
@@ -216,7 +216,7 @@ files.set(
   await json({
     name: PLUGIN_ID,
     description: DESCRIPTION,
-    owner: { name: 'Understudy' },
+    owner: { name: 'Cue' },
     plugins: [
       {
         ...marketplacePlugin,
@@ -230,11 +230,11 @@ files.set(
   join(repoRoot, '.agents', 'plugins', 'marketplace.json'),
   await json({
     name: PLUGIN_ID,
-    interface: { displayName: 'Understudy' },
+    interface: { displayName: 'Cue' },
     plugins: [
       {
         name: PLUGIN_ID,
-        source: { source: 'local', path: './plugins/understudy' },
+        source: { source: 'local', path: './plugins/cue' },
         policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' },
         category: 'Productivity',
       },
@@ -256,13 +256,13 @@ files.set(
   join(pluginDir, 'README.md'),
   await md(`<!-- GENERATED. Run \`pnpm skills:generate\`. Do not edit. -->
 
-# Understudy plugin
+# Cue plugin
 
 The skill catalog, packaged so coding agents can install it as a plugin rather
 than copying markdown by hand. Procedures are the same files as \`skills/\`; this
 directory is the installable unit around them.
 
-Two MCP servers are bundled. \`understudy\` answers point lookups —
+Two MCP servers are bundled. \`cue\` answers point lookups —
 \`explain_rule\`, \`resolve_owner\`, \`resolve_locator\`, \`resolve_route\`,
 \`resolve_api\`, \`get_evidence\`, \`get_freshness\` and \`find_knowledge\` — against this
 project's rules and knowledge base, and writes nothing. Playwright MCP handles
@@ -274,13 +274,13 @@ ownership table in \`AGENTS.md\`.
 
 | Agent | Command |
 | --- | --- |
-| Claude Code | \`/plugin marketplace add wiluszdamian/understudy\` then \`/plugin install understudy@understudy\` |
-| Cursor | add \`wiluszdamian/understudy\` as a marketplace, install **understudy** |
-| Codex | \`codex plugin marketplace add wiluszdamian/understudy\` |
-| Grok | \`grok plugin marketplace add wiluszdamian/understudy\` then \`grok plugin install understudy --trust\` |
-| Gemini CLI | \`gemini extensions install https://github.com/wiluszdamian/understudy.git\` |
-| OpenCode | \`npx skills add wiluszdamian/understudy -a opencode\` |
-| .agents (universal) | \`npx skills add wiluszdamian/understudy -a universal\` |
+| Claude Code | \`/plugin marketplace add wiluszdamian/cue\` then \`/plugin install cue@cue\` |
+| Cursor | add \`wiluszdamian/cue\` as a marketplace, install **cue** |
+| Codex | \`codex plugin marketplace add wiluszdamian/cue\` |
+| Grok | \`grok plugin marketplace add wiluszdamian/cue\` then \`grok plugin install cue --trust\` |
+| Gemini CLI | \`gemini extensions install https://github.com/wiluszdamian/project-cue.git\` |
+| OpenCode | \`npx skills add wiluszdamian/cue -a opencode\` |
+| .agents (universal) | \`npx skills add wiluszdamian/cue -a universal\` |
 
 OpenCode and the \`.agents/skills\` convention do not have a marketplace of their
 own that this package can publish to. \`npx skills add\` copies the catalog into
@@ -290,7 +290,7 @@ This is the light channel: conventions, not the ESLint guarantee. For
 enforcement:
 
 \`\`\`bash
-npx @understudy/cli init
+npx @wiluszdamian/cue init
 \`\`\`
 
 ## Skills
@@ -299,13 +299,13 @@ npx @understudy/cli init
 | --- | --- | --- |
 ${catalogRows}
 
-\`/understudy\` is the on-ramp a model may invoke. The rest of the getting-started
+\`/cue\` is the on-ramp a model may invoke. The rest of the getting-started
 and main-flow skills stay user-invoked so a mention of testing does not start a
 survey.
 
 ## Credits
 
-Understudy composes work maintained by others — the official Playwright skills
+Cue composes work maintained by others — the official Playwright skills
 and CLI, and Playwright MCP (Microsoft, Apache-2.0), and a Playwright
 best-practices reference skill (Currents Software Inc., MIT). It is not
 affiliated with Microsoft, Anthropic, OpenAI, Google, xAI, or Currents.

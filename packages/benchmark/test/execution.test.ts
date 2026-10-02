@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { indexKnowledge, loadKnowledge, loadRules, writeRouteMap } from '@understudy/engine';
+import { indexKnowledge, loadKnowledge, loadRules, writeRouteMap } from '@wiluszdamian/cue-engine';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Agent, AgentResponse } from '../src/agent.js';
 import { compileFiles } from '../src/compile.js';
@@ -25,7 +25,7 @@ const rules = loadRules(join(REPO, 'rules'));
 
 let dir: string;
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'understudy-exec-'));
+  dir = mkdtempSync(join(tmpdir(), 'cue-exec-'));
 });
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
@@ -64,7 +64,7 @@ describe('prompt set 2', () => {
     const known = new Set(rules.constitution.rules.map((r) => r.id));
     for (const prompt of PROMPTS_V2) {
       const text = prompt.text.toLowerCase();
-      for (const giveaway of ['understudy', 'constitution', 'page object', '@smoke', 'tag the']) {
+      for (const giveaway of ['cue', 'constitution', 'page object', '@smoke', 'tag the']) {
         expect(text, `${prompt.id} mentions "${giveaway}"`).not.toContain(giveaway);
       }
       for (const ruleId of prompt.exercises) expect(known.has(ruleId)).toBe(true);
@@ -415,7 +415,7 @@ describe('a run with an executor', () => {
   const withDefects = PROMPTS_V2.filter((prompt) => prompt.mutation !== undefined);
 
   it('executes every answer of both conditions and summarises them per condition', async () => {
-    const executor = new FakeExecutor((input) => ok(input.condition === 'understudy'));
+    const executor = new FakeExecutor((input) => ok(input.condition === 'cue'));
     const result = await runBenchmark({
       projectRoot: dir,
       agent,
@@ -429,8 +429,8 @@ describe('a run with an executor', () => {
     expect(executor.inputs.map((i) => `${i.condition}/${i.promptId}`)).toEqual([
       'bare/demo-navigation',
       'bare/demo-items-crud',
-      'understudy/demo-navigation',
-      'understudy/demo-items-crud',
+      'cue/demo-navigation',
+      'cue/demo-items-crud',
     ]);
     expect(result.promptSetVersion).toBe(2);
     expect(result.conditions.map((c) => c.execution)).toEqual([

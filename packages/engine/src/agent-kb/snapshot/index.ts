@@ -30,7 +30,7 @@ export class UnsupportedSnapshotFormatError extends Error {
     readonly supported: readonly string[],
   ) {
     super(
-      `The browser tool's output is not a snapshot format Understudy understands` +
+      `The browser tool's output is not a snapshot format Cue understands` +
         `${cliVersion === undefined ? '' : ` (playwright-cli ${cliVersion})`}.\n` +
         `Supported: ${supported.join(', ')}.\n` +
         'Nothing was written. Install a supported @playwright/cli (see docs/help/troubleshooting.md),\n' +
