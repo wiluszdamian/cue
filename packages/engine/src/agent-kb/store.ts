@@ -1,3 +1,4 @@
+import { adoptOwner } from './owner.js';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { parse, stringify } from 'yaml';
@@ -72,6 +73,7 @@ export function writeRouteMap(root: string, map: RouteMap): WriteResult {
   const path = routeMapPath(root, parsed.route);
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, `${HEADER}${text}`, 'utf8');
+  adoptOwner(path, root);
 
   return { path, redactions };
 }

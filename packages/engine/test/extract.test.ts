@@ -1,9 +1,14 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { extract } from '../src/agent-kb/extract/run.js';
-import { nextAdapter, openApiAdapter, testIdAdapter } from '../src/agent-kb/extract/adapters.js';
+import {
+  laravelAdapter,
+  nextAdapter,
+  openApiAdapter,
+  testIdAdapter,
+} from '../src/agent-kb/extract/adapters.js';
 import { scanSource } from '../src/agent-kb/extract/scan.js';
 import { correlate } from '../src/agent-kb/store.js';
 import { parseSnapshot } from '../src/agent-kb/snapshot/index.js';
@@ -305,5 +310,141 @@ describe('the point of doing both', () => {
     // Neither source alone proves a selector is real *and* reachable.
     expect(button?.confidence).toBe('confirmed');
     expect(button?.testId).toBe('log-in');
+  });
+});
+
+describe('extract options', () => {
+  it('--dry-run reports what it would write and writes nothing', () => {
+    const result = extract({ projectRoot: project, sourceRoot: product, dryRun: true });
+    expect(result.dryRun).toBe(true);
+    expect(result.written).toEqual([]);
+    expect(result.wouldWrite.length).toBeGreaterThan(0);
+    expect(existsSync(join(project, '.agent-kb'))).toBe(false);
+  });
+
+  it('leaves excluded directories out, so a template app is not taken for the product', () => {
+    write(product, 'resources/apps/starter/package.json', '{"dependencies":{"next":"14"}}\n');
+    write(product, 'resources/apps/starter/pages/about.tsx', 'export default () => null;\n');
+
+    const withTemplates = scanSource(product);
+    expect(withTemplates.files.some((f) => f.path.startsWith('resources/apps/'))).toBe(true);
+
+    const without = scanSource(product, undefined, { exclude: ['resources/apps'] });
+    expect(without.files.some((f) => f.path.startsWith('resources/apps/'))).toBe(false);
+  });
+
+  it('does not take a package.json with a key called next for a Next.js project', () => {
+    const only = mkdtempSync(join(tmpdir(), 'cue-nonnext-'));
+    try {
+      write(only, 'package.json', '{"scripts":{"next":"echo"}}\n');
+      write(only, 'pages/x.tsx', 'export default () => null;\n');
+      expect(nextAdapter.detect({ files: scanSource(only).files })).toBe(false);
+    } finally {
+      rmSync(only, { recursive: true, force: true });
+    }
+  });
+
+  it('reads an OpenAPI document named by --openapi from outside the scanned tree', () => {
+    write(
+      project,
+      'generated/api-docs.json',
+      JSON.stringify({ openapi: '3.0.0', paths: { '/api/ping': { get: {} } } }),
+    );
+    const result = extract({
+      projectRoot: project,
+      sourceRoot: product,
+      openapi: 'generated/api-docs.json',
+    });
+    expect(result.surface.some((e) => e.path === '/api/ping' && e.method === 'GET')).toBe(true);
+  });
+
+  it('says so when the named OpenAPI document is missing', () => {
+    const result = extract({ projectRoot: project, sourceRoot: product, openapi: 'nope.json' });
+    expect(result.gaps.some((g) => g.includes('nope.json'))).toBe(true);
+  });
+
+  it('reads the Playwright tests in the directory Cue runs in, not only in --source', () => {
+    write(
+      project,
+      'tests/login.spec.ts',
+      `import { test } from '@playwright/test';
+// cue-route: /login
+test('x', async ({ page }) => {
+  await page.getByRole('button', { name: 'Log in' }).click();
+});
+`,
+    );
+    const result = extract({ projectRoot: project, sourceRoot: product });
+    expect(result.adapters).toContain('existing-tests');
+    expect(result.fromTests.locators).toBeGreaterThan(0);
+  });
+});
+
+describe('laravel adapter', () => {
+  it('reads routes, groups and resources, pointing at the controller action', () => {
+    const app = mkdtempSync(join(tmpdir(), 'cue-laravel-'));
+    try {
+      write(app, 'composer.json', '{"require":{"laravel/framework":"^11"}}\n');
+      write(
+        app,
+        'routes/web.php',
+        `<?php
+Route::get('/', [HomeController::class, 'index']);
+Route::prefix('admin')->group(function () {
+    Route::get('/users', 'UserController@list');
+    Route::post('/users', [UserController::class, 'store']);
+});
+Route::get('/after', fn () => 'ok');
+`,
+      );
+      write(
+        app,
+        'routes/api.php',
+        `<?php
+Route::apiResource('photos', PhotoController::class);
+`,
+      );
+      write(
+        app,
+        'app/Http/Controllers/HomeController.php',
+        '<?php\nclass HomeController {\n  public function index() {}\n}\n',
+      );
+      write(
+        app,
+        'app/Http/Controllers/UserController.php',
+        '<?php\nclass UserController {\n  public function list() {}\n  public function store() {}\n}\n',
+      );
+      write(
+        app,
+        'app/Http/Controllers/PhotoController.php',
+        '<?php\nclass PhotoController {\n  public function index() {}\n  public function show($photo) {}\n}\n',
+      );
+
+      const files = scanSource(app).files;
+      expect(laravelAdapter.detect({ files })).toBe(true);
+      const surface = laravelAdapter.extract({ files }).surface ?? [];
+      const has = (kind: string, path: string, source: string, method?: string) =>
+        surface.some(
+          (e) => e.kind === kind && e.path === path && e.source === source && e.method === method,
+        );
+
+      expect(has('route', '/', 'app/Http/Controllers/HomeController.php:3')).toBe(true);
+      expect(has('route', '/admin/users', 'app/Http/Controllers/UserController.php:3')).toBe(true);
+      expect(
+        has('endpoint', '/admin/users', 'app/Http/Controllers/UserController.php:4', 'POST'),
+      ).toBe(true);
+      // The group's prefix does not leak past its closing brace.
+      expect(surface.some((e) => e.path === '/after')).toBe(true);
+      expect(
+        has('endpoint', '/api/photos', 'app/Http/Controllers/PhotoController.php:3', 'GET'),
+      ).toBe(true);
+      expect(
+        has('endpoint', '/api/photos/{photo}', 'app/Http/Controllers/PhotoController.php:4', 'GET'),
+      ).toBe(true);
+      // The controller has no `store`, so the resource does not claim one.
+      expect(surface.some((e) => e.method === 'POST' && e.path === '/api/photos')).toBe(false);
+    } finally {
+      rmSync(app, { recursive: true, force: true });
+    }
   });
 });

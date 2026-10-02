@@ -171,3 +171,5 @@ export {
   type ReporterName,
   type ReportContext,
 } from './reporters/index.js';
+
+export { adoptOwner } from './agent-kb/owner.js';
