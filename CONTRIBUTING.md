@@ -134,6 +134,17 @@ Widening a rule (catching more) follows the same versioning as adding one.
 Narrowing it is a patch. Either way, add a fixture that covers the case you
 changed — a rule change with no new fixture is a rule change nobody can review.
 
+## The end-to-end check
+
+`node scripts/e2e.mjs` runs the whole path against a real browser: it builds a project
+in a directory with a space in its name, extracts from the demo app, surveys it (one
+URL carries `&` and `%`), looks a locator up, checks the reference page objects, runs
+the demo's Playwright tests, verifies the map, then breaks the app and verifies again.
+Run `pnpm build` first, and install Chromium once with
+`pnpm --filter @understudy/demo-app exec playwright install chromium`. CI runs it on
+Ubuntu for every push and on Windows weekly (`e2e-windows.yml`); pass `--keep` to leave
+the project it built behind for inspection.
+
 ## Supporting a new `@playwright/cli`
 
 The snapshot format belongs to Microsoft and changes without notice. Bump the

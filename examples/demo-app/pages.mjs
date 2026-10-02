@@ -60,7 +60,7 @@ const POST_JSON = `async function postJson(url, body) {
   return { ok: response.ok, data: await response.json().catch(() => ({})) };
 }`;
 
-export function loginPage() {
+export function loginPage({ submitLabel = t('auth.login.submit') } = {}) {
   return layout({
     title: t('auth.login.title'),
     body: `<h1>${t('auth.login.title')}</h1>
@@ -68,7 +68,7 @@ export function loginPage() {
   ${field('login-email', t('auth.login.email'), 'email', 'username')}
   ${field('login-password', t('auth.login.password'), 'password', 'current-password')}
   <p role="alert" id="login-error" data-testid="login-error" hidden>${t('auth.login.error')}</p>
-  <button type="submit" data-testid="login-submit">${t('auth.login.submit')}</button>
+  <button type="submit" data-testid="login-submit">${submitLabel}</button>
 </form>
 <p><a href="/forgot" data-testid="login-forgot">${t('auth.login.forgot')}</a></p>`,
     script: `${POST_JSON}

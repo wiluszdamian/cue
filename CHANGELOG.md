@@ -67,6 +67,11 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- `scripts/e2e.mjs` runs the whole user path against a real browser, from `init` to a
+  deliberately broken app, and CI runs it on Ubuntu for every push (Windows weekly).
+  The demo app gained a `login-button-renamed` mutation, so that `verify` has a page
+  that needs no session to drift on.
+
 - **`understudy check [files…]`** reports which locators in your tests the knowledge base
   does not know, with the nearest real locator and the command to run, using the same
   analyzer the lint rule will. Output is `human`, `agent`, `json`, `sarif` or `github`.
