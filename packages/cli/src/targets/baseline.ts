@@ -1,3 +1,4 @@
+import { eslintConfigPath, OVERLAY_PATH, overlayBody, userConfigSeed } from '../eslint-overlay.js';
 import type { Ownership } from '@wiluszdamian/cue-engine';
 import type { DesiredFile } from '../install.js';
 import { runCommand } from '../package-manager.js';
@@ -117,19 +118,19 @@ export const baselineTarget: Target = {
         reason: 'ignore the Cue cache, but never .agent-kb',
       },
       {
-        path: 'eslint.config.mjs',
+        path: OVERLAY_PATH,
         target: 'agents',
-        // Only when no config exists: a flat config is code, and pattern-matching
-        // into someone's own is how a tool corrupts what it did not understand.
-        content: `import cue from '@wiluszdamian/cue-eslint-plugin';
-
-// The constitution as ESLint rules: the half of the guarantee that holds with no
-// agent involved.
-export default [
-  ...cue.configs.recommended,
-];
-`,
-        reason: 'the mechanical guarantee — without this nothing enforces the constitution',
+        content: overlayBody,
+        reason: 'the constitution as ESLint rules — Cue-owned, rewritten by sync',
+      },
+      {
+        // The user's config. Created only when none exists, and wired by `init`; Cue
+        // never rewrites it, so imports and exceptions of their own survive `sync`.
+        path: eslintConfigPath(context.projectRoot),
+        target: 'agents',
+        content: userConfigSeed,
+        seed: true,
+        reason: 'your ESLint config: imports the overlay, and is yours to extend',
       },
       {
         path: '.agent-kb/README.md',

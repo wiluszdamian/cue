@@ -21,6 +21,7 @@ const READABLE = new Set([
   '.svelte',
   '.html',
   '.astro',
+  '.php',
   '.json',
   '.yaml',
   '.yml',
@@ -65,7 +66,19 @@ function extensionOf(name: string): string {
   return dot === -1 ? '' : name.slice(dot).toLowerCase();
 }
 
-export function scanSource(root: string, limit = 5000): ScanResult {
+export interface ScanOptions {
+  /**
+   * Directories to leave out, relative to the root (`resources/apps`) or a bare name
+   * (`templates`). For nested projects that are not the product, such as app templates
+   * with their own `package.json`, which framework detection would take for it.
+   */
+  readonly exclude?: readonly string[];
+}
+
+const normaliseExclude = (entry: string): string =>
+  entry.replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/+$/, '');
+
+export function scanSource(root: string, limit = 5000, options: ScanOptions = {}): ScanResult {
   if (!existsSync(root)) {
     return { files: [], notes: [`no such directory: ${root}`] };
   }
@@ -73,6 +86,13 @@ export function scanSource(root: string, limit = 5000): ScanResult {
   const files: SourceFileRef[] = [];
   const notes: string[] = [];
   const queue: string[] = [root];
+  const excluded = (options.exclude ?? []).map(normaliseExclude).filter((e) => e.length > 0);
+  const isExcluded = (name: string, path: string): boolean => {
+    const rel = relative(root, path).split(sep).join('/');
+    return excluded.some((e) =>
+      e.includes('/') ? rel === e || rel.startsWith(`${e}/`) : e === name,
+    );
+  };
 
   for (let dir = queue.pop(); dir !== undefined && files.length < limit; dir = queue.pop()) {
     let entries;
@@ -88,7 +108,13 @@ export function scanSource(root: string, limit = 5000): ScanResult {
       const path = join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        if (!SKIP_DIRS.has(entry.name) && !entry.name.startsWith('.')) queue.push(path);
+        if (
+          !SKIP_DIRS.has(entry.name) &&
+          !entry.name.startsWith('.') &&
+          !isExcluded(entry.name, path)
+        ) {
+          queue.push(path);
+        }
         continue;
       }
       if (!entry.isFile()) continue;

@@ -8,6 +8,46 @@ Rule-specific versioning policy: a new rule at `severity: error` is a major
 change; at `severity: warn`, a minor one. Rules are retired via `deprecated:`
 rather than deletion, and stay documented for one major cycle.
 
+## [Unreleased]
+
+## [1.0.1] - 2026-10-02
+
+### Fixed
+
+- **`skips-need-a-reason`** accepted only a plain string or a template without
+  `${}` as the reason. It now accepts any second argument that is not an empty
+  string, so `${reason}`, a constant, `reason ?? ''` and a concatenation no longer
+  warn. An options object or the test body in that position still does not count.
+- **Next.js detection** required only a `"next":` key anywhere in a `package.json`.
+  It now requires `next` among the dependencies.
+- **Files written by a root process** (`.cue/install.json`, `.agent-kb/`) are
+  handed to the owner of the project directory, so a later run as that user can
+  update them.
+
+### Added
+
+- **Laravel adapter** for `cue extract`: reads `routes/*.php` (`Route::get` and the
+  other verbs, `prefix` groups, `resource` and `apiResource`) and cites the
+  controller action as `file:line`. The scanner now reads `.php` files.
+- **`cue extract --openapi <file>`** reads a named OpenAPI document, such as the one
+  `artisan l5-swagger:generate` writes. `api-docs.json` is also recognised when
+  found in the source tree.
+- **`cue extract --exclude <dirs>`** leaves directories out of the scan, for nested
+  projects such as app templates that are not the product.
+- **`cue extract --dry-run`** reports what it would write and writes nothing.
+- **`existing-tests`** also reads the Playwright tests in the directory Cue runs in,
+  not only those under `--source`.
+
+### Changed
+
+- **ESLint setup is two files.** `eslint.cue.mjs` belongs to Cue and `cue sync`
+  rewrites it. `eslint.config.mjs` belongs to you: `init` creates it when absent, or
+  adds one import and one `...cue` spread to an existing `export default [` config,
+  and Cue does not change it afterwards. `cue doctor` prints the line to add when
+  the import is missing; `remove` leaves the import in your config and reports it.
+  In an existing installation the first `sync` creates `eslint.cue.mjs` and
+  `doctor` reports the import to add.
+
 ## [1.0.0] - 2026-10-02
 
 The first release. Everything below is new.
@@ -311,4 +351,5 @@ tested application actually looks like.
   — two translation files giving different labels for one key, say — the first
   value stays and the disagreement is kept with the evidence on each side.
 
+[1.0.1]: https://github.com/wiluszdamian/cue/releases/tag/v1.0.1
 [1.0.0]: https://github.com/wiluszdamian/cue/releases/tag/v1.0.0

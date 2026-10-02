@@ -6,6 +6,7 @@ import { isTargetId } from './agents.js';
 import { COMMANDS } from './commands.js';
 import { formatReport, runChecks, summarise } from './doctor.js';
 import { describePlan, planInit, resolveRules, runInit } from './init.js';
+import { configImportsOverlay, OVERLAY_PATH } from './eslint-overlay.js';
 import { removeFiles } from './install.js';
 import {
   filesForTarget,
@@ -95,7 +96,11 @@ Options
   --from <file>        survey from a captured snapshot instead of a browser
   --playwright-cli <p> use this playwright-cli (a script or executable) for survey/verify
   --source <path>      where the product source lives (extract)
-  --adapter <a,b>      restrict extract to named adapters
+  --adapter <a,b>      restrict extract to named adapters (nextjs, laravel, openapi, i18n, ...)
+  --exclude <a,b>      extract: directories of the source to skip, e.g. resources/apps (template
+                       apps that would be mistaken for the product)
+  --openapi <file>     extract: read this OpenAPI document too, e.g. the one written by
+                       artisan l5-swagger:generate (storage/api-docs/api-docs.json)
   --base-url <url>     environment to verify the map against, or to survey routes of
                        (or set CUE_BASE_URL)
   --env <name>         name this environment (staging) in what survey and verify record
@@ -106,7 +111,7 @@ Options
   --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked);
                        with survey, the pages to look at again
   --stale              survey: the pages with something stale or read from changed code
-  --dry-run            survey: show the plan, open nothing
+  --dry-run            survey: show the plan, open nothing; extract: report, write nothing
   --refresh            mark unchanged routes as verified now
   --package-manager <npm|pnpm|yarn|bun>
   --cwd <path>         project root (default: current directory)
@@ -466,9 +471,26 @@ async function main(): Promise<number> {
         .map((id) => id.trim())
         .filter((id) => id.length > 0);
 
+      const list = (name: string): string[] | undefined => {
+        const values = asString(flags[name])
+          ?.split(',')
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0);
+        return values !== undefined && values.length > 0 ? values : undefined;
+      };
+      const exclude = list('exclude');
+      const openapi = asString(flags['openapi']);
+
       out(
         formatExtractResult(
-          extract({ projectRoot, sourceRoot: source, ...(only ? { only } : {}) }),
+          extract({
+            projectRoot,
+            sourceRoot: source,
+            ...(only ? { only } : {}),
+            ...(exclude ? { exclude } : {}),
+            ...(openapi === undefined ? {} : { openapi }),
+            ...(flags['dry-run'] === true ? { dryRun: true } : {}),
+          }),
         ),
       );
       return 0;
@@ -642,6 +664,11 @@ async function main(): Promise<number> {
 
       out(`Removed ${getTarget(id).name}: ${removal.removed.length} file(s).`);
       for (const kept of removal.kept) out(`  kept ${kept.path} — ${kept.reason}`);
+      if (removal.removed.includes(OVERLAY_PATH) && configImportsOverlay(projectRoot)) {
+        out(
+          `  ${OVERLAY_PATH} is gone but your ESLint config still imports it: remove that import and the spread by hand.`,
+        );
+      }
       return 0;
     }
 
@@ -668,6 +695,11 @@ async function main(): Promise<number> {
       });
       out(`Removed ${removal.removed.length} file(s).`);
       for (const kept of removal.kept) out(`  kept ${kept.path} — ${kept.reason}`);
+      if (removal.removed.includes(OVERLAY_PATH) && configImportsOverlay(projectRoot)) {
+        out(
+          `  ${OVERLAY_PATH} is gone but your ESLint config still imports it: remove that import and the spread by hand.`,
+        );
+      }
       out(`\nThe manifest at .cue/ is left for you to delete.`);
       return 0;
     }

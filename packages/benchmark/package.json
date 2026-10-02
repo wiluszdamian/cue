@@ -1,6 +1,6 @@
 {
   "name": "@wiluszdamian/cue-benchmark",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Does Cue actually change what an assistant writes? This measures it.",
   "license": "MIT",

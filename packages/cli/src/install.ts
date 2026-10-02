@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { adoptOwner } from '@wiluszdamian/cue-engine';
 import type { TargetId } from './agents.js';
+import { wireOverlay } from './eslint-overlay.js';
 import { hashContent, type FileState, type Manifest, type ManagedFile } from './manifest.js';
 
 /**
@@ -16,6 +18,11 @@ export interface DesiredFile {
   /** The only way an existing file is modified, so removal is an exact reversal. */
   readonly region?: { readonly begin: string; readonly end: string };
   readonly reason: string;
+  /**
+   * The user's file, created once when absent. Never tracked in the manifest, never
+   * updated, never removed: what is there afterwards belongs to them.
+   */
+  readonly seed?: boolean;
 }
 
 export type PlanAction =
@@ -91,6 +98,10 @@ export function planFile(
 ): PlannedFile {
   const state = inspect(projectRoot, file, manifest);
 
+  if (file.seed) {
+    return { file, action: state.kind === 'absent' ? 'create' : 'unchanged', state };
+  }
+
   switch (state.kind) {
     case 'absent':
       return { file, action: 'create', state };
@@ -123,6 +134,8 @@ export interface ApplyOptions {
   readonly cueVersion: string;
   /** Overwrite conflicts. Only ever set from an explicit user instruction. */
   readonly force?: boolean;
+  /** `init` only: wire the overlay into a config the user already has. `sync` never does. */
+  readonly wire?: boolean;
 }
 
 export interface ApplyResult {
@@ -147,6 +160,23 @@ export function apply(plan: Plan, options: ApplyOptions): ApplyResult {
     }
 
     const absolute = join(options.projectRoot, file.path);
+
+    if (file.seed) {
+      if (action === 'create') {
+        mkdirSync(dirname(absolute), { recursive: true });
+        writeFileSync(absolute, file.content, 'utf8');
+        adoptOwner(absolute, options.projectRoot);
+        written.push(file.path);
+      } else if (options.wire === true && file.path.startsWith('eslint.config.')) {
+        const wired = wireOverlay(readFileSync(absolute, 'utf8'));
+        if (wired !== undefined) {
+          writeFileSync(absolute, wired, 'utf8');
+          written.push(file.path);
+        }
+      }
+      continue;
+    }
+
     mkdirSync(dirname(absolute), { recursive: true });
 
     if (file.region) {
@@ -159,6 +189,7 @@ export function apply(plan: Plan, options: ApplyOptions): ApplyResult {
     } else if (action !== 'unchanged') {
       writeFileSync(absolute, file.content, 'utf8');
     }
+    adoptOwner(absolute, options.projectRoot);
 
     if (action !== 'unchanged') written.push(file.path);
 

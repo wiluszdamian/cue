@@ -10,6 +10,7 @@ export {
   ADAPTERS,
   existingTestsAdapter,
   i18nAdapter,
+  laravelAdapter,
   nextAdapter,
   openApiAdapter,
   testIdAdapter,
