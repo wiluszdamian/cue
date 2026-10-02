@@ -7,17 +7,19 @@
       name="description"
       content="Cue gives your AI agent your team's Playwright rules as ESLint rules, and a map of your app's real routes and selectors."
     />
+    <link rel="icon" href="brand/cue-mark-light.svg" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="brand/cue-mark-dark.svg" media="(prefers-color-scheme: dark)" />
     <title>Cue: Playwright rules and an app map for AI agents</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,300..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap"
       rel="stylesheet"
     />
     <style>
-      /* Layout: a stage manager's prompt book. A narrow margin column carries cue
-     numbers and pencil notes; the wide column carries the script. One face,
-     Martian Mono, does everything through its width and weight axes. */
+      /* Layout: a stage manager's prompt book. A narrow margin column carries pencil
+     notes; the wide column carries the script. One family, Recursive, does all
+     of it: casual and heavy for headings, linear for reading, mono for code. */
       :root {
         --paper: #f3f5f7;
         --sheet: #fbfcfd;
@@ -27,16 +29,22 @@
         --blue: #2547c9;
         --standby: #d23a2c;
         --go: #17894f;
-        --console: #0e1620;
+        --console: #0d141c;
+        --console-2: #121b25;
+        --console-edge: #223142;
         --console-ink: #dbe3ec;
-        --console-dim: #6f8193;
-        --font: 'Martian Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-        --step--1: 0.78rem;
-        --step-0: 0.9rem;
-        --step-1: 1.05rem;
-        --step-2: 1.5rem;
-        --step-3: clamp(1.9rem, 4.2vw, 2.9rem);
-        --step-4: clamp(2.1rem, 5.4vw, 4.2rem);
+        --console-dim: #71839a;
+        --term-green: #6be3a2;
+        --term-red: #ff8a80;
+        --term-blue: #9fb4ff;
+        --term-amber: #f4c873;
+        --font: 'Recursive', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --step--1: 0.84rem;
+        --step-0: 1rem;
+        --step-1: 1.16rem;
+        --step-2: 1.6rem;
+        --step-3: clamp(2rem, 4.4vw, 3.1rem);
+        --step-4: clamp(2.5rem, 6vw, 4.6rem);
       }
       @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
@@ -48,7 +56,9 @@
           --blue: #86a2ff;
           --standby: #ff5d50;
           --go: #3fd68a;
-          --console: #070c11;
+          --console: #070c12;
+          --console-2: #0d151e;
+          --console-edge: #1f2e3e;
           color-scheme: dark;
         }
       }
@@ -61,7 +71,9 @@
         --blue: #86a2ff;
         --standby: #ff5d50;
         --go: #3fd68a;
-        --console: #070c11;
+        --console: #070c12;
+        --console-2: #0d151e;
+        --console-edge: #1f2e3e;
         color-scheme: dark;
       }
 
@@ -75,10 +87,12 @@
         background: var(--paper);
         color: var(--ink);
         font-family: var(--font);
+        font-variation-settings:
+          'CASL' 0,
+          'MONO' 0;
         font-size: var(--step-0);
-        font-stretch: 87.5%;
         font-weight: 400;
-        line-height: 1.7;
+        line-height: 1.65;
         -webkit-font-smoothing: antialiased;
       }
       a {
@@ -89,9 +103,17 @@
         outline: 2px solid var(--blue);
         outline-offset: 3px;
       }
-      code {
-        font-family: inherit;
-        font-stretch: 87.5%;
+      code,
+      pre,
+      kbd,
+      .mono,
+      .label,
+      .crumb,
+      .group-title {
+        font-family: var(--font);
+        font-variation-settings:
+          'CASL' 0,
+          'MONO' 1;
       }
       .page {
         max-width: 1180px;
@@ -104,81 +126,208 @@
         }
       }
 
-      /* ---------- Top bar ---------- */
+      /* ---------- Navbar ---------- */
       .bar {
         position: sticky;
         top: env(safe-area-inset-top, 0px);
-        z-index: 10;
-        background: color-mix(in srgb, var(--paper) 88%, transparent);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--rule);
+        z-index: 20;
+        background: color-mix(in srgb, var(--paper) 82%, transparent);
+        backdrop-filter: saturate(1.5) blur(12px);
+        -webkit-backdrop-filter: saturate(1.5) blur(12px);
+        border-bottom: 1px solid transparent;
+        transition:
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
       }
-      .bar .page {
+      .bar.scrolled {
+        border-bottom-color: var(--rule);
+        box-shadow: 0 6px 24px -18px rgba(10, 20, 30, 0.45);
+      }
+      .bar-inner {
         display: flex;
         align-items: center;
-        gap: 24px;
-        height: 58px;
+        gap: 20px;
+        height: 64px;
       }
-      .wordmark {
+      .brand {
+        display: flex;
+        align-items: center;
+        color: var(--ink);
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      .brand svg {
+        height: 28px;
+        width: auto;
+        display: block;
+      }
+      .lamp-dot {
+        fill: var(--lamp, var(--standby));
+        transition: fill 0.3s ease;
+      }
+      .bar.go {
+        --lamp: var(--go);
+      }
+      .links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 20px;
+      }
+      .links a {
+        position: relative;
+        color: var(--pencil);
+        text-decoration: none;
+        font-size: 0.92rem;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition:
+          color 0.2s ease,
+          background 0.2s ease;
+      }
+      .links a:hover {
+        color: var(--ink);
+        background: color-mix(in srgb, var(--ink) 6%, transparent);
+      }
+      .links a.current {
+        color: var(--ink);
+      }
+      .links a.current::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 2px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--standby);
+      }
+      .bar-tools {
+        margin-left: auto;
         display: flex;
         align-items: center;
         gap: 10px;
-        font-weight: 800;
-        font-stretch: 75%;
-        font-size: 1.25rem;
-        letter-spacing: -0.02em;
-        color: var(--ink);
-        text-decoration: none;
       }
-      .lamp {
+      .theme-switch {
+        display: inline-flex;
+        padding: 3px;
+        gap: 2px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--ink) 6%, transparent);
+      }
+      .theme-switch button {
+        width: 30px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--pencil);
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+      .theme-switch button:hover {
+        color: var(--ink);
+      }
+      .theme-switch button[aria-checked='true'] {
+        background: var(--sheet);
+        color: var(--ink);
+        box-shadow: 0 1px 3px rgba(10, 20, 30, 0.18);
+      }
+      .theme-switch svg {
+        width: 15px;
+        height: 15px;
+      }
+      .icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--ink);
+        padding: 7px 8px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.2s ease;
+      }
+      .icon-link:hover {
+        background: color-mix(in srgb, var(--ink) 6%, transparent);
+      }
+      .icon-link .gh {
+        width: 20px;
+        height: 20px;
+      }
+      .icon-link .ext {
         width: 11px;
         height: 11px;
-        border-radius: 50%;
-        background: var(--standby);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--standby) 22%, transparent);
-        transition:
-          background 0.25s ease,
-          box-shadow 0.25s ease;
-      }
-      .lamp.go {
-        background: var(--go);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--go) 22%, transparent);
-      }
-      .bar nav {
-        display: flex;
-        gap: 22px;
-        font-size: var(--step--1);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-      .bar nav a {
         color: var(--pencil);
+        transition: transform 0.2s ease;
+      }
+      .icon-link:hover .ext {
+        transform: translate(1px, -1px);
+      }
+      .btn-start {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--paper);
+        background: var(--ink);
+        padding: 8px 14px;
+        border-radius: 999px;
         text-decoration: none;
+        white-space: nowrap;
+        transition: transform 0.2s ease;
       }
-      .bar nav a:hover {
-        color: var(--ink);
+      .btn-start:hover {
+        transform: translateY(-1px);
       }
-      .spacer {
-        flex: 1;
-      }
-      .ghost {
-        font: inherit;
-        font-size: var(--step--1);
-        color: var(--ink);
-        background: transparent;
+      .menu-btn {
+        display: none;
+        width: 38px;
+        height: 38px;
         border: 1px solid var(--rule);
-        padding: 6px 12px;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--ink);
         cursor: pointer;
-        text-decoration: none;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+        place-items: center;
       }
-      .ghost:hover {
-        border-color: var(--ink);
+      .menu-btn svg {
+        width: 18px;
+        height: 18px;
       }
-      @media (max-width: 820px) {
-        .bar nav {
+      @media (max-width: 900px) {
+        .links {
           display: none;
+          position: absolute;
+          top: 64px;
+          left: 0;
+          right: 0;
+          margin: 0;
+          padding: 10px 16px 16px;
+          flex-direction: column;
+          align-items: stretch;
+          background: var(--paper);
+          border-bottom: 1px solid var(--rule);
+        }
+        .links.open {
+          display: flex;
+        }
+        .links a {
+          padding: 12px;
+          font-size: 1rem;
+        }
+        .menu-btn {
+          display: grid;
+        }
+      }
+      @media (max-width: 480px) {
+        .btn-start {
+          display: none;
+        }
+        .bar-inner {
+          gap: 10px;
         }
       }
 
@@ -200,7 +349,6 @@
       .margin .cue-no {
         display: block;
         font-weight: 800;
-        font-stretch: 75%;
         font-size: var(--step-2);
         color: var(--ink);
         line-height: 1;
@@ -235,7 +383,6 @@
       h2,
       h3 {
         font-weight: 800;
-        font-stretch: 75%;
         letter-spacing: -0.03em;
         line-height: 1.02;
         text-wrap: balance;
@@ -276,89 +423,173 @@
 
       /* ---------- Hero ---------- */
       .hero {
-        padding-block: 72px 80px;
+        padding-block: 76px 88px;
         display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
         gap: 56px;
-        align-items: start;
+        align-items: center;
         border-bottom: 1px solid var(--rule);
       }
       .hero h1 .soft {
+        display: block;
         color: var(--pencil);
-        font-weight: 300;
+        font-variation-settings:
+          'CASL' 0.4,
+          'MONO' 0;
+        font-weight: 400;
       }
       .hero .stack {
         gap: 26px;
       }
-      @media (max-width: 980px) {
+      @media (max-width: 1000px) {
         .hero {
           grid-template-columns: minmax(0, 1fr);
-          gap: 40px;
+          gap: 44px;
           padding-block: 48px 64px;
         }
       }
-
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: stretch;
+      }
       .install {
         display: flex;
-        align-items: stretch;
-        border: 1.5px solid var(--ink);
+        align-items: center;
+        gap: 4px;
+        border: 1px solid var(--rule);
         background: var(--sheet);
+        border-radius: 12px;
+        padding: 6px 6px 6px 16px;
         max-width: 100%;
-        width: fit-content;
+        min-width: 0;
+        box-shadow: 0 1px 2px rgba(10, 20, 30, 0.05);
       }
       .install code {
-        padding: 14px 18px;
-        font-size: var(--step-0);
-        font-weight: 500;
+        font-size: 0.9rem;
         white-space: nowrap;
         overflow-x: auto;
         min-width: 0;
+        padding-right: 8px;
       }
       .install code::before {
         content: '$ ';
         color: var(--pencil);
       }
       .copy {
-        font: inherit;
-        font-size: var(--step--1);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        border: 0;
-        border-left: 1.5px solid var(--ink);
-        background: var(--ink);
-        color: var(--paper);
-        padding: 0 16px;
-        cursor: pointer;
         flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--pencil);
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
       }
       .copy:hover {
-        background: var(--blue);
+        background: color-mix(in srgb, var(--ink) 7%, transparent);
+        color: var(--ink);
       }
-      .copy.done {
-        background: var(--go);
+      .copy svg {
+        width: 16px;
+        height: 16px;
       }
-      .handoff {
-        border-left: 2px solid var(--rule);
-        padding-left: 16px;
-        display: grid;
-        gap: 6px;
-        max-width: 60ch;
+      .copy .i-check,
+      .copy.done .i-copy {
+        display: none;
       }
-      .handoff p {
-        color: var(--pencil);
-        font-size: var(--step--1);
+      .copy.done .i-check {
+        display: block;
+        color: var(--go);
       }
-      .linkish {
+      .prompt-btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
         font: inherit;
-        font-size: var(--step--1);
-        background: none;
+        font-weight: 600;
+        font-size: 0.92rem;
+        color: var(--paper);
+        background: var(--ink);
         border: 0;
-        padding: 0;
-        color: var(--blue);
+        border-radius: 12px;
+        padding: 10px 16px 10px 10px;
         cursor: pointer;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        justify-self: start;
+        transition: transform 0.2s ease;
+      }
+      .prompt-btn:hover {
+        transform: translateY(-1px);
+      }
+      .agents-stack {
+        display: flex;
+      }
+      .agents-stack span {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: #111;
+        box-shadow: 0 0 0 2px var(--ink);
+        transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+      }
+      .agents-stack span + span {
+        margin-left: -7px;
+      }
+      .agents-stack svg {
+        width: 16px;
+        height: 16px;
+      }
+      .prompt-btn:hover .agents-stack span:nth-child(1) {
+        transform: translateX(-3px);
+      }
+      .prompt-btn:hover .agents-stack span:nth-child(3) {
+        transform: translateX(3px);
+      }
+      .prompt-btn .done-text {
+        display: none;
+      }
+      .prompt-btn.done .idle-text {
+        display: none;
+      }
+      .prompt-btn.done .done-text {
+        display: inline;
+      }
+      .prompt-peek {
+        position: absolute;
+        left: 0;
+        top: calc(100% + 10px);
+        width: min(440px, 86vw);
+        text-align: left;
+        font-weight: 400;
+        font-size: 0.82rem;
+        line-height: 1.55;
+        color: var(--ink);
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 18px 40px -20px rgba(10, 20, 30, 0.5);
+        opacity: 0;
+        transform: translateY(-4px);
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        z-index: 5;
+      }
+      .prompt-btn:hover .prompt-peek,
+      .prompt-btn:focus-visible .prompt-peek {
+        opacity: 1;
+        transform: none;
       }
       .meta-row {
         display: flex;
@@ -368,99 +599,175 @@
         color: var(--pencil);
       }
 
-      /* ---------- Show-calling console ---------- */
-      .console {
-        background: var(--console);
+      /* ---------- Terminal windows ---------- */
+      .term {
+        --pad: 20px;
+        background: linear-gradient(180deg, var(--console-2), var(--console));
         color: var(--console-ink);
-        font-size: 0.76rem;
-        line-height: 1.75;
+        border: 1px solid var(--console-edge);
+        border-radius: 14px;
+        overflow: hidden;
         min-width: 0;
-        position: relative;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 30px 60px -30px rgba(5, 12, 20, 0.55),
+          0 12px 24px -16px rgba(5, 12, 20, 0.4);
+        font-family: var(--font);
+        font-variation-settings:
+          'CASL' 0,
+          'MONO' 1;
       }
-      .console-head {
+      .term-bar {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        border-bottom: 1px solid #1d2a37;
-        font-size: var(--step--1);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
+        gap: 8px;
+        height: 40px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--console-edge);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .term-dots {
+        display: flex;
+        gap: 7px;
+      }
+      .term-dots i {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #2a3746;
+      }
+      .term-dots i:nth-child(1) {
+        background: #ff5f57;
+      }
+      .term-dots i:nth-child(2) {
+        background: #febc2e;
+      }
+      .term-dots i:nth-child(3) {
+        background: #28c840;
+      }
+      .term-title {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.74rem;
+        color: var(--console-dim);
+        white-space: nowrap;
+      }
+      .term-side {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.7rem;
         color: var(--console-dim);
       }
-      .console-head .lamp {
-        width: 14px;
-        height: 14px;
-      }
-      .console-head .state {
-        color: var(--console-ink);
-        font-weight: 700;
-        min-width: 7ch;
-      }
-      .console-head .spacer {
-        flex: 1;
-      }
-      .console-head button {
-        font: inherit;
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
+      .cue-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 9px 2px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--console-edge);
         text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.64rem;
+        color: var(--console-ink);
+      }
+      .cue-pill i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--term-red);
+        box-shadow: 0 0 8px var(--term-red);
+        transition:
+          background 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .cue-pill.go i {
+        background: var(--term-green);
+        box-shadow: 0 0 8px var(--term-green);
+      }
+      .term-side button {
+        font: inherit;
+        font-size: 0.66rem;
         background: transparent;
         color: var(--console-dim);
-        border: 1px solid #253546;
-        padding: 3px 9px;
+        border: 1px solid var(--console-edge);
+        border-radius: 6px;
+        padding: 2px 8px;
         cursor: pointer;
       }
-      .console-head button:hover {
+      .term-side button:hover {
         color: var(--console-ink);
       }
-      .script {
-        padding: 14px 0 18px;
-        overflow-x: auto;
+      @media (max-width: 520px) {
+        .term-title {
+          display: none;
+        }
       }
-      .ln {
-        display: grid;
-        grid-template-columns: 4.5ch minmax(0, 1fr);
-        gap: 10px;
-        padding: 0 16px;
+      .term-body {
+        margin: 0;
+        padding: 16px var(--pad) 20px;
+        font-size: 0.8rem;
+        line-height: 1.75;
         white-space: pre;
-        transition:
-          opacity 0.35s ease,
-          background 0.35s ease;
+        overflow-x: auto;
+        tab-size: 2;
       }
-      .ln .who {
-        color: var(--console-dim);
-        font-weight: 700;
+      .hero .term-body {
+        min-height: 26.5em;
       }
-      .ln.call .txt {
-        font-weight: 700;
+      .t-prompt {
+        color: var(--term-green);
       }
-      .ln.call.standby .txt {
-        color: #ff8a80;
+      .t-path {
+        color: var(--term-blue);
       }
-      .ln.call.go .txt {
-        color: #6be3a2;
+      .t-cmd {
+        color: #fff;
       }
-      .ln .d {
+      .t-dim {
         color: var(--console-dim);
       }
-      .ln .ok {
-        color: #6be3a2;
+      .t-ok {
+        color: var(--term-green);
       }
-      .ln .bad {
-        color: #ff8a80;
+      .t-bad {
+        color: var(--term-red);
       }
-      .ln .hl {
-        color: #a9bcff;
+      .t-hl {
+        color: var(--term-blue);
       }
-      .console.running .ln {
-        opacity: 0.28;
+      .t-warn {
+        color: var(--term-amber);
       }
-      .console.running .ln.on {
-        opacity: 1;
+      .t-errline {
+        display: inline-block;
+        width: calc(100% + 2 * var(--pad));
+        margin-inline: calc(-1 * var(--pad));
+        padding-inline: calc(var(--pad) - 2px) var(--pad);
+        border-left: 2px solid var(--term-red);
+        background: rgba(255, 93, 80, 0.1);
       }
-      .console.running .ln.now {
-        background: rgba(134, 162, 255, 0.08);
+      .caret {
+        display: inline-block;
+        width: 0.6em;
+        height: 1.15em;
+        vertical-align: -0.2em;
+        background: var(--console-ink);
+        animation: blink 1.05s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .ln-no {
+        display: inline-block;
+        width: 2.2em;
+        color: #3b4b5c;
+        user-select: none;
       }
 
       /* ---------- Correction (pencil strike) ---------- */
@@ -560,7 +867,6 @@
       }
       td.no {
         font-weight: 800;
-        font-stretch: 75%;
         font-size: var(--step-1);
         white-space: nowrap;
         font-variant-numeric: tabular-nums;
@@ -779,43 +1085,6 @@
         color: var(--pencil);
       }
 
-      /* ---------- Theme switch ---------- */
-      .theme-switch {
-        display: inline-flex;
-        border: 1px solid var(--rule);
-        padding: 2px;
-        gap: 2px;
-      }
-      .theme-switch button {
-        font: inherit;
-        font-size: 0.68rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        background: transparent;
-        color: var(--pencil);
-        border: 0;
-        padding: 4px 9px;
-        cursor: pointer;
-        transition:
-          background 0.2s ease,
-          color 0.2s ease;
-      }
-      .theme-switch button:hover {
-        color: var(--ink);
-      }
-      .theme-switch button[aria-checked='true'] {
-        background: var(--ink);
-        color: var(--paper);
-      }
-      .bar nav a.nav-docs {
-        color: var(--blue);
-      }
-      @media (max-width: 560px) {
-        .hide-sm {
-          display: none;
-        }
-      }
-
       /* ---------- Docs (Mintlify-style three columns) ---------- */
       .docs {
         max-width: 1320px;
@@ -831,9 +1100,9 @@
       .docs-side,
       .docs-toc {
         position: sticky;
-        top: calc(58px + env(safe-area-inset-top, 0px));
+        top: calc(64px + env(safe-area-inset-top, 0px));
         align-self: start;
-        max-height: calc(100vh - 58px);
+        max-height: calc(100vh - 64px);
         overflow-y: auto;
         padding-block: 28px;
       }
@@ -1245,6 +1514,150 @@
         display: none !important;
       }
 
+      /* ---------- Typography overrides (Recursive) ---------- */
+      h1,
+      h2,
+      h3 {
+        font-variation-settings:
+          'CASL' 1,
+          'MONO' 0;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+      }
+      h3 {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .lede {
+        font-size: var(--step-1);
+      }
+      .margin .note {
+        font-style: normal;
+        font-variation-settings:
+          'CASL' 1,
+          'MONO' 0;
+      }
+      td.no,
+      .margin .cue-no {
+        font-variation-settings:
+          'CASL' 1,
+          'MONO' 0;
+      }
+      .label {
+        font-size: 0.74rem;
+      }
+
+      /* ---------- Code blocks share the terminal look ---------- */
+      .docs-main pre.code,
+      .codegroup {
+        background: linear-gradient(180deg, var(--console-2), var(--console));
+        border: 1px solid var(--console-edge);
+        border-radius: 12px;
+        overflow: hidden;
+        font-size: 0.8rem;
+        box-shadow: 0 16px 32px -24px rgba(5, 12, 20, 0.6);
+      }
+      .docs-main pre.code code::before {
+        content: '❯ ';
+        color: var(--term-green);
+      }
+      .codegroup .tabs {
+        border-bottom-color: var(--console-edge);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .codegroup .tabs button[aria-selected='true'] {
+        border-bottom-color: var(--term-green);
+      }
+      .term + .term {
+        margin-top: 0;
+      }
+
+      /* ---------- Footer ---------- */
+      .site-foot {
+        border-top: 1px solid var(--rule);
+        padding-block: 56px 32px;
+        font-size: var(--step--1);
+        color: var(--pencil);
+      }
+      .foot-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+        gap: 32px;
+      }
+      .foot-brand {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+      .foot-brand svg {
+        height: 26px;
+        width: auto;
+        color: var(--ink);
+        display: block;
+      }
+      .foot-brand p {
+        max-width: 36ch;
+      }
+      .author a {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .site-foot nav {
+        display: grid;
+        gap: 8px;
+        align-content: start;
+      }
+      .foot-h {
+        color: var(--ink);
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .site-foot nav a {
+        color: var(--pencil);
+        text-decoration: none;
+      }
+      .site-foot nav a:hover {
+        color: var(--ink);
+      }
+      .foot-bottom {
+        margin-top: 44px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px 24px;
+        font-size: 0.78rem;
+      }
+      @media (max-width: 760px) {
+        .foot-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .foot-brand {
+          grid-column: 1 / -1;
+        }
+      }
+
+      /* ---------- Shared rounding ---------- */
+      .search,
+      .dcard,
+      .callout,
+      .table,
+      .sheet-wrap,
+      .correction,
+      .pager a,
+      .helpful button,
+      .chips span {
+        border-radius: 10px;
+      }
+      .docs-nav a {
+        border-radius: 0 8px 8px 0;
+      }
+      .steps li::before {
+        border-radius: 50%;
+      }
+      .verdict {
+        border-radius: 6px;
+      }
+
       /* ---------- Load sequence ---------- */
       @keyframes rise {
         from {
@@ -1267,7 +1680,7 @@
       .js .hero .stack > *:nth-child(5) {
         animation-delay: 0.32s;
       }
-      .js .hero .console {
+      .js .hero .term {
         animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
       }
 
@@ -1285,50 +1698,210 @@
     </style>
   </head>
   <body>
-    <header class="bar">
-      <div class="page">
-        <a class="wordmark" href="#top"
-          ><span class="lamp" id="bar-lamp" aria-hidden="true"></span>Cue</a
-        >
-        <nav aria-label="Sections">
-          <a href="#running-order">Running order</a>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-copy" viewBox="0 0 24 24">
+          <rect
+            x="9"
+            y="9"
+            width="11"
+            height="11"
+            rx="2.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="M15 9V6.5A2.5 2.5 0 0 0 12.5 4h-6A2.5 2.5 0 0 0 4 6.5v6A2.5 2.5 0 0 0 6.5 15H9"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path
+            d="M5 12.5l4.5 4.5L19 7.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <path
+            d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M5.3 18.7l1.5-1.5M17.2 6.8l1.5-1.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24">
+          <path
+            d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+        </symbol>
+        <symbol id="i-auto" viewBox="0 0 24 24">
+          <rect
+            x="3"
+            y="4.5"
+            width="18"
+            height="12.5"
+            rx="2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="M8.5 20.5h7M12 17v3.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </symbol>
+        <symbol id="i-ext" viewBox="0 0 12 12">
+          <path
+            d="M3.5 2.5h6v6M9.5 2.5l-7 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24">
+          <path
+            d="M4 7h16M4 12h16M4 17h16"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </symbol>
+        <symbol id="i-github" viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+          />
+        </symbol>
+        <symbol id="i-claude" viewBox="0 0 24 24">
+          <path
+            d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z"
+            fill="#D97757"
+            fill-rule="nonzero"
+          ></path>
+        </symbol>
+        <symbol id="i-codex" viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M8.086.457a6.105 6.105 0 013.046-.415c1.333.153 2.521.72 3.564 1.7a.117.117 0 00.107.029c1.408-.346 2.762-.224 4.061.366l.063.03.154.076c1.357.703 2.33 1.77 2.918 3.198.278.679.418 1.388.421 2.126a5.655 5.655 0 01-.18 1.631.167.167 0 00.04.155 5.982 5.982 0 011.578 2.891c.385 1.901-.01 3.615-1.183 5.14l-.182.22a6.063 6.063 0 01-2.934 1.851.162.162 0 00-.108.102c-.255.736-.511 1.364-.987 1.992-1.199 1.582-2.962 2.462-4.948 2.451-1.583-.008-2.986-.587-4.21-1.736a.145.145 0 00-.14-.032c-.518.167-1.04.191-1.604.185a5.924 5.924 0 01-2.595-.622 6.058 6.058 0 01-2.146-1.781c-.203-.269-.404-.522-.551-.821a7.74 7.74 0 01-.495-1.283 6.11 6.11 0 01-.017-3.064.166.166 0 00.008-.074.115.115 0 00-.037-.064 5.958 5.958 0 01-1.38-2.202 5.196 5.196 0 01-.333-1.589 6.915 6.915 0 01.188-2.132c.45-1.484 1.309-2.648 2.577-3.493.282-.188.55-.334.802-.438.286-.12.573-.22.861-.304a.129.129 0 00.087-.087A6.016 6.016 0 015.635 2.31C6.315 1.464 7.132.846 8.086.457zm-.804 7.85a.848.848 0 00-1.473.842l1.694 2.965-1.688 2.848a.849.849 0 001.46.864l1.94-3.272a.849.849 0 00.007-.854l-1.94-3.393zm5.446 6.24a.849.849 0 000 1.695h4.848a.849.849 0 000-1.696h-4.848z"
+          ></path>
+        </symbol>
+        <symbol id="i-cursor" viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            d="M22.106 5.68L12.5.135a.998.998 0 00-.998 0L1.893 5.68a.84.84 0 00-.419.726v11.186c0 .3.16.577.42.727l9.607 5.547a.999.999 0 00.998 0l9.608-5.547a.84.84 0 00.42-.727V6.407a.84.84 0 00-.42-.726zm-.603 1.176L12.228 22.92c-.063.108-.228.064-.228-.061V12.34a.59.59 0 00-.295-.51l-9.11-5.26c-.107-.062-.063-.228.062-.228h18.55c.264 0 .428.286.296.514z"
+          ></path>
+        </symbol>
+        <symbol id="cue-logo" viewBox="0 0 94 32">
+          <path
+            d="M20.89 10.21A9 9 0 1 0 20.89 21.79"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="4.6"
+            stroke-linecap="round"
+          />
+          <circle class="lamp-dot" cx="25.6" cy="16" r="3.4" />
+          <g
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M51.95 12.05A7 7 0 1 0 51.95 21.95" />
+            <path d="M58 10V18A5.5 5.5 0 0 0 69 18V10M69 18V24" />
+            <path d="M75 17H89A7 7 0 1 0 87.36 21.5" />
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+
+    <header class="bar" id="bar">
+      <div class="page bar-inner">
+        <a class="brand" href="#top" aria-label="Cue home"
+          ><svg viewBox="0 0 94 32" role="img" aria-label="Cue"><use href="#cue-logo" /></svg
+        ></a>
+        <nav class="links" id="links" aria-label="Sections">
+          <a href="#running-order">How it works</a>
           <a href="#rules">Rules</a>
-          <a href="#map">Map</a>
+          <a href="#map">App map</a>
           <a href="#who">Who decides</a>
           <a href="#faq">FAQ</a>
-          <a href="#docs" class="nav-docs">Docs</a>
+          <a href="#docs" data-docs-link>Docs</a>
         </nav>
-        <span class="spacer"></span>
-        <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+        <div class="bar-tools">
+          <div class="theme-switch" role="radiogroup" aria-label="Colour theme">
+            <button
+              type="button"
+              role="radio"
+              data-theme-set="system"
+              aria-checked="true"
+              aria-label="Match system"
+              title="Match system"
+            >
+              <svg><use href="#i-auto" /></svg>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              data-theme-set="light"
+              aria-checked="false"
+              aria-label="Light"
+              title="Light"
+            >
+              <svg><use href="#i-sun" /></svg>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              data-theme-set="dark"
+              aria-checked="false"
+              aria-label="Dark"
+              title="Dark"
+            >
+              <svg><use href="#i-moon" /></svg>
+            </button>
+          </div>
+          <a
+            class="icon-link"
+            href="https://github.com/wiluszdamian/project-cue"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Cue on GitHub (opens in a new tab)"
+            title="GitHub"
+            ><svg class="gh"><use href="#i-github" /></svg
+            ><svg class="ext"><use href="#i-ext" /></svg
+          ></a>
+          <a class="btn-start" href="#docs-quickstart">Get started</a>
           <button
+            class="menu-btn"
+            id="menu-btn"
             type="button"
-            role="radio"
-            data-theme-set="system"
-            aria-checked="true"
-            title="Follow system"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="links"
           >
-            Auto
-          </button>
-          <button
-            type="button"
-            role="radio"
-            data-theme-set="light"
-            aria-checked="false"
-            title="Light"
-          >
-            Light
-          </button>
-          <button
-            type="button"
-            role="radio"
-            data-theme-set="dark"
-            aria-checked="false"
-            title="Dark"
-          >
-            Dark
+            <svg><use href="#i-menu" /></svg>
           </button>
         </div>
-        <a class="ghost hide-sm" href="https://github.com/wiluszdamian/project-cue">GitHub</a>
       </div>
     </header>
 
@@ -1337,7 +1910,7 @@
         <!-- ======== Hero ======== -->
         <section class="hero">
           <div class="stack">
-            <span class="label">Cue · for Playwright teams with AI agents</span>
+            <span class="label">For Playwright teams with AI agents</span>
             <h1>
               Your agent knows Playwright. <span class="soft">It doesn't know your app.</span>
             </h1>
@@ -1345,60 +1918,86 @@
               Cue gives it its cues: your team's testing rules as ESLint rules it can't talk past,
               and a map of the routes and selectors your application really has.
             </p>
-            <div class="stack" style="gap: 14px">
+            <div class="cta-row">
               <div class="install">
                 <code id="cmd-install">npx @wiluszdamian/cue-cli init</code>
-                <button class="copy" type="button" data-copy="cmd-install">Copy</button>
+                <button
+                  class="copy"
+                  type="button"
+                  data-copy="cmd-install"
+                  aria-label="Copy install command"
+                >
+                  <svg class="i-copy"><use href="#i-copy" /></svg
+                  ><svg class="i-check"><use href="#i-check" /></svg>
+                </button>
               </div>
-              <div class="meta-row">
-                <span>Node 22.13+</span><span>MIT</span><span>Runs locally</span
-                ><a href="#docs-quickstart">Quickstart →</a
-                ><a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli">npm ↗</a>
-              </div>
+              <button
+                class="prompt-btn"
+                type="button"
+                data-copy="agent-line"
+                aria-describedby="agent-line"
+              >
+                <span class="agents-stack" aria-hidden="true">
+                  <span title="Claude"
+                    ><svg><use href="#i-claude" /></svg
+                  ></span>
+                  <span title="Codex"
+                    ><svg><use href="#i-codex" /></svg
+                  ></span>
+                  <span title="Cursor"
+                    ><svg><use href="#i-cursor" /></svg
+                  ></span>
+                </span>
+                <span class="idle-text">Copy prompt</span
+                ><span class="done-text">Copied, paste it in</span>
+                <span class="prompt-peek" id="agent-line" role="tooltip"
+                  >Set up Cue in this Playwright project: run npx @wiluszdamian/cue-cli init, show
+                  me the plan before writing anything, then run npx @wiluszdamian/cue-cli doctor and
+                  fix what it reports.</span
+                >
+              </button>
             </div>
-            <div class="handoff">
-              <span class="label">Or hand your agent this line</span>
-              <p id="agent-line">
-                Set up Cue in this Playwright project: run npx @wiluszdamian/cue-cli init, show me
-                the plan before writing anything, then run npx @wiluszdamian/cue-cli doctor and fix
-                what it reports.
-              </p>
-              <button class="linkish" type="button" data-copy="agent-line">Copy the line</button>
+            <div class="meta-row">
+              <span>Node 22.13+</span><span>MIT</span><span>Runs locally</span
+              ><a href="#docs-quickstart">Quickstart →</a>
             </div>
           </div>
 
           <div
-            class="console"
-            id="console"
-            aria-label="Example session: Cue being installed, surveying a page, and blocking a bad test"
+            class="term"
+            id="hero-term"
+            aria-label="Example terminal session: installing Cue, surveying a page, and ESLint blocking a hard wait"
           >
-            <div class="console-head">
-              <span class="lamp" id="console-lamp" aria-hidden="true"></span>
-              <span class="state" id="console-state">Standby</span>
-              <span>Calling the show</span>
-              <span class="spacer"></span>
-              <button type="button" id="replay">Replay</button>
+            <div class="term-bar">
+              <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="term-title">~/shop-e2e — zsh</span>
+              <span class="term-side">
+                <span class="cue-pill" id="cue-pill"
+                  ><i></i><span id="cue-state">standby</span></span
+                >
+                <button type="button" id="replay" aria-label="Replay the terminal session">
+                  Replay
+                </button>
+              </span>
             </div>
             <!-- prettier-ignore -->
-            <div class="script" id="script">
-        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 1.</span></div>
-        <div class="ln"><span class="who">$</span><span>npx @wiluszdamian/cue-cli init</span></div>
-        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 1, go.</span></div>
-        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  AGENTS.md</span></div>
-        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  eslint.config.mjs</span></div>
-        <div class="ln"><span class="who"></span><span><span class="ok">create</span>  .agent-kb/</span></div>
-        <div class="ln"><span class="who"></span><span><span class="d">SKIP</span>    playwright.config.ts <span class="d">yours, left alone</span></span></div>
-        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 2.</span></div>
-        <div class="ln"><span class="who">$</span><span>cue survey http://localhost:3000/login</span></div>
-        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 2, go.</span></div>
-        <div class="ln"><span class="who"></span><span><span class="d">/login  button</span> <span class="hl">getByRole('button', { name: 'Log in' })</span></span></div>
-        <div class="ln call standby" data-cue="standby"><span class="who">SM</span><span class="txt">Standby cue 3.</span></div>
-        <div class="ln"><span class="who">you</span><span>write a test for a locked-out login</span></div>
-        <div class="ln call go" data-cue="go"><span class="who">SM</span><span class="txt">Cue 3, go.</span></div>
-        <div class="ln"><span class="who"></span><span><span class="bad">✗ no-hard-waits</span> <span class="d">waitForTimeout waits on the clock,</span></span></div>
-        <div class="ln"><span class="who"></span><span><span class="d">  not on the app. Use await expect(locator)…</span></span></div>
-        <div class="ln"><span class="who"></span><span><span class="ok">✓ rewritten · eslint: 0 problems</span></span></div>
-      </div>
+            <pre class="term-body" id="hero-screen"><span class="t-prompt">❯</span> <span class="t-cmd">npx @wiluszdamian/cue-cli init</span>
+<span class="t-dim">Detected: claude-code, cursor</span>
+  <span class="t-ok">create</span>  AGENTS.md
+  <span class="t-ok">create</span>  eslint.config.mjs
+  <span class="t-ok">create</span>  .agent-kb/
+  <span class="t-warn">skip</span>    playwright.config.ts <span class="t-dim">yours, left alone</span>
+<span class="t-hl">?</span> Apply this plan? <span class="t-ok">yes</span>
+
+<span class="t-prompt">❯</span> <span class="t-cmd">cue survey http://localhost:3000/login</span>
+<span class="t-ok">✓</span> /login <span class="t-dim">4 elements recorded</span>
+  button <span class="t-hl">getByRole('button', { name: 'Log in' })</span>
+
+<span class="t-prompt">❯</span> <span class="t-cmd">npx eslint tests/login.spec.ts</span>
+<span class="t-errline"><span class="t-dim">14:3</span>  <span class="t-bad">error</span>  no-hard-waits</span>
+  <span class="t-dim">waitForTimeout waits on the clock, not on the app.</span>
+  <span class="t-dim">Use</span> <span class="t-ok">await expect(locator).toBeVisible()</span>
+<span class="t-bad">✗ 1 problem</span> <span class="t-dim">· agent rewrites the wait</span> <span class="t-ok">✓ 0 problems</span></pre>
           </div>
         </section>
 
@@ -1505,16 +2104,25 @@
               what to write instead, because "violates rule" teaches an agent to route around it and
               naming the replacement teaches it to fix the test.
             </p>
-            <pre class="lint"><span class="d">tests/checkout.spec.ts</span>
-  <span class="d">14:3</span>  <span class="bad">error</span>  <span class="hl">no-hard-waits</span>
+            <div class="term">
+              <div class="term-bar">
+                <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span
+                ><span class="term-title">npx eslint tests/</span>
+              </div>
+              <!-- prettier-ignore -->
+              <pre class="term-body"><span class="t-prompt">❯</span> <span class="t-cmd">npx eslint tests/</span>
+
+<span class="t-hl">tests/checkout.spec.ts</span>
+<span class="t-errline">  <span class="t-dim">14:3</span>  <span class="t-bad">error</span>  no-hard-waits</span>
 
   waitForTimeout waits on the clock, not on the app. Wait on the
   state you actually care about with a web-first assertion, which
-  retries until the condition holds: <span class="ok">await expect(locator).toBeVisible()</span>,
-  <span class="ok">.toHaveText()</span>, <span class="ok">.toBeEnabled()</span>. For a network round-trip, use
-  <span class="ok">await page.waitForResponse(...)</span>.
+  retries until the condition holds: <span class="t-ok">await expect(locator).toBeVisible()</span>,
+  <span class="t-ok">.toHaveText()</span>, <span class="t-ok">.toBeEnabled()</span>. For a network round-trip, use
+  <span class="t-ok">await page.waitForResponse(...)</span>.
 
-<span class="bad">✗ 1 problem</span></pre>
+<span class="t-bad">✗ 1 problem</span></pre>
+            </div>
             <div class="stack" style="gap: 10px">
               <span class="label">Eleven rules, ten enforced automatically</span>
               <ul class="rule-list">
@@ -1551,15 +2159,22 @@
               against your source. Every entry can answer one question: why does Cue believe this?
             </p>
             <div class="two">
-              <pre class="lint"><span class="d">$ cue locator "Log in" --route /login</span>
+              <div class="term">
+                <div class="term-bar">
+                  <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span
+                  ><span class="term-title">cue locator</span>
+                </div>
+                <!-- prettier-ignore -->
+                <pre class="term-body"><span class="t-prompt">❯</span> <span class="t-cmd">cue locator "Log in" --route /login</span>
 
-Route:      /login
-Locator:    <span class="hl">getByRole('button', { name: 'Log in' })</span>
-Test id:    login-submit
-Confidence: <span class="ok">confirmed</span>
+<span class="t-dim">Route:</span>      /login
+<span class="t-dim">Locator:</span>    <span class="t-hl">getByRole('button', { name: 'Log in' })</span>
+<span class="t-dim">Test id:</span>    login-submit
+<span class="t-dim">Confidence:</span> <span class="t-ok">confirmed</span>
             Present in the product source
             and seen running.
-Freshness:  <span class="ok">fresh</span></pre>
+<span class="t-dim">Freshness:</span>  <span class="t-ok">fresh</span></pre>
+              </div>
               <div class="stack" style="gap: 14px; align-content: start">
                 <p>
                   <strong>Confidence</strong> says whether a locator was confirmed in source and at
@@ -1756,23 +2371,73 @@ Freshness:  <span class="ok">fresh</span></pre>
           <h2>Places, please.</h2>
           <div class="install">
             <code id="cmd-install-2">npx @wiluszdamian/cue-cli init</code>
-            <button class="copy" type="button" data-copy="cmd-install-2">Copy</button>
+            <button
+              class="copy"
+              type="button"
+              data-copy="cmd-install-2"
+              aria-label="Copy install command"
+            >
+              <svg class="i-copy"><use href="#i-copy" /></svg
+              ><svg class="i-check"><use href="#i-check" /></svg>
+            </button>
           </div>
           <p style="color: var(--pencil)">A plan first. Nothing written until you say yes.</p>
         </section>
       </main>
 
-      <footer>
-        <div class="page">
-          <span>Cue · MIT licensed · Built on Playwright, not affiliated with Microsoft</span>
-          <nav aria-label="Footer">
-            <a href="https://github.com/wiluszdamian/project-cue">GitHub</a>
-            <a href="#docs">Docs</a>
-            <a href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md"
-              >Changelog</a
-            >
-            <a href="https://www.npmjs.com/package/@wiluszdamian/cue-cli">npm</a>
+      <footer class="site-foot">
+        <div class="page foot-grid">
+          <div class="foot-brand">
+            <svg viewBox="0 0 94 32" role="img" aria-label="Cue"><use href="#cue-logo" /></svg>
+            <p>Playwright rules and an app map for AI agents. Open source, MIT licensed.</p>
+            <p class="author">
+              Authored by
+              <a href="https://github.com/wiluszdamian" target="_blank" rel="noopener noreferrer"
+                >Damian Wilusz</a
+              >
+            </p>
+          </div>
+          <nav aria-label="Product">
+            <span class="foot-h">Product</span>
+            <a href="#running-order">How it works</a>
+            <a href="#rules">Rules</a>
+            <a href="#map">App map</a>
+            <a href="#faq">FAQ</a>
           </nav>
+          <nav aria-label="Docs">
+            <span class="foot-h">Docs</span>
+            <a href="#docs-quickstart">Quickstart</a>
+            <a href="#docs-commands">Commands</a>
+            <a href="#docs-rules">Rules reference</a>
+          </nav>
+          <nav aria-label="Project">
+            <span class="foot-h">Project</span>
+            <a
+              href="https://github.com/wiluszdamian/project-cue"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub ↗</a
+            >
+            <a
+              href="https://www.npmjs.com/package/@wiluszdamian/cue-cli"
+              target="_blank"
+              rel="noopener noreferrer"
+              >npm ↗</a
+            >
+            <a
+              href="https://github.com/wiluszdamian/project-cue/blob/main/CHANGELOG.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Changelog ↗</a
+            >
+          </nav>
+        </div>
+        <div class="page foot-bottom">
+          <span>© 2026 Cue</span>
+          <span
+            >Built on Playwright. Not affiliated with Microsoft, Anthropic, OpenAI or
+            Anysphere.</span
+          >
         </div>
       </footer>
     </div>
@@ -2459,6 +3124,8 @@ await expect(checkout.confirmation).toBeVisible();</code></pre>
           var inDocs = hash === 'docs' || hash.indexOf('docs-') === 0;
           landing.hidden = inDocs;
           docs.hidden = !inDocs;
+          var dl = document.querySelector('[data-docs-link]');
+          if (dl) dl.classList.toggle('current', inDocs);
           if (inDocs) {
             showPage(hash.slice(5));
             window.scrollTo(0, 0);
@@ -2520,14 +3187,11 @@ await expect(checkout.confirmation).toBeVisible();</code></pre>
           btn.addEventListener('click', function () {
             var el = document.getElementById(btn.getAttribute('data-copy'));
             var text = el.textContent.replace(/\s+/g, ' ').trim();
-            var label = btn.textContent;
             var done = function () {
-              btn.textContent = 'Copied';
               btn.classList.add('done');
               setTimeout(function () {
-                btn.textContent = label;
                 btn.classList.remove('done');
-              }, 1600);
+              }, 1800);
             };
             try {
               navigator.clipboard.writeText(text).then(done, function () {
@@ -2572,57 +3236,114 @@ await expect(checkout.confirmation).toBeVisible();</code></pre>
           });
         }
 
-        // Calling the show: the cue light holds red on a standby and goes green
-        // on the go, while the script advances line by line.
-        var consoleEl = document.getElementById('console');
-        var lines = Array.prototype.slice.call(document.querySelectorAll('#script .ln'));
-        var lamp = document.getElementById('console-lamp');
-        var barLamp = document.getElementById('bar-lamp');
-        var state = document.getElementById('console-state');
+        // Hero terminal: commands type out, output lands line by line, and the cue
+        // light holds on standby while a command is typed and goes green when it runs.
+        var screen = document.getElementById('hero-screen');
+        var bar = document.getElementById('bar');
+        var pill = document.getElementById('cue-pill');
+        var pillText = document.getElementById('cue-state');
+        var finalHtml = screen.innerHTML;
+        var lines = finalHtml.split('\n');
+        var CARET = '<span class="caret" aria-hidden="true"></span>';
+        var PROMPT = '<span class="t-prompt">❯</span> ';
         var timer = null;
 
-        function setLight(cue) {
-          var go = cue === 'go';
-          lamp.classList.toggle('go', go);
-          barLamp.classList.toggle('go', go);
-          state.textContent = go ? 'Go' : 'Standby';
+        function setCue(go) {
+          pill.classList.toggle('go', go);
+          bar.classList.toggle('go', go);
+          pillText.textContent = go ? 'go' : 'standby';
         }
 
-        function run() {
+        function play() {
           clearTimeout(timer);
-          consoleEl.classList.add('running');
-          lines.forEach(function (l) {
-            l.classList.remove('on', 'now');
-          });
-          setLight('standby');
+          screen.style.minHeight = screen.offsetHeight + 'px';
+          var done = [];
           var i = 0;
-          (function step() {
-            if (i > 0) lines[i - 1].classList.remove('now');
+          setCue(false);
+          (function nextLine() {
             if (i >= lines.length) {
-              timer = setTimeout(function () {
-                consoleEl.classList.remove('running');
-              }, 400);
+              screen.innerHTML = done.join('\n') + '\n\n' + PROMPT + CARET;
+              setCue(true);
               return;
             }
-            var line = lines[i];
-            line.classList.add('on', 'now');
-            var cue = line.getAttribute('data-cue');
-            if (cue) setLight(cue);
-            i++;
-            var wait = cue === 'standby' ? 1100 : cue === 'go' ? 520 : 300;
-            timer = setTimeout(step, wait);
+            var line = lines[i++];
+            var cmd = line.match(/<span class="t-cmd">([^<]*)<\/span>/);
+            if (cmd) {
+              setCue(false);
+              var text = cmd[1];
+              var n = 0;
+              (function typeChar() {
+                var typed = text.slice(0, n);
+                screen.innerHTML =
+                  (done.length ? done.join('\n') + '\n' : '') +
+                  PROMPT +
+                  '<span class="t-cmd">' +
+                  typed +
+                  '</span>' +
+                  CARET;
+                if (n++ < text.length) {
+                  timer = setTimeout(typeChar, 22 + Math.random() * 40);
+                } else {
+                  done.push(line);
+                  timer = setTimeout(function () {
+                    setCue(true);
+                    nextLine();
+                  }, 380);
+                }
+              })();
+            } else {
+              done.push(line);
+              screen.innerHTML = done.join('\n') + CARET;
+              timer = setTimeout(nextLine, line.trim() === '' ? 420 : 120);
+            }
           })();
         }
 
         document.getElementById('replay').addEventListener('click', function () {
-          if (reduced) return;
-          run();
+          if (!reduced) play();
         });
-
         if (reduced) {
-          setLight('go');
+          setCue(true);
         } else {
-          setTimeout(run, 700);
+          setTimeout(play, 500);
+        }
+
+        // Navbar: hairline once scrolled, a menu on small screens, and the
+        // current section underlined.
+        function onScroll() {
+          bar.classList.toggle('scrolled', window.scrollY > 8);
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        var menuBtn = document.getElementById('menu-btn');
+        var linksEl = document.getElementById('links');
+        menuBtn.addEventListener('click', function () {
+          var open = linksEl.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', String(open));
+        });
+        linksEl.addEventListener('click', function (ev) {
+          if (ev.target.closest('a')) {
+            linksEl.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+        var navLinksTop = Array.prototype.slice.call(linksEl.querySelectorAll('a'));
+        if ('IntersectionObserver' in window) {
+          var spy = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                navLinksTop.forEach(function (a) {
+                  a.classList.toggle('current', a.getAttribute('href') === '#' + entry.target.id);
+                });
+              });
+            },
+            { rootMargin: '-45% 0px -50% 0px' },
+          );
+          ['running-order', 'rules', 'map', 'who', 'faq'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) spy.observe(el);
+          });
         }
       })();
     </script>
