@@ -8,6 +8,8 @@ import {
   parseRawSnapshot,
   readAllRouteMapsWithErrors,
   recordLiveCheck,
+  SURVEY_STALE_COMMAND,
+  surveyCommand,
   UnsupportedSnapshotFormatError,
   writeRouteMap,
   type FileStateProvider,
@@ -311,6 +313,10 @@ const LIVE_WORDS: Record<LiveOutcome, string> = {
 
 function resultLines(report: VerifyReport): string[] {
   const { counts } = report;
+  // The routes that need another look, so the advice can name them.
+  const drifted = report.routes
+    .filter((route) => route.live === 'drifted' || route.live === 'unreachable')
+    .map((route) => route.route);
   switch (report.overall) {
     case 'PASS':
       return ['PASS — every route was checked against the running application and still matches.'];
@@ -321,10 +327,10 @@ function resultLines(report: VerifyReport): string[] {
           ? `${String(counts.liveSkipped)} route(s) were not checked; nothing is claimed about them.`
           : '',
         counts.stale > 0
-          ? `${String(counts.stale)} route(s) are stale. Re-survey them: understudy survey <url>`
+          ? `${String(counts.stale)} route(s) are stale. Re-survey them: ${SURVEY_STALE_COMMAND}`
           : '',
         counts.possiblyStale > 0
-          ? `${String(counts.possiblyStale)} route(s) were read from code that has changed since. Check them: understudy verify --base-url <url>`
+          ? `${String(counts.possiblyStale)} route(s) were read from code that has changed since. Re-survey them: ${SURVEY_STALE_COMMAND}`
           : '',
       ].filter((line) => line.length > 0);
     case 'NOT_VERIFIED':
@@ -335,7 +341,7 @@ function resultLines(report: VerifyReport): string[] {
     case 'FAIL':
       return [
         `FAIL — ${String(counts.drifted)} drifted, ${String(counts.unreachable)} unreachable, ${String(counts.invalid)} unreadable file(s).`,
-        'Re-survey the affected routes: understudy survey <url>',
+        `Re-survey what drifted: ${drifted.length > 0 ? surveyCommand(drifted.join(',')) : SURVEY_STALE_COMMAND}`,
       ];
     case 'EMPTY':
       return [

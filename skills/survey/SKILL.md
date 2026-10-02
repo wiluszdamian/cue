@@ -23,7 +23,10 @@ looks like when it is running.
 3. For each route, write `.agent-kb/app-map/<route>.yaml`: title, accessibility
    tree, verified selectors, outgoing links, `verifiedAt`, snapshot hash.
 4. Record multi-step journeys under `flows/` with their checkpoints.
-5. If `extract` has already run, flag any disagreement with
+5. To refresh rather than start over, survey only what needs it: `understudy survey --stale
+--base-url <url>` (or `--route <path>`, or `--affected-by <git range>`). Prefer that to a
+   full crawl; it names the pages and why before it opens any.
+6. If `extract` has already run, flag any disagreement with
    `.agent-kb/product/testids.yaml` — a selector present in one and not the other
    is a finding, not a detail.
 

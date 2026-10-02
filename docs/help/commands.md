@@ -65,6 +65,29 @@ Surveying a live page needs `@playwright/cli`. It is found in the project's
 `node_modules`, then on `PATH`; `--playwright-cli <path>` points at a specific copy.
 It is never run through a shell, so URLs with `&` or `%` arrive intact.
 
+#### Looking at some pages again
+
+You rarely need the whole app again. Name the pages, or let Understudy pick them:
+
+```bash
+npx @understudy/cli survey --route /login,/admin/settings/security --base-url http://localhost:3000
+npx @understudy/cli survey --stale --base-url http://localhost:3000
+npx @understudy/cli survey --affected-by main..HEAD --base-url http://localhost:3000 --source ../my-app
+npx @understudy/cli survey --stale --base-url http://localhost:3000 --dry-run
+```
+
+| Option                  | Chooses                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `--route <a,b>`         | The pages you name. They need not have been surveyed before.                                                                |
+| `--stale`               | Pages not confirmed for over a month, with an element that failed its last check, or read from code that has since changed. |
+| `--affected-by <range>` | Pages read from files that changed over this git range (needs `--source`).                                                  |
+| `--base-url <url>`      | Where the environment is (or set `UNDERSTUDY_BASE_URL`). Used to open pages; never saved.                                   |
+| `--dry-run`             | Show the plan and stop.                                                                                                     |
+
+It shows the plan first, with the reason for each page. A page with a parameter
+(`/items/[id]`) is skipped and says why: survey a real URL for it. One page failing does
+not stop the others; the run fails if any did. `--action` is not implemented yet.
+
 ### `understudy locator <description>`
 
 Look up how to point at something.

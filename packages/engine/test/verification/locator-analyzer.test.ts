@@ -158,7 +158,7 @@ describe('unknown', () => {
     expect(finding?.verdict).toBe('unknown');
     expect(finding?.nearest[0]?.expression).toContain('Log in');
     expect(finding?.suggestion).toContain('Nearest known');
-    expect(finding?.suggestion).toContain('understudy survey <url>/login');
+    expect(finding?.suggestion).toContain('understudy survey --route /login --base-url <url>');
   });
 
   it('flags an invented test id', () => {
