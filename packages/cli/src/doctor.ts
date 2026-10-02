@@ -1,3 +1,4 @@
+import { hasOverlayImport, OVERLAY_PATH, wiringLines, ESLINT_CONFIGS } from './eslint-overlay.js';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { judgeVersions, type Rules } from '@wiluszdamian/cue-engine';
@@ -64,14 +65,6 @@ function dependencyNames(pkg: Record<string, unknown> | undefined): Set<string> 
   }
   return names;
 }
-
-const ESLINT_CONFIGS = [
-  'eslint.config.js',
-  'eslint.config.mjs',
-  'eslint.config.cjs',
-  'eslint.config.ts',
-  'eslint.config.mts',
-];
 
 // --------------------------------------------------------------------- checks
 
@@ -147,6 +140,20 @@ function checkEslintWired(ctx: DoctorContext): CheckResult {
   }
 
   const content = readFileSync(join(ctx.projectRoot, config), 'utf8');
+
+  // The overlay is Cue's; the import of it is the one thing of ours in the user's config.
+  // Doctor says what to paste and does not write it.
+  if (existsSync(join(ctx.projectRoot, OVERLAY_PATH)) && !hasOverlayImport(content)) {
+    if (!content.includes('@wiluszdamian/cue-eslint-plugin')) {
+      return {
+        id: 'eslint-config',
+        title: 'ESLint preset wired up',
+        status: 'error',
+        detail: `${config} does not import ${OVERLAY_PATH}, so no rule is enforced.`,
+        fix: `Add to ${config}:  ${wiringLines()}`,
+      };
+    }
+  }
   if (!content.includes('@wiluszdamian/cue-eslint-plugin') && !content.includes('cue')) {
     return {
       id: 'eslint-config',

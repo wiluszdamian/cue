@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { adoptOwner } from '@wiluszdamian/cue-engine';
 import { z } from 'zod';
 import { TARGET_IDS, type TargetId } from './agents.js';
 
@@ -106,6 +107,7 @@ export function writeManifest(projectRoot: string, manifest: Manifest): void {
     updatedAt: new Date().toISOString(),
   };
   writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`, 'utf8');
+  adoptOwner(file, projectRoot);
 }
 
 export type FileState =

@@ -139,6 +139,7 @@ describe('init', () => {
 
     const result = runInit(initOptions(), prepared);
     expect(result.written).toContain('AGENTS.md');
+    expect(result.written).toContain('eslint.cue.mjs');
     expect(result.written).toContain('eslint.config.mjs');
   });
 
@@ -162,25 +163,25 @@ describe('init', () => {
     expect(readFileSync(join(root, 'AGENTS.md'), 'utf8')).toBe(before);
   });
 
-  it('never overwrites a file the user has edited', () => {
+  it('never overwrites a managed file the user has edited', () => {
     runInit(initOptions(), planInit(initOptions()));
 
-    const path = join(root, 'eslint.config.mjs');
+    const path = join(root, 'eslint.cue.mjs');
     writeFileSync(path, `${readFileSync(path, 'utf8')}\n// my own rule tweaks\n`);
 
     const prepared = planInit(initOptions());
-    const conflict = prepared.plan.files.find((f) => f.file.path === 'eslint.config.mjs');
+    const conflict = prepared.plan.files.find((f) => f.file.path === 'eslint.cue.mjs');
     expect(conflict?.action).toBe('conflict');
 
     const result = runInit(initOptions(), prepared);
-    expect(result.written).not.toContain('eslint.config.mjs');
+    expect(result.written).not.toContain('eslint.cue.mjs');
     expect(readFileSync(path, 'utf8')).toContain('// my own rule tweaks');
     expect(describePlan(prepared)).toContain('--force overrides');
   });
 
-  it('overwrites an edited file only when explicitly forced', () => {
+  it('overwrites an edited overlay only when explicitly forced', () => {
     runInit(initOptions(), planInit(initOptions()));
-    const path = join(root, 'eslint.config.mjs');
+    const path = join(root, 'eslint.cue.mjs');
     writeFileSync(path, '// replaced entirely\n');
 
     const options = initOptions({ force: true });
@@ -188,15 +189,42 @@ describe('init', () => {
     expect(readFileSync(path, 'utf8')).toContain('@wiluszdamian/cue-eslint-plugin');
   });
 
-  it('leaves a foreign file at a path it wanted alone', () => {
-    writeFileSync(join(root, 'eslint.config.mjs'), '// pre-existing config\n');
+  it('creates the user config once, importing the overlay, and never tracks it', () => {
+    runInit(initOptions(), planInit(initOptions()));
+    const config = readFileSync(join(root, 'eslint.config.mjs'), 'utf8');
+    expect(config).toContain("import cue from './eslint.cue.mjs'");
+    expect(config).toContain('...cue,');
+    expect(readManifest(root)?.files.map((f) => f.path)).not.toContain('eslint.config.mjs');
+  });
 
-    const prepared = planInit(initOptions());
-    const occupied = prepared.plan.files.find((f) => f.file.path === 'eslint.config.mjs');
-    expect(occupied?.action).toBe('occupied');
+  it('keeps a customised user config through init --force and sync', () => {
+    runInit(initOptions(), planInit(initOptions()));
+    const path = join(root, 'eslint.config.mjs');
+    const custom = `${readFileSync(path, 'utf8')}// tests/unit exceptions\n`;
+    writeFileSync(path, custom);
 
-    runInit(initOptions(), prepared);
-    expect(readFileSync(join(root, 'eslint.config.mjs'), 'utf8')).toBe('// pre-existing config\n');
+    const options = initOptions({ force: true });
+    runInit(options, planInit(options));
+    expect(readFileSync(path, 'utf8')).toBe(custom);
+  });
+
+  it('wires the overlay into an existing config with one import and one spread', () => {
+    const existing = `import js from '@eslint/js';\n\nexport default [\n  js.configs.recommended,\n  { rules: { semi: 'error' } },\n];\n`;
+    writeFileSync(join(root, 'eslint.config.mjs'), existing);
+
+    runInit(initOptions(), planInit(initOptions()));
+    const config = readFileSync(join(root, 'eslint.config.mjs'), 'utf8');
+    expect(config).toContain("import cue from './eslint.cue.mjs';");
+    expect(config.indexOf('...cue,')).toBeLessThan(config.indexOf('js.configs.recommended'));
+    expect(config).toContain("{ rules: { semi: 'error' } }");
+  });
+
+  it('leaves a config it cannot wire alone, for doctor to point at', () => {
+    const existing = '// pre-existing config\nexport default defineConfig([]);\n';
+    writeFileSync(join(root, 'eslint.config.mjs'), existing);
+
+    runInit(initOptions(), planInit(initOptions()));
+    expect(readFileSync(join(root, 'eslint.config.mjs'), 'utf8')).toBe(existing);
   });
 
   it('records everything it wrote in the manifest', () => {

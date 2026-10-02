@@ -116,6 +116,7 @@ export function runInit(options: InitOptions, prepared: InitPlan): InitResult {
   const result = apply(prepared.plan, {
     projectRoot: options.projectRoot,
     cueVersion: options.cueVersion,
+    wire: true,
     ...(options.force === true ? { force: true } : {}),
   });
 
