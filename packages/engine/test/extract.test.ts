@@ -156,6 +156,74 @@ describe('the Next.js adapter', () => {
   });
 });
 
+describe('the Next.js adapter, and a folder that is only called pages', () => {
+  const surfaceOf = (root: string) =>
+    nextAdapter.extract({ files: scanSource(root).files }).surface?.map((entry) => entry.path) ??
+    [];
+
+  function repo(files: Record<string, string>): string {
+    const root = mkdtempSync(join(tmpdir(), 'understudy-next-'));
+    for (const [path, text] of Object.entries(files)) write(root, path, text);
+    return root;
+  }
+
+  it('does not turn a test suite’s page objects into routes', () => {
+    const root = repo({
+      'pages/login-page.ts': 'export class LoginPage {}\n',
+      'pages/items-page.ts': 'export class ItemsPage {}\n',
+      'tests/a.spec.ts': 'export {};\n',
+    });
+    try {
+      expect(nextAdapter.detect({ files: scanSource(root).files })).toBe(false);
+      expect(surfaceOf(root)).toEqual([]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('reads the Pages Router when there is evidence the project is Next.js', () => {
+    for (const evidence of [
+      { 'next.config.js': 'module.exports = {};\n' },
+      { 'package.json': '{ "dependencies": { "next": "^14.0.0" } }\n' },
+    ]) {
+      const root = repo({
+        ...evidence,
+        'pages/index.tsx': 'x',
+        'pages/about.tsx': 'x',
+        'pages/api/hi.ts': 'x',
+      });
+      try {
+        expect(surfaceOf(root).sort()).toEqual(['/', '/about', '/api/hi']);
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
+    }
+  });
+
+  it('keeps to the Next.js project in a monorepo, and leaves the suite beside it alone', () => {
+    const root = repo({
+      'apps/web/next.config.mjs': 'export default {};\n',
+      'apps/web/pages/index.tsx': 'x',
+      'apps/web/pages/pricing.tsx': 'x',
+      'e2e/pages/login-page.ts': 'export class LoginPage {}\n',
+    });
+    try {
+      expect(surfaceOf(root).sort()).toEqual(['/', '/pricing']);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('still reads the App Router without a config, since page.tsx is Next’s own name', () => {
+    const root = repo({ 'app/settings/page.tsx': 'x', 'app/page.tsx': 'x' });
+    try {
+      expect(surfaceOf(root).sort()).toEqual(['/', '/settings']);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('the test-id adapter', () => {
   it('finds ids and points at the first place each is defined', () => {
     const ids = testIdAdapter.extract({ files: scanSource(product).files }).testIds ?? [];
