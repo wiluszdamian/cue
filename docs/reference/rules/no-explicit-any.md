@@ -13,7 +13,7 @@ _No explicit any_
 | Skill       | `strict-types` |
 | Applies to  | `**/*.ts`      |
 | Exempt      | `**/*.d.ts`    |
-| Since       | 0.8.0          |
+| Since       | 1.0.0          |
 
 ## Why
 

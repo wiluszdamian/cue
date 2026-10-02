@@ -13,7 +13,7 @@ _No hardcoded environment URLs_
 | Skill       | `harness`                                            |
 | Applies to  | `tests/**/*.ts`, `pages/**/*.ts`, `fixtures/**/*.ts` |
 | Exempt      | —                                                    |
-| Since       | 0.8.0                                                |
+| Since       | 1.0.0                                                |
 
 ## Why
 

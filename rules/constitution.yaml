@@ -43,7 +43,7 @@ rules:
       good: |
         await page.getByRole('button', { name: 'Submit' }).click();
         await expect(page.getByRole('status')).toHaveText('Saved');
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: web-first-assertions
@@ -73,7 +73,7 @@ rules:
     examples:
       bad: "expect(await page.locator('.total').textContent()).toBe('42');"
       good: "await expect(page.getByTestId('total')).toHaveText('42');"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: no-raw-selectors
@@ -107,7 +107,7 @@ rules:
     examples:
       bad: "page.locator('div.card > button.primary')"
       good: "page.getByRole('button', { name: 'Continue' })"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: no-locators-in-tests
@@ -135,7 +135,7 @@ rules:
     examples:
       bad: "await page.getByRole('button', { name: 'Log in' }).click();"
       good: 'await loginPage.logInButton.click();'
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: strict-zod-objects
@@ -163,7 +163,7 @@ rules:
     examples:
       bad: 'const User = z.object({ id: z.string() });'
       good: 'const User = z.strictObject({ id: z.string() });'
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: no-focused-tests
@@ -191,7 +191,7 @@ rules:
     examples:
       bad: "test.only('checkout succeeds', async () => {});"
       good: "test('checkout succeeds', async () => {});"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: skips-need-a-reason
@@ -221,7 +221,7 @@ rules:
       good: |
         // TODO(PROJ-1234) un-skip once the refund webhook is stubbed
         test.skip('refund flow', async () => {});
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: require-test-tags
@@ -250,7 +250,7 @@ rules:
     examples:
       bad: "test('user can log in', async ({ page }) => {});"
       good: "test('user can log in', { tag: ['@smoke', '@auth'] }, async ({ page }) => {});"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: no-explicit-any
@@ -277,7 +277,7 @@ rules:
     examples:
       bad: 'const body: any = await response.json();'
       good: 'const body = UserSchema.parse(await response.json());'
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: no-hardcoded-urls
@@ -305,7 +305,7 @@ rules:
     examples:
       bad: "await page.goto('https://staging.internal.acme.com/login');"
       good: "await page.goto('/login');"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null
 
   - id: selectors-from-agent-kb
@@ -341,5 +341,5 @@ rules:
     examples:
       bad: "page.getByTestId('submit-order-btn') // invented, not in .agent-kb"
       good: "page.getByTestId('checkout-submit') // .agent-kb/app-map/checkout.yaml:31"
-    since: '0.8.0'
+    since: '1.0.0'
     deprecated: null

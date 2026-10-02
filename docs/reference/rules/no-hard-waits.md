@@ -13,7 +13,7 @@ _No hard waits_
 | Skill       | `canon`          |
 | Applies to  | `**/*.ts`        |
 | Exempt      | `**/*.config.ts` |
-| Since       | 0.8.0            |
+| Since       | 1.0.0            |
 
 ## Why
 

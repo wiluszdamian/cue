@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Bakes rules/ and compatibility.yaml into the CLI, the same way rules/ is baked into
+ * Bakes rules/, compatibility.yaml and VERSION into the CLI, the same way rules/ is baked into
  * the ESLint plugin.
  *
  * `cue init` runs inside somebody else's repository, where there is no rules/
@@ -33,6 +33,7 @@ if (problems.length > 0) {
   process.exit(1);
 }
 const compatibility = loadCompatibility(join(repoRoot, 'compatibility.yaml'));
+const version = readFileSync(join(repoRoot, 'VERSION'), 'utf8').trim();
 
 const outputs = [
   {
@@ -72,6 +73,20 @@ import type { Compatibility } from '@wiluszdamian/cue-engine';
 export const COMPATIBILITY = ${JSON.stringify(compatibility, null, 2)} as unknown as Compatibility;
 `,
     summary: `${Object.keys(compatibility.tools).length} tools`,
+  },
+  {
+    file: 'version.ts',
+    source: `// GENERATED FILE — do not edit.
+//
+// Source:     VERSION
+// Regenerate: pnpm --filter @wiluszdamian/cue generate
+//
+// What \`cue --version\` prints and what \`init\` records in the manifest it writes.
+// Generated so a release bump cannot leave it behind.
+
+export const VERSION = ${JSON.stringify(version)};
+`,
+    summary: `version ${version}`,
   },
 ];
 

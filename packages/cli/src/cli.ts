@@ -58,8 +58,7 @@ import {
 } from '@wiluszdamian/cue-engine';
 import { checkExitCode, formatSyncReport, NotInstalledError, planSync, runSync } from './sync.js';
 import { getTarget, optionalTargets, TARGETS } from './targets/index.js';
-
-const VERSION = '0.8.0';
+import { VERSION } from './generated/version.js';
 
 const USAGE = `cue <command> [options]
 
@@ -279,14 +278,14 @@ async function main(): Promise<number> {
   const out = (text: string): void => void process.stdout.write(`${text}\n`);
   const err = (text: string): void => void process.stderr.write(`${text}\n`);
 
-  if (command === undefined || command === 'help' || flags['help'] !== undefined) {
-    out(USAGE);
-    return command === undefined ? 1 : 0;
-  }
-
   if (command === 'version' || flags['version'] !== undefined) {
     out(VERSION);
     return 0;
+  }
+
+  if (command === undefined || command === 'help' || flags['help'] !== undefined) {
+    out(USAGE);
+    return command === undefined ? 1 : 0;
   }
 
   const projectRoot = asString(flags['cwd']) ?? process.cwd();

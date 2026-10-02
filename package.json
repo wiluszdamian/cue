@@ -1,6 +1,6 @@
 {
   "name": "cue-monorepo",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "The Playwright framework your AI agent already knows by heart.",
