@@ -128,22 +128,22 @@ section. A workaround nobody is watching becomes permanent.
 
 ## Publishing
 
-A release is a tag, and CI does the rest. Never `npm publish`.
+A release is one manual workflow run, and nothing publishes by itself. Never `npm publish`.
 
-```bash
-pnpm release:bump 0.9.0          # VERSION, every package.json, the changelog heading
-pnpm generate                    # the pinned MCP version and plugin manifests follow VERSION
-git commit -am "release v0.9.0"
-git tag v0.9.0
-git push --follow-tags
-```
+Actions -> **release** -> Run workflow, on `main`, with the version (`0.9.0`, no leading `v`).
+`.github/workflows/release.yml` has no push, tag or schedule trigger. One run:
 
-`.github/workflows/release.yml` runs on the tag: `scripts/release.mjs check` fails unless the
-tag, `VERSION`, the changelog and every manifest say the same number; then build, `pnpm verify`,
-`pnpm -r publish` (the four public packages, together, with provenance) and a GitHub release
-whose notes are that version's changelog section. It needs the `NPM_TOKEN` secret. Run the
-workflow by hand with `dry_run` to rehearse everything but the upload; `pnpm release:dry` does
-the publish step locally.
+1. `scripts/release.mjs bump` sets `VERSION`, every `package.json` and the changelog heading;
+2. `pnpm generate` follows it (the pinned MCP version, the plugin manifests);
+3. `scripts/release.mjs check` fails unless the version, the changelog and every manifest agree;
+4. `pnpm verify`;
+5. commit `release v0.9.0` and tag `v0.9.0`;
+6. `pnpm -r publish` — the four public packages together, with provenance;
+7. only then push the commit and tag, and create the GitHub release from the changelog section.
+
+`dry_run` (on by default) does every step except the upload, the push and the release, so it
+can be rehearsed first. It needs the `NPM_TOKEN` secret, and permission to push to `main`.
+`pnpm release:dry` runs the publish step locally; `pnpm release:bump 0.9.0` does step 1 by hand.
 
 Two things make the npm path quietly wrong:
 

@@ -12,6 +12,13 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **Releases are one manual workflow run.** `.github/workflows/release.yml` (Run workflow, with a
+  version) sets the version everywhere, regenerates what follows it, checks that the version, the
+  changelog and every package agree, verifies, commits and tags, publishes the four public
+  packages to npm together with provenance, and creates the GitHub release from the changelog.
+  It has no push, tag or schedule trigger, and `dry_run` (the default) stops short of every step
+  that leaves the runner.
+
 - **Existing tests and page objects are read as evidence.** `extract` now records the role
   locators the suite already uses (with the page each was on) and the actions its page objects
   perform, in `.agent-kb/product/from-tests.yaml`. They load as `inferred` and cite the file,

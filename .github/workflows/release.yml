@@ -1,24 +1,32 @@
 name: release
 
-# Pushing a tag such as v0.9.0 publishes every public package to npm and creates the
-# GitHub release, in that order, from one commit. Prepare the commit with
-# `pnpm release:prepare 0.9.0`; the tag is then the only manual step.
+# Manual only: nothing here runs on a push, a tag or a schedule. Start it from
+# Actions -> release -> Run workflow, on main.
 #
-# Needs one secret: NPM_TOKEN, an npm automation token with publish rights on the
-# @wiluszdamian scope.
+# One run is the whole release: it sets the version everywhere, regenerates what is
+# derived from it, verifies, commits and tags, publishes the four public packages to
+# npm, and creates the GitHub release from the changelog. With dry_run on (the default)
+# it does every step except the ones that leave the runner: no commit is pushed, nothing
+# is uploaded, no release is created.
+#
+# Needs one secret, NPM_TOKEN: an npm automation token with publish rights on the
+# @wiluszdamian scope. Pushing to main needs the workflow to be allowed to bypass any
+# branch protection on it.
 
 on:
-  push:
-    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
   workflow_dispatch:
     inputs:
+      version:
+        description: The version to release, e.g. 0.9.0 or 1.0.0-rc.1 (no leading v)
+        type: string
+        required: true
       dry_run:
-        description: Run everything except the upload
+        description: Do everything except push, upload and create the release
         type: boolean
         default: true
 
 permissions:
-  contents: write
+  contents: write # the release commit, the tag and the GitHub release
   id-token: write # npm provenance: the package says which commit and workflow built it
 
 concurrency:
@@ -26,13 +34,16 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
+  release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
-      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      VERSION: ${{ inputs.version }}
+      DRY_RUN: ${{ inputs.dry_run }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
@@ -41,16 +52,35 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
 
-      # A tag that disagrees with the code publishes nothing. On a manual run there is no tag,
-      # so the version in the repository is the one that is checked.
-      - name: The tag, VERSION, changelog and every package agree
-        run: node scripts/release.mjs check "${TAG:-v$(cat VERSION)}"
+      - name: The tag must be new
+        run: |
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            echo "v${VERSION} already exists." >&2
+            exit 1
+          fi
+
+      - name: Set the version everywhere and date the changelog
+        run: node scripts/release.mjs bump "$VERSION"
 
       - run: pnpm run build
+      - name: Regenerate what follows the version (pinned MCP version, plugin manifests)
+        run: pnpm run generate
+
+      - name: The version, VERSION, changelog and every package agree
+        run: node scripts/release.mjs check "v${VERSION}"
+
       - name: Everything verified, generated files included
         run: pnpm run verify
         env:
           CI: 'true'
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release v${VERSION}"
+          git tag -a "v${VERSION}" -m "v${VERSION}"
 
       - name: Publish to npm
         run: |
@@ -63,13 +93,17 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
 
+      # After npm, so a failed publish leaves no tag behind that says it happened.
+      - name: Push the release commit and tag
+        if: inputs.dry_run != true
+        run: git push origin HEAD:main "v${VERSION}"
+
       - name: GitHub release
-        if: env.TAG != '' && env.DRY_RUN != 'true'
+        if: inputs.dry_run != true
         run: |
-          version="${TAG#v}"
-          node scripts/release.mjs notes "$version" > release-notes.md
+          node scripts/release.mjs notes "$VERSION" > release-notes.md
           flags=""
-          case "$version" in *-*) flags="--prerelease" ;; esac
-          gh release create "$TAG" --title "Cue $version" --notes-file release-notes.md --verify-tag $flags
+          case "$VERSION" in *-*) flags="--prerelease" ;; esac
+          gh release create "v${VERSION}" --title "Cue ${VERSION}" --notes-file release-notes.md --verify-tag $flags
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
