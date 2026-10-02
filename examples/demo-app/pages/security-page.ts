@@ -1,3 +1,4 @@
+// understudy-route: /admin/settings/security
 import type { Locator, Page } from '@playwright/test';
 
 export class SecurityPage {

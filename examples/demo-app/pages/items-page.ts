@@ -1,3 +1,4 @@
+// understudy-route: /items
 import type { Locator, Page } from '@playwright/test';
 
 export class ItemsPage {
