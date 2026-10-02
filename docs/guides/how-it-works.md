@@ -1,6 +1,6 @@
 # How it all fits together
 
-_The idea behind Understudy, in plain terms._
+_The idea behind Cue, in plain terms._
 
 ## The situation
 
@@ -12,7 +12,7 @@ What it doesn't know is two things:
 1. **How your team writes tests.** Which folder, which naming, which patterns.
 2. **What your app looks like.** Every button, every field, every page.
 
-Understudy supplies exactly those two, and deliberately nothing else.
+Cue supplies exactly those two, and deliberately nothing else.
 
 ## Why it doesn't teach you Playwright
 
@@ -22,10 +22,10 @@ There are already good sources for that:
 - **Playwright's browser tools**, for exploring a page.
 - **Community best-practice guides**, for the specialised corners.
 
-Understudy doesn't rewrite any of that. Their updates become your updates, for
+Cue doesn't rewrite any of that. Their updates become your updates, for
 free, and there's no second copy sitting here going stale.
 
-What Understudy adds is small, and it ages slowly.
+What Cue adds is small, and it ages slowly.
 
 ## The three pieces
 
@@ -56,9 +56,9 @@ disagree, something has to decide. Otherwise it picks one more or less at random
 ## The order things happen in
 
 ```
-Set up once          npx @understudy/cli init
+Set up once          npx @wiluszdamian/cue-cli init
      ↓
-Learn the app        npx @understudy/cli survey <url>
+Learn the app        npx @wiluszdamian/cue-cli survey <url>
      ↓
 Write tests          your assistant, or you
      ↓
@@ -78,7 +78,7 @@ That's the difference between a convention and a guarantee.
 
 ## What it deliberately won't do
 
-Understudy has opinions about tests. It has none about:
+Cue has opinions about tests. It has none about:
 
 - how features should be specified
 - how work should be split into tickets

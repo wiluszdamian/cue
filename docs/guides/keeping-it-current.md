@@ -11,7 +11,7 @@ Two commands handle it.
 ## Check whether the notes still match
 
 ```bash
-npx @understudy/cli verify --base-url http://localhost:3000
+npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000
 ```
 
 It revisits each page you have surveyed and compares. For each you get one of:
@@ -39,14 +39,14 @@ from the date alone; only a live check can say the app still looks that way.
 Where a page has drifted, survey it again:
 
 ```bash
-npx @understudy/cli survey http://localhost:3000/login
+npx @wiluszdamian/cue-cli survey http://localhost:3000/login
 ```
 
 In CI, `--ci` turns breakage into a failed build:
 
 ```bash
-npx @understudy/cli verify --base-url $STAGING_URL --ci
-npx @understudy/cli verify --base-url $STAGING_URL --ci=strict
+npx @wiluszdamian/cue-cli verify --base-url $STAGING_URL --ci
+npx @wiluszdamian/cue-cli verify --base-url $STAGING_URL --ci=strict
 ```
 
 The first fails only on `FAIL`; the second fails unless the verdict is `PASS`.
@@ -78,7 +78,7 @@ A route whose notes were read from a file that has since changed (or gone) is
 **possibly stale**, and the report names the file:
 
 ```bash
-npx @understudy/cli verify --base-url http://localhost:3000 --source ../my-app
+npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000 --source ../my-app
 ```
 
 Where the code lives is the place `extract` read it from, if that is still there, or
@@ -89,7 +89,7 @@ whatever happened to the source.
 To look only at what a change could have broken, give it the git range:
 
 ```bash
-npx @understudy/cli verify --base-url http://localhost:3000 --source ../my-app --affected-by main..HEAD
+npx @wiluszdamian/cue-cli verify --base-url http://localhost:3000 --source ../my-app --affected-by main..HEAD
 ```
 
 Only the routes read from a changed file are checked; the others are listed as not
@@ -97,19 +97,19 @@ checked, so the result is `PARTIAL` rather than a claim about the whole app.
 
 ## When the rules themselves change
 
-If Understudy updates, or your team changes a rule, your project's copy of the
+If Cue updates, or your team changes a rule, your project's copy of the
 house rules falls behind. This catches that:
 
 Report what has changed, without touching anything:
 
 ```bash
-npx @understudy/cli sync --check
+npx @wiluszdamian/cue-cli sync --check
 ```
 
 Show a diff and ask before writing:
 
 ```bash
-npx @understudy/cli sync
+npx @wiluszdamian/cue-cli sync
 ```
 
 `sync` never overwrites a file you have edited by hand. It reports it and leaves

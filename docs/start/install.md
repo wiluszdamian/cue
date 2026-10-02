@@ -1,6 +1,6 @@
 # Set it up
 
-_Add Understudy to a project in about five minutes._
+_Add Cue to a project in about five minutes._
 
 ## Before you start
 
@@ -10,7 +10,7 @@ You need [Node.js](https://nodejs.org) version 22 or newer. To check:
 node --version
 ```
 
-That's it. Understudy works with npm, pnpm, yarn and bun, and figures out which
+That's it. Cue works with npm, pnpm, yarn and bun, and figures out which
 one you use on its own.
 
 ## Run it
@@ -18,7 +18,7 @@ one you use on its own.
 From the folder your tests live in — or will live in:
 
 ```bash
-npx @understudy/cli init
+npx @wiluszdamian/cue-cli init
 ```
 
 It will:
@@ -27,7 +27,7 @@ It will:
 2. Show you a list of every file it wants to create, and why.
 3. Wait. **Nothing is written until you say yes.**
 
-If a file already exists and you've changed it, Understudy leaves it alone and
+If a file already exists and you've changed it, Cue leaves it alone and
 tells you. It never overwrites your work.
 
 ## What you get
@@ -40,11 +40,11 @@ tells you. It never overwrites your work.
 | `tests/`, `pages/`, `fixtures/` | Where things go, with a working example of each                   |
 | `.agent-kb/`                    | Where knowledge about your app will be stored                     |
 
-Already have a test suite and just want the rules? Use `--bare` and Understudy
+Already have a test suite and just want the rules? Use `--bare` and Cue
 will skip the folder layout.
 
 ```bash
-npx @understudy/cli init --bare
+npx @wiluszdamian/cue-cli init --bare
 ```
 
 ## Finish the setup
@@ -53,14 +53,14 @@ npx @understudy/cli init --bare
 Usually:
 
 ```bash
-npm install --save-dev @@understudy/cli/eslint-plugin understudy
+npm install --save-dev @understudy/eslint-plugin @wiluszdamian/cue-cli
 npx playwright install
 ```
 
 Then check everything landed:
 
 ```bash
-npx @understudy/cli doctor
+npx @wiluszdamian/cue-cli doctor
 ```
 
 ## Reading the doctor report
@@ -75,7 +75,7 @@ npx @understudy/cli doctor
 | `?`          | Couldn't check — usually you're offline. Not a pass and not a fail. |
 
 **Every problem comes with the exact command that fixes it.** If a line doesn't
-tell you what to run, that's a bug in Understudy — please report it.
+tell you what to run, that's a bug in Cue — please report it.
 
 ## Next
 

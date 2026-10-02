@@ -1,10 +1,10 @@
 # All the rules
 
-_Every rule Understudy checks, why it exists, and what to write instead._
+_Every rule Cue checks, why it exists, and what to write instead._
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-These are the rules Understudy owns outright. Everything else — how to drive the
+These are the rules Cue owns outright. Everything else — how to drive the
 browser, how to debug a test, how to handle Electron or i18n — belongs to another
 source; see [Who decides what](ownership.md) for who owns what.
 

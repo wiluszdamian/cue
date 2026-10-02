@@ -9,7 +9,7 @@
 # skill.
 #
 # The governing principle: every topic the constitution covers belongs to
-# Understudy unconditionally. Everything else is delegated on purpose. A topic
+# Cue unconditionally. Everything else is delegated on purpose. A topic
 # with no owner is a gap to fill in this file, never an invitation to improvise —
 # `whoOwns` says so explicitly rather than staying silent.
 #
@@ -18,9 +18,9 @@ schemaVersion: 1
 
 owners:
   - id: understudy
-    name: Understudy
+    name: Cue
     kind: internal
-    maintainer: The Understudy Authors
+    maintainer: The Cue Authors
     consult: >
       rules/constitution.yaml and docs/rules/. The ESLint plugin enforces it, so
       a disagreement here surfaces as a failing build, not as a style debate.
@@ -59,7 +59,7 @@ owners:
     maintainer: Currents Software Inc. (MIT)
     install: optional, chosen during `understudy init`
     consult: >
-      The owner of general Playwright practice — the areas Understudy has no
+      The owner of general Playwright practice — the areas Cue has no
       opinion about because someone else already maintains one.
 
   - id: external-process
@@ -67,9 +67,9 @@ owners:
     kind: external
     maintainer: Whoever runs your product process
     consult: >
-      Understudy has no opinion here and will not grow one. It rules on
+      Cue has no opinion here and will not grow one. It rules on
       testability and on the shape of a suite, never on a roadmap. Say the topic
-      is outside Understudy and hand it back to however your team already writes
+      is outside Cue and hand it back to however your team already writes
       specs, splits tickets, and reviews features — duplicating that is how a
       focused tool turns into a worse version of a general one.
 
@@ -234,7 +234,7 @@ topics:
     keywords: [playwright.config, project, parallel, shard, timeout, reporter option, webserver]
     note: >
       How the options work is theirs. Which values this repo uses is
-      Understudy's — see "fixtures, dependency injection and environment
+      Cue's — see "fixtures, dependency injection and environment
       configuration".
 
   # ------------------------------------------------------------ playwright-mcp
@@ -288,6 +288,6 @@ topics:
         review this feature,
       ]
     note: >
-      Deliberately not ours. Understudy rules on testability and on the shape of
+      Deliberately not ours. Cue rules on testability and on the shape of
       a suite; a tool that also claims the roadmap is a worse version of the
       general process tools your team already has. Say so and hand it back.

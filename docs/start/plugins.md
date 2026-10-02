@@ -1,32 +1,32 @@
 # Install for your assistant
 
-_Add Understudy as a plugin for Claude Code, Cursor, Codex, Grok, Gemini, OpenCode, or any agent that reads .agents/skills._
+_Add Cue as a plugin for Claude Code, Cursor, Codex, Grok, Gemini, OpenCode, or any agent that reads .agents/skills._
 
 The catalog of procedures can be installed as a **plugin**, so your assistant
 loads it the way it loads everything else — not as a folder of markdown you
 copied in.
 
-This is the light half of Understudy: the skills. It does not install the ESLint
+This is the light half of Cue: the skills. It does not install the ESLint
 preset that fails a build when a rule is broken. For that, [set the project
-up](./install.md) with `understudy init`.
+up](./install.md) with `cue init`.
 
 ## Claude Code
 
 ```bash
-/plugin marketplace add wiluszdamian/understudy
+/plugin marketplace add wiluszdamian/project-cue
 /plugin install understudy@understudy
 ```
 
 ## Cursor
 
-Add `wiluszdamian/understudy` as a plugin marketplace, then install **understudy**.
+Add `wiluszdamian/project-cue` as a plugin marketplace, then install **understudy**.
 Cursor also loads the same package as an [Agent Plugin](https://agent-plugins.org)
 from `plugins/understudy/plugin.json`.
 
 ## Codex
 
 ```bash
-codex plugin marketplace add wiluszdamian/understudy
+codex plugin marketplace add wiluszdamian/project-cue
 ```
 
 Then `/plugins` and install **understudy**. Codex also reads the repo marketplace
@@ -35,14 +35,14 @@ at `.agents/plugins/marketplace.json`.
 ## Grok
 
 ```bash
-grok plugin marketplace add wiluszdamian/understudy
+grok plugin marketplace add wiluszdamian/project-cue
 grok plugin install understudy --trust
 ```
 
 ## Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/wiluszdamian/understudy.git
+gemini extensions install https://github.com/wiluszdamian/project-cue.git
 ```
 
 ## OpenCode
@@ -51,7 +51,7 @@ OpenCode does not have a marketplace this package can publish to. It already
 reads `.opencode/skills/` and `.agents/skills/`:
 
 ```bash
-npx skills add wiluszdamian/understudy -a opencode
+npx skills add wiluszdamian/project-cue -a opencode
 ```
 
 ## .agents
@@ -59,7 +59,7 @@ npx skills add wiluszdamian/understudy -a opencode
 The same command, targeting the directory several agents share:
 
 ```bash
-npx skills add wiluszdamian/understudy -a universal
+npx skills add wiluszdamian/project-cue -a universal
 ```
 
 That lands in `.agents/skills/`. Codex, Cursor, Gemini CLI, OpenCode and others
