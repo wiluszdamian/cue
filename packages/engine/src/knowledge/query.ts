@@ -21,6 +21,7 @@ export type LocatorFact = FactOfKind<'locator'>;
 export type TestIdFact = FactOfKind<'test-id'>;
 export type ApiFact = FactOfKind<'api'>;
 export type TermFact = FactOfKind<'term'>;
+export type ActionFact = FactOfKind<'action'>;
 
 /**
  * Which sources have seen a locator — the question the older `.agent-kb` format
@@ -63,6 +64,7 @@ export interface KnowledgeIndex {
   byTestId(testId: string): (LocatorFact | TestIdFact)[];
   apis(): ApiFact[];
   terms(): TermFact[];
+  actions(): ActionFact[];
   fact(id: string): KnowledgeFact | undefined;
   evidenceFor(factId: string): KnowledgeEvidence[];
   coverage(fact: LocatorFact): Coverage;
@@ -110,6 +112,7 @@ export function indexKnowledge(kb: KnowledgeBase): KnowledgeIndex {
       ),
     apis: () => ofKind('api'),
     terms: () => ofKind('term'),
+    actions: () => ofKind('action'),
     fact: (id) => facts.get(id),
     evidenceFor,
 

@@ -234,3 +234,24 @@ function render(method: string, value: string | undefined, name: string | undefi
     ? `${method}(${quoted})`
     : `${method}(${quoted}, { name: '${name.replace(/'/g, "\\'")}' })`;
 }
+
+/** The route the test is on where `use` is written, and the evidence for saying so. */
+export function routeContextFor(use: LocatorUse, scan: TestSourceScan): string | undefined {
+  // Innermost function first: a goto in this test beats one further out.
+  for (const scope of use.scopes) {
+    const before = scan.navigations
+      .filter((nav) => nav.scopes[0] === scope && nav.offset < use.offset)
+      .at(-1);
+    if (before !== undefined) return pathFromTarget(before.target);
+  }
+  return scan.routeAnnotation === undefined ? undefined : pathFromTarget(scan.routeAnnotation);
+}
+
+export function pathFromTarget(target: string): string {
+  try {
+    return new URL(target).pathname || '/';
+  } catch {
+    const path = target.split(/[?#]/)[0] ?? target;
+    return path.startsWith('/') ? path : `/${path}`;
+  }
+}

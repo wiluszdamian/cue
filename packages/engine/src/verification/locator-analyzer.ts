@@ -1,8 +1,4 @@
-import {
-  scanTestSource,
-  type LocatorUse,
-  type TestSourceScan,
-} from '../agent-kb/extract-locators.js';
+import { routeContextFor, scanTestSource, type LocatorUse } from '../agent-kb/extract-locators.js';
 import { surveyCommand } from '../agent-kb/advice.js';
 import { routeToFilename } from '../agent-kb/snapshot/index.js';
 import {
@@ -132,27 +128,6 @@ const sameRoute = (a: string, b: string): boolean => routeToFilename(a) === rout
 
 /** `route:/login` → `/login` */
 const pathOf = (fact: LocatorFact): string => fact.route.replace(/^route:/, '');
-
-/** The route the test is on where `use` is written, and the evidence for saying so. */
-function routeContextFor(use: LocatorUse, scan: TestSourceScan): string | undefined {
-  // Innermost function first: a goto in this test beats one further out.
-  for (const scope of use.scopes) {
-    const before = scan.navigations
-      .filter((nav) => nav.scopes[0] === scope && nav.offset < use.offset)
-      .at(-1);
-    if (before !== undefined) return pathFromTarget(before.target);
-  }
-  return scan.routeAnnotation === undefined ? undefined : pathFromTarget(scan.routeAnnotation);
-}
-
-function pathFromTarget(target: string): string {
-  try {
-    return new URL(target).pathname || '/';
-  } catch {
-    const path = target.split(/[?#]/)[0] ?? target;
-    return path.startsWith('/') ? path : `/${path}`;
-  }
-}
 
 export function analyzeLocators(input: AnalyzeLocatorsInput): LocatorFinding[] {
   const { index, now } = input;
@@ -363,6 +338,8 @@ function standing(
   now: Date | undefined,
   codeChanged: boolean,
 ): 'known' | 'stale' | 'unverified' {
+  // Never confirmed is not the same as out of date: nobody has looked, so there is nothing to have aged.
+  if (fact.status === 'inferred' && fact.verifiedAt === undefined) return 'unverified';
   if (fact.status === 'stale' || index.freshness(fact, now) === 'stale' || codeChanged) {
     return 'stale';
   }

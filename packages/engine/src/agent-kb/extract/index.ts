@@ -6,7 +6,14 @@
  * overlap between the two is the only thing that earns the word `confirmed`.
  */
 
-export { ADAPTERS, i18nAdapter, nextAdapter, openApiAdapter, testIdAdapter } from './adapters.js';
+export {
+  ADAPTERS,
+  existingTestsAdapter,
+  i18nAdapter,
+  nextAdapter,
+  openApiAdapter,
+  testIdAdapter,
+} from './adapters.js';
 export type { Adapter, AdapterContext, AdapterResult } from './adapters.js';
 export { reference, scanSource, type ScanResult, type SourceFileRef } from './scan.js';
 export { extract, formatExtractResult, type ExtractOptions, type ExtractResult } from './run.js';

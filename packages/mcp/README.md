@@ -13,6 +13,7 @@ reachable output rather than against one sample.
 | `resolve_owner`   | which source of guidance governs a topic when several disagree     | 300 tokens                 |
 | `resolve_locator` | the real selector for an element, with freshness and confidence    | 350 tokens                 |
 | `resolve_route`   | a page: title, standing, freshness with reasons, elements, sources | 350 tokens                 |
+| `resolve_action`  | what a page object already does on a page, with its locators       | 350 tokens                 |
 | `resolve_api`     | endpoints matching a path, with the file each came from            | 350 tokens                 |
 | `get_evidence`    | why a fact is believed: source lines, surveys, tests               | 300 tokens                 |
 | `get_freshness`   | when a fact was confirmed, and what changed since                  | 250 tokens                 |

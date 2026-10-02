@@ -70,6 +70,8 @@ export {
 
 export {
   extractLocators,
+  pathFromTarget,
+  routeContextFor,
   scanTestSource,
   type LocatorUse,
   type Navigation,

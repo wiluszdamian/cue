@@ -6,6 +6,7 @@ import {
   getContext,
   getEvidence,
   getFreshness,
+  resolveAction,
   resolveApi,
   resolveLocatorTool,
   resolveOwner,
@@ -14,7 +15,7 @@ import {
 } from './tools.js';
 
 /**
- * The Understudy MCP server: nine tools, all read-only point lookups.
+ * The Understudy MCP server: ten tools, all read-only point lookups.
  *
  * What is not here matters as much — browser exploration goes through
  * `playwright-cli`, never through MCP. This server answers questions cheaply
@@ -117,6 +118,21 @@ export function createServer(context: ToolContext): McpServer {
       annotations: READ_ONLY,
     },
     ({ route }) => text(resolveRoute(context, route)),
+  );
+
+  server.registerTool(
+    'resolve_action',
+    {
+      title: 'Find what a page does',
+      description:
+        'What the project already does on a page, from its page objects: the action, the page, the locators it uses. Use before writing a helper, to reuse one that exists. Inferred until a survey agrees.',
+      inputSchema: {
+        action: z.string().describe('What it does, in a few words, e.g. "change password".'),
+        route: z.string().optional().describe('Restrict to one page, e.g. /settings.'),
+      },
+      annotations: READ_ONLY,
+    },
+    ({ action, route }) => text(resolveAction(context, action, route)),
   );
 
   server.registerTool(

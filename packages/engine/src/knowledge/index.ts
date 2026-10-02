@@ -52,6 +52,7 @@ export { KnowledgeBuilder } from './builder.js';
 export {
   coverageFrom,
   indexKnowledge,
+  type ActionFact,
   type ApiFact,
   type Coverage,
   type KnowledgeIndex,

@@ -123,6 +123,22 @@ It shows the plan first, with the reason for each page. A page with a parameter
 (`/items/[id]`) is skipped and says why: survey a real URL for it. One page failing does
 not stop the others; the run fails if any did. `--action` is not implemented yet.
 
+### `understudy extract --source <path>`
+
+Reads the product source into `.agent-kb/product`: test ids, routes, endpoints from an OpenAPI
+document, and the labels in translation catalogues (nested JSON and YAML keep their full dotted
+keys, such as `auth.login.submit`).
+
+It also reads the tests and page objects that are already there. Every `getByRole` with a plain
+role and name becomes a locator on the page the test was on, and each public page object method
+that uses locators becomes an action (`changePassword` is "change password"). All of it is
+recorded as **inferred**, citing the file and line: a test can be dead or failing, so it is
+evidence and not proof. A survey that sees the same element raises it; the tests alone never can.
+
+```bash
+npx @understudy/cli extract --source .
+```
+
 ### `understudy locator <description>`
 
 Look up how to point at something.
