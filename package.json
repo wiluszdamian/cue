@@ -27,7 +27,7 @@
     "skills:generate": "node packages/engine/scripts/generate-skills.mjs && node packages/engine/scripts/generate-plugins.mjs",
     "skills:check": "node packages/engine/scripts/generate-skills.mjs --check && node packages/engine/scripts/generate-plugins.mjs --check",
     "release:dry": "pnpm -r publish --dry-run --no-git-checks",
-    "release": "pnpm run verify && pnpm run generate && pnpm -r publish"
+    "release:bump": "node scripts/release.mjs bump"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

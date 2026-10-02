@@ -4,7 +4,7 @@ _Assert on locators, not on awaited values_
 
 <!-- GENERATED from rules/. Run `pnpm docs:generate`. Do not edit. -->
 
-|             |              |
+| Property    | Value        |
 | ----------- | ------------ |
 | Tier        | `MUST`       |
 | Severity    | `error`      |
