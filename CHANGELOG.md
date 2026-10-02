@@ -12,6 +12,12 @@ rather than deletion, and stay documented for one major cycle.
 
 ### Added
 
+- **`get_context`** (MCP) and **`understudy context "<task>"`**: one answer, at the start of a
+  task, with the page it is about, the matching elements, endpoints, vocabulary, the rules, and
+  how fresh each part is, inside a token budget the caller sets (200 to 3000). Retrieval is by
+  words, not a model, so the same task over the same notes gives the same answer. Trimming drops
+  a second page, vocabulary, endpoints and elements in that order, never the rules or the ages.
+
 - **Five MCP lookups over the knowledge base**: `resolve_route`, `resolve_api`, `get_evidence`,
   `get_freshness` and `find_knowledge`. Each answers from the same engine functions the CLI uses,
   has a token ceiling asserted over hits, misses and oversized input, and answers a miss with

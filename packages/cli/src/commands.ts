@@ -22,6 +22,7 @@ export const COMMANDS = [
   'verify',
   'verify-map',
   'locator',
+  'context',
   'uninstall',
 ] as const;
 

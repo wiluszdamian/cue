@@ -114,6 +114,24 @@ npx @understudy/cli locator "log in button"
 npx @understudy/cli locator "submit" --route /checkout
 ```
 
+### `understudy context <task>`
+
+What is known that bears on a task, in one answer that fits a token budget. The same
+answer the `get_context` tool gives an agent, which is what makes it useful for seeing what
+an agent was told.
+
+```bash
+npx @understudy/cli context "test changing the password"
+npx @understudy/cli context "add an item" --route /items --max-tokens 600
+```
+
+It picks the page the task is about, the elements on it that match, the endpoints and
+vocabulary it mentions, the rules a test must follow, and how recent each part is. Nothing
+is asked of a model: the same task over the same notes gives the same answer. When the
+budget is tight it drops a second page, then vocabulary, then endpoints, then elements, and
+never the rules or the ages. A task that matches nothing says `status: unknown` and what to
+run to find out. `--max-tokens` takes 200 to 3000 (default 1200).
+
 ### `understudy check`
 
 Check that the locators in your tests name things the notes know about.

@@ -24,6 +24,8 @@ import {
 } from './survey.js';
 import {
   changedFiles,
+  buildTaskContext,
+  cachedKnowledgeIndex,
   findProductRoot,
   indexKnowledge,
   loadKnowledge,
@@ -76,6 +78,7 @@ const USAGE = `understudy <command> [options]
   verify               check the map against the application (and say what was not checked)
   verify-map           old name for verify
   locator <element>    look up a selector, with freshness and confidence
+  context <task>       what is known that bears on a task, within a token budget
   uninstall            remove everything init installed
 
 Options
@@ -100,6 +103,7 @@ Options
   --source <path>      the product source: where discover and extract read from, and what verify
                        compares the map with
   --affected-by <range> check only the routes read from files changed over this git range (verify)
+  --max-tokens <n>     the budget for context (200 to 3000, default 1200)
   --route <path[,path]> restrict locator or verify to these routes (verify: the rest count as not checked);
                        with survey, the pages to look at again
   --stale              survey: the pages with something stale or read from changed code
@@ -579,6 +583,31 @@ async function main(): Promise<number> {
       );
       // An unknown element is a finding, not a crash: the output says which
       // route to survey.
+      return 0;
+    }
+
+    case 'context': {
+      const task = positional.join(' ');
+      if (task.length === 0) {
+        err('context needs a task, e.g. understudy context "test changing the password"');
+        return 2;
+      }
+      const rawBudget = asString(flags['max-tokens']);
+      const maxTokens = rawBudget === undefined ? undefined : Number(rawBudget);
+      if (maxTokens !== undefined && !Number.isInteger(maxTokens)) {
+        err('--max-tokens takes a whole number, e.g. --max-tokens 800');
+        return 2;
+      }
+      const productRoot = findProductRoot(projectRoot, asString(flags['source']));
+      out(
+        buildTaskContext(
+          cachedKnowledgeIndex(projectRoot),
+          resolveRules(projectRoot).constitution.rules,
+          { task, maxTokens, route: asString(flags['route']) },
+          { files: productRoot === undefined ? undefined : workingTreeFiles(productRoot) },
+        ).text,
+      );
+      // Not knowing is an answer, with its own next step in the text.
       return 0;
     }
 

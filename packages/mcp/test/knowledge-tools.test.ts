@@ -14,6 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   estimateTokens,
   findKnowledge,
+  getContext,
   getEvidence,
   getFreshness,
   loadContext,
@@ -303,5 +304,36 @@ describe('the context budget', () => {
         TOKEN_BUDGET.find_knowledge,
       );
     }
+  });
+});
+
+describe('get_context', () => {
+  const tasks = ['log in', 'sign in with email', 'reconcile the ledger', 'x'.repeat(5000)];
+
+  it('answers about the page the task names, from the same builder the CLI uses', () => {
+    const answer = getContext(context, 'log in with an email');
+    expect(answer).toContain('Applicable route: /login');
+    expect(answer).toContain('## Policy');
+  });
+
+  it('says unknown for a task nothing matches, and how to find out', () => {
+    const answer = getContext(context, 'reconcile the ledger');
+    expect(answer).toContain('status: unknown');
+    expect(answer).toContain('understudy survey --route');
+  });
+
+  it.each([300, 1200, 3000])('stays inside %i tokens, found or not', (maxTokens) => {
+    for (const task of tasks) {
+      expect(
+        estimateTokens(getContext(context, task, { maxTokens })),
+        task.slice(0, 20),
+      ).toBeLessThanOrEqual(maxTokens);
+    }
+  });
+
+  it('stays inside its own ceiling when asked for more than it offers', () => {
+    expect(
+      estimateTokens(getContext(context, 'log in', { maxTokens: 10 ** 9 })),
+    ).toBeLessThanOrEqual(TOKEN_BUDGET.get_context);
   });
 });

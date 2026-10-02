@@ -1,5 +1,8 @@
 import {
+  buildTaskContext,
   cachedKnowledgeIndex,
+  DEFAULT_CONTEXT_TOKENS,
+  describeEvidence,
   computeFreshness,
   findProductRoot,
   nameSimilarity,
@@ -65,16 +68,7 @@ function unknown(what: string, suggestion: string, extra: readonly string[] = []
   return ['status: unknown', what, ...extra, '', `suggested action: ${suggestion}`].join('\n');
 }
 
-function evidenceLine(item: KnowledgeEvidence): string {
-  const where =
-    item.file === undefined
-      ? [item.route, item.environment === undefined ? undefined : `(${item.environment})`]
-          .filter((part) => part !== undefined)
-          .join(' ')
-      : `${item.file}${item.line === undefined ? '' : `:${String(item.line)}`}`;
-  const when = item.observedAt === undefined ? '' : ` · ${item.observedAt.slice(0, 10)}`;
-  return `- ${item.type}${where === '' ? '' : ` ${where}`}${when}`;
-}
+const evidenceLine = (item: KnowledgeEvidence): string => `- ${describeEvidence(item)}`;
 
 function sourcesOf(index: KnowledgeIndex, fact: KnowledgeFact): string[] {
   const all = index.evidenceFor(fact.id);
@@ -322,4 +316,24 @@ export function findKnowledge(context: ToolContext, query: string, kind?: string
       ? [`…and ${String(hits.length - MAX_HITS)} more; narrow the query`]
       : []),
   ].join('\n');
+}
+
+// ---------------------------------------------------------------- get_context
+
+export function getContext(
+  context: ToolContext,
+  task: string,
+  options: { maxTokens?: number | undefined; route?: string | undefined } = {},
+  now: Date = new Date(),
+): string {
+  const productRoot = findProductRoot(context.projectRoot);
+  return buildTaskContext(
+    indexOf(context),
+    context.rules.constitution.rules,
+    { task, maxTokens: options.maxTokens ?? DEFAULT_CONTEXT_TOKENS, route: options.route },
+    {
+      now,
+      files: productRoot === undefined ? undefined : workingTreeFiles(productRoot),
+    },
+  ).text;
 }

@@ -207,6 +207,7 @@ describe('the server', () => {
     expect(registered).toEqual([
       'explain_rule',
       'find_knowledge',
+      'get_context',
       'get_evidence',
       'get_freshness',
       'resolve_api',

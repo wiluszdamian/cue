@@ -81,6 +81,19 @@ export * from './extract/index.js';
 export { cachedKnowledgeIndex, clearKnowledgeCache, findKnowledgeRoot } from './knowledge-cache.js';
 
 export {
+  buildTaskContext,
+  DEFAULT_CONTEXT_TOKENS,
+  describeEvidence,
+  estimateTokens,
+  MAX_CONTEXT_TOKENS,
+  MIN_CONTEXT_TOKENS,
+  stemsOf,
+  type TaskContext,
+  type TaskContextInput,
+  type TaskContextOptions,
+} from './task-context.js';
+
+export {
   changedFiles,
   findProductRoot,
   hashContent,
